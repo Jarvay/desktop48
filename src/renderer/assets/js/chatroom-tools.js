@@ -1,6 +1,7 @@
 import './48sdk/base-v2.8.0';
 import './48sdk/nim-v2.8.0';
 import Chatroom from './48sdk/chatroom-v2.8.0';
+import LiveApi from "./live-api";
 
 class ChatRoomTools {
     /**
@@ -10,11 +11,11 @@ class ChatRoomTools {
      */
     static chatroom(options){
         return new Promise((resolve, reject) => {
-            axios.get(Tools.API_URL + '/api/token').then(response => {
+            LiveApi.chatRoomToken().then(responseBody => {
                 const chatroom = new Chatroom({
                     appKey:'632feff1f4c838541ab75195d1ceb3fa',      //从官网公演直播网页代码获取
-                    account:response.data.data.account,
-                    token:response.data.data.token,
+                    account:responseBody.account,
+                    token:responseBody.token,
                     chatroomId:options.roomId,
                     chatroomAddresses:[
                         // '127.0.0.1:7272',

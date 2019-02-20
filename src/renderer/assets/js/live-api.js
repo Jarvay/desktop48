@@ -184,6 +184,26 @@ class LiveApi {
             });
         });
     }
+
+    static chatRoomToken(){
+        const cookieVal = '48web' + Math.random().toString(36).substr(2);
+        const body = {
+            timestamp:new Date().getTime(),
+            cookie_val:cookieVal,
+            type:2
+        };
+
+        const formData = new FormData();
+        formData.append('cookie_val', '48web_fdhdrdfgdfd');
+
+        return new Promise((resolve, reject) => {
+            axios.post('http://zhibo.ckg48.com/Server/do_ajax_setcookie', formData).then(response => {
+                resolve(response.data);
+            }).catch(error => {
+                reject(error);
+            });
+        });
+    }
 }
 
 
