@@ -1,0 +1,81 @@
+// Variables
+
+.navbar-laravel {
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+}
+
+#app {
+  width: 100%;
+  height: 540px;
+}
+
+.vjs-big-play-button {
+  display: none !important;
+}
+
+.vjs-error-display, .vjs-modal-dialog {
+  display: none;
+}
+
+div[id^="vjs_video_"] {
+  width: 400px;
+  height: 640px;
+}
+
+.layout {
+  border: 1px solid #d7dde4;
+  background: #f5f7f9;
+  position: relative;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.barrage {
+  font-size: 24px !important;
+  color: white
+}
+
+.ivu-carousel-track, .ivu-carousel-item {
+  display: flex !important;
+  justify-content: center;
+  align-items: center;
+  height: 640px;
+}
+
+.picture {
+  max-width: 400px;
+  max-height: 640px;
+}
+
+.player-container {
+  display: flex;
+}
+
+.video {
+  display: flex;
+  justify-content: center;
+  width: 400px;
+  height: 640px;
+}
+
+.barrage-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  .barrage-box {
+    flex: 1 0 auto;
+    height: 640px;
+  }
+}
+
+.team-badge {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  min-width: 32px;
+  padding: 0 4px;
+  border-radius: 24px;
+  color: white;
+  font-size: 12px;
+}
