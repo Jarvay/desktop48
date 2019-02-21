@@ -10,14 +10,11 @@ import 'iview/dist/styles/iview.css'
 
 import flvjs from 'flv.js'
 
-import VueVideoPlayer from 'vue-video-player'
-import 'video.js/dist/video-js.css'
-import 'vue-video-player/src/custom-theme.css'
-import 'videojs-contrib-hls'
-import 'videojs-flash'
+// import VueVideoPlayer from 'vue-video-player'
+
 
 Vue.use(iView);
-Vue.use(VueVideoPlayer);
+// Vue.use(VueVideoPlayer);
 Vue.prototype.$flvjs = flvjs;
 
 if (!process.env.IS_WEB) Vue.use(require('vue-electron'))

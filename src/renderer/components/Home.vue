@@ -167,6 +167,7 @@
                     })
                 }
             });
+
         },
         updated:function(){
             this.reSize();

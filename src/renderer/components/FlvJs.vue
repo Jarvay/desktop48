@@ -139,7 +139,7 @@
             });
             this.getOne();
 
-            console.log(flvjs);
+            console.log('flvjs');
         },
         methods:{
             getOne:function(){

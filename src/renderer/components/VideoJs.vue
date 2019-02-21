@@ -16,7 +16,9 @@
                             </CarouselItem>
                         </Carousel>
 
-                        <video-player ref="videoPlayer" class="video" :options="playerOptions" v-else></video-player>
+                        <!--<video-player ref="videoPlayer" class="video" :options="playerOptions" v-else></video-player>-->
+
+                        <video id="video-js" class="video" v-else></video>
 
                         <PlayerControls ref="controls" :is-muted="isMuted" :show-progress="isReview"
                                 :is-playing="isPlaying" :volume-disabled="volumeDisabled"
@@ -46,6 +48,8 @@
     import Barrage from "./Barrage";
     import Tools from "../assets/js/tools";
     import LiveApi from "../assets/js/live-api";
+    import videojs from 'video.js';
+    import 'videojs-flash'
 
     const STATUS_PLAYING = 1;
     const STATUS_PREPARED = 0;
@@ -63,7 +67,9 @@
                     controls:false, // 是否显示控制栏
                     techOrder:['flash', 'html5'], // 兼容顺序
                     sourceOrder:true, //
-                    flash:{hls:{withCredentials:false}},
+                    flash:{
+                        hls:{withCredentials:false},
+                    },
                     html5:{hls:{withCredentials:false}},
                     sources:[{
                         withCredentials:false,
@@ -89,15 +95,16 @@
                 isRadio:false,
                 pictures:[],
                 number:0,
+                player:{}
             }
         },
         computed:{
             isPlaying:function(){
                 return this.status === STATUS_PLAYING;
             },
-            player(){
-                return this.$refs.videoPlayer.player;
-            }
+            // player(){
+            //     return this.$refs.videoPlayer.player;
+            // }
         },
         watch:{
             volume:function(newVolume){
@@ -108,56 +115,57 @@
             this.$Notice.config({
                 top:80
             });
-            this.getOne();
         },
         mounted:function(){
-
+            this.getOne();
         },
         methods:{
             getOne:function(){
                 LiveApi.live(this.liveId).then(responseBody => {
-                   if(responseBody.status == 200){
-                       const data = responseBody.content;
-                       this.streamPath = data.streamPath;
-                       this.title = data.title;
-                       this.subTitle = data.subTitle;
-                       this.isReview = data.isReview;
-                       this.barrageUrl = 'http://source.48.cn' + data.lrcPath;
-                       this.isRadio = data.liveType == 2;
-                       this.number = data.number;
+                    if(responseBody.status == 200){
+                        const data = responseBody.content;
+                        this.streamPath = data.streamPath;
+                        this.title = data.title;
+                        this.subTitle = data.subTitle;
+                        this.isReview = data.isReview;
+                        this.barrageUrl = 'http://source.48.cn' + data.lrcPath;
+                        this.isRadio = data.liveType == 2;
+                        this.number = data.number;
 
-                       this.pictures = Tools.pictureUrls(data.picPath);
+                        this.player = videojs('video-js', this.playerOptions);
 
-                       this.player.volume(this.$refs.controls.volume * 0.01);
+                        this.pictures = Tools.pictureUrls(data.picPath);
 
-                       this.player.src({
-                           type:this.getType(this.streamPath),
-                           src:this.streamPath
-                       });
-                       //时长
-                       this.player.on('loadeddata', event => {
-                           this.duration = event.target.player.duration();
+                        this.player.volume(this.$refs.controls.volume * 0.01);
 
-                           if(this.isReview){
-                               this.getBarrages();
-                           }
-                       });
-                       //当前进度
-                       this.player.on('timeupdate', event => {
-                           this.currentTime = event.target.player.currentTime();
-                           //弹幕
-                           this.loadBarrages();
-                       });
-                       //播放结束
-                       this.player.on('ended', () => {
-                           this.status = STATUS_PREPARED;
-                           this.$Notice.info({
-                               title:'播放完毕',
-                               desc:''
-                           });
-                       });
-                       this.spinShow = false;
-                   }
+                        this.player.src({
+                            type:this.getType(this.streamPath),
+                            src:this.streamPath
+                        });
+                        //时长
+                        this.player.on('loadeddata', event => {
+                            this.duration = event.target.player.duration();
+
+                            if(this.isReview){
+                                this.getBarrages();
+                            }
+                        });
+                        //当前进度
+                        this.player.on('timeupdate', event => {
+                            this.currentTime = event.target.player.currentTime();
+                            //弹幕
+                            this.loadBarrages();
+                        });
+                        //播放结束
+                        this.player.on('ended', () => {
+                            this.status = STATUS_PREPARED;
+                            this.$Notice.info({
+                                title:'播放完毕',
+                                desc:''
+                            });
+                        });
+                        this.spinShow = false;
+                    }
                 }).catch(error => {
                     this.spinShow = false;
                     console.log(error);

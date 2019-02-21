@@ -21,16 +21,18 @@
     "postinstall": ""
   },
   "dependencies": {
+    "aes-decrypter": "^3.0.0",
     "axios": "^0.18.0",
     "flv.js": "^1.4.2",
     "iview": "^2.14.0-rc.3",
     "lowdb": "^1.0.0",
-    "videojs-contrib-hls": "^5.14.1",
-    "videojs-flash": "^2.1.0",
+    "m3u8-parser": "^4.3.0",
+    "mux.js": "^5.1.0",
+    "video.js": "^7.4.1",
+    "videojs-flash": "^2.2.0",
     "vue": "^2.5.16",
     "vue-electron": "^1.0.6",
-    "vue-router": "^3.0.1",
-    "vue-video-player": "^5.0.2"
+    "vue-router": "^3.0.1"
   },
   "devDependencies": {
     "ajv": "^6.5.0",
