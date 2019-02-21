@@ -8,15 +8,15 @@
         </div>
 
         <div class="button-box">
-            <Icon class="button" @click="play" type="play" v-if="!isPlaying && showPlayButton"></Icon>
+            <Icon class="button" @click="play" type="md-play" v-if="!isPlaying && showPlayButton"></Icon>
 
-            <Icon class="button" @click="pause" type="pause" v-if="isPlaying && showPlayButton"></Icon>
+            <Icon class="button" @click="pause" type="md-pause" v-if="isPlaying && showPlayButton"></Icon>
 
             <div class="volume-box">
-                <Icon style="margin-right:8px;" class="volume-icon" type="volume-high" @click="mute"
+                <Icon style="margin-right:8px;" class="volume-icon" type="md-volume-up" @click="mute"
                         v-if="!isMuted"></Icon>
 
-                <Icon style="margin-right:8px;" class="volume-icon" type="volume-mute" @click="unmute"
+                <Icon style="margin-right:8px;" class="volume-icon" type="md-volume-mute" @click="unmute"
                         v-if="isMuted"></Icon>
 
                 <Slider class="volume-slider" :disabled="volumeDisabled" v-model="volume"

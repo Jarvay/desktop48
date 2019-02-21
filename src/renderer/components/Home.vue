@@ -55,7 +55,7 @@
                                                 </div>
                                             </Col>
                                         </Row>
-                                        <Page :current="livePage" :total="liveTotal" :page-size="pageSize" size="small"
+                                        <Page :current="livePage" :total="liveTotal" :page-size="pageSize"
                                                 show-total
                                                 @on-change="onLivePageChange"></Page>
                                     </TabPane>
@@ -87,7 +87,7 @@
                                                 </div>
                                             </Col>
                                         </Row>
-                                        <Page :current="reviewPage" :total="reviewTotal" :page-size="pageSize" size="small"
+                                        <Page :current="reviewPage" :total="reviewTotal" :page-size="pageSize"
                                                 show-total
                                                 @on-change="onReviewPageChange"></Page>
                                     </TabPane>
