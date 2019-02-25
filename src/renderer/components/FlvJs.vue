@@ -1,7 +1,7 @@
 <template>
     <div class="layout">
         <Layout>
-            <PlayerHeader other-player="videojs" :video-url="streamPath" @change-player="changePlayer"></PlayerHeader>
+            <PlayerHeader :other-player="'/videojs/' + liveId" :video-url="streamPath"></PlayerHeader>
             <Content style="padding: 16px;">
                 <div class="player-container">
                     <Spin size="large" fix v-if="spinShow"></Spin>
@@ -18,7 +18,7 @@
                             </CarouselItem>
                         </Carousel>
 
-                        <video class="video" id="liveVideo" ref="video" v-else></video>
+                        <video class="video" :id="'video-' + liveId" ref="video" v-else></video>
 
                         <PlayerControls ref="controls" :show-play-button="isReview" :is-muted="isMuted"
                                 :show-progress="isReview"
@@ -34,7 +34,7 @@
                         <p slot="extra">观看人数：{{number}}</p>
 
                         <div class="barrage-container">
-                            <Barrage ref="barrage" class="barrage-box"></Barrage>
+                            <Barrage :ref="'barrage-' + liveId" class="barrage-box"></Barrage>
 
                             <div class="barrage-input-box" v-if="!isReview">
                                 <Poptip trigger="hover" title="发送者名称" style="margin-left:8px;">
@@ -89,7 +89,7 @@
         name:'FlvJs',
         components:{Casitem, Barrage, PlayerControls, PlayerHeader},
         props:{
-            liveId:''
+            // liveId:''
         },
         data(){
             return {
@@ -121,11 +121,15 @@
                 chatroom:null,
                 endTipsShow:false,
                 number:0,   //观看人数
+                liveId:'',
             }
         },
         computed:{
             isPlaying:function(){
                 return this.status === STATUS_PLAYING;
+            },
+            barrage:function(){
+                return this.$refs['barrage-' + this.liveId];
             }
         },
         watch:{
@@ -137,14 +141,14 @@
             this.$Notice.config({
                 top:80
             });
-            this.getOne();
 
-            console.log('flvjs');
+            this.liveId = this.$route.params.liveId;
+
+            this.getOne();
         },
         methods:{
             getOne:function(){
                 LiveApi.live(this.liveId).then(responseBody => {
-                    console.log(responseBody);
                     if(responseBody.status == 200){
                         const data = responseBody.content;
                         this.streamPath = data.streamPath;
@@ -171,7 +175,7 @@
             },
             init:function(){
                 if(this.$flvjs.isSupported()){
-                    const videoElement = document.getElementById('liveVideo');
+                    const videoElement = document.getElementById('video-' + this.liveId);
                     this.flvPlayer = this.$flvjs.createPlayer({
                         type:this.getType(this.streamPath),
                         url:this.streamPath,
@@ -269,7 +273,7 @@
             loadBarrages:function(){
                 const barrageTime = Tools.timeToSecond(this.currentBarrage.time);
                 if(barrageTime > this.currentTime - 1 && barrageTime < this.currentTime + 1){ //弹幕可误差1秒
-                    this.$refs.barrage.shoot({
+                    this.barrage.shoot({
                         content:this.currentBarrage.content,
                         username:this.currentBarrage.username
                     });
@@ -309,7 +313,7 @@
                     chatroomId:this.roomId,
                     done:(error) => {
                         if(error == null){
-                            this.$refs.barrage.shoot({
+                            this.barrage.shoot({
                                 username:this.senderName,
                                 content:this.content
                             });
@@ -364,7 +368,6 @@
                         messages.forEach(message => {
                             if(message.type == 'text'){
                                 const custom = JSON.parse(message.custom);
-                                console.log(custom);
                                 switch(custom.contentType){
                                     case 1: //弹幕消息
                                         let level = 1;
@@ -373,14 +376,14 @@
                                         }else if(custom.isBarrage){
                                             level = 2;
                                         }
-                                        this.$refs.barrage.shoot({
+                                        this.barrage.shoot({
                                             content:custom.content,
                                             username:custom.senderName,
                                             level:level
                                         });
                                         break;
                                     case 3: //礼物信息
-                                        this.$refs.barrage.shoot({
+                                        this.barrage.shoot({
                                             username:custom.senderName,
                                             content:'送出了' + custom.giftCount + '个' + custom.giftName,
                                             level:0

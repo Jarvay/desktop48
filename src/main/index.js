@@ -20,10 +20,10 @@ function createWindow(){
     mainWindow = new BrowserWindow({
         height:820,
         useContentSize:true,
-        width:1280,
+        width:1340,
         webPreferences:{
             webSecurity:false,
-            plugins: true
+            plugins:true
         }
     })
 
@@ -36,7 +36,7 @@ function createWindow(){
 
 const path = require('path')
 let pluginName
-switch (process.platform) {
+switch(process.platform){
     case 'win32':
         pluginName = 'pepflashplayer.dll'
         break

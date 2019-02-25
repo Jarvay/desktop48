@@ -2,109 +2,102 @@
     <div class="layout">
         <Spin size="large" fix v-if="spinShow"></Spin>
 
-        <Tabs type="card" closable @on-tab-remove="handleTabRemove" :value="activeTab">
-            <TabPane label="Home" :closable="homeClosable">
-                <Layout>
-                    <Header class="header">
-                        <div>
-                            <Cascader filterable="" class="cascader" placeholder="请选择成员" :data="members"
-                                    v-model="selectedMember"></Cascader>
+        <Layout>
+            <Header class="header">
+                <div>
+                    <Cascader class="cascader" placeholder="请选择成员" :data="members"
+                            v-model="selectedMember"></Cascader>
 
-                            <span style="margin-left:16px;color:white;">获取条数</span>
+                    <span style="margin-left:16px;color:white;">获取条数</span>
 
-                            <Tooltip content="最大值：4800" placement="bottom">
-                                <InputNumber style="margin-left:8px;" :max="4800" :min="1" :step="160" v-model="limit"></InputNumber>
-                            </Tooltip>
+                    <Tooltip content="最大值：4800" placement="bottom">
+                        <InputNumber style="margin-left:8px;" :max="4800" :min="16" :step="160"
+                                v-model="limit"></InputNumber>
+                    </Tooltip>
 
-                            <Button type="primary" @click="getList">搜索</Button>
-                        </div>
+                    <Button type="primary" @click="getList">搜索</Button>
+                </div>
 
-                        <Button :loading="syncing" @click="syncInfo">同步成员信息</Button>
-                    </Header>
-                    <Content style="padding: 8px 32px;">
-                        <Card>
-                            <div style="min-height: 200px;">
-                                <Tabs type="card">
-                                    <TabPane label="直播">
-                                        <Card v-if="currentLiveList.length === 0" style="margin-bottom:8px">
-                                            <p slot="title">当前没有直播</p>
-                                        </Card>
+                <Button :loading="syncing" @click="syncInfo">同步成员信息</Button>
+            </Header>
+            <Content style="padding: 8px 32px;">
+                <Card>
+                    <div style="min-height: 200px;">
+                        <Tabs type="card">
+                            <TabPane label="直播">
+                                <Card v-if="currentLiveList.length === 0" style="margin-bottom:8px">
+                                    <p slot="title">当前没有直播</p>
+                                </Card>
 
-                                        <Row v-for="index in Math.ceil(currentLiveList.length / 8)"
-                                                :key="index">
-                                            <Col style="padding: 4px;" span="3" v-for="(item, i) in currentLiveList"
-                                                    v-if="i <  index * 8 && i >= (index - 1) * 8" :key="item.liveId">
-                                                <div  @click="openLive(item)">
-                                                    <Card>
-                                                        <p slot="title">{{item.subTitle}}</p>
+                                <Row v-for="index in Math.ceil(currentLiveList.length / 8)"
+                                        :key="index">
+                                    <Col style="padding: 4px;" span="3" v-for="(item, i) in currentLiveList"
+                                            v-if="i <  index * 8 && i >= (index - 1) * 8" :key="item.liveId">
+                                        <a :href="getUrl(item)" target="_blank">
+                                            <Card>
+                                                <p slot="title">{{item.subTitle}}</p>
 
-                                                        <img ref="cover" class="cover" :src="item.cover">
-                                                        <p style="color:#ccc;">{{item.date}}</p>
-                                                        <div style="display: flex;justify-content: space-between;">
-                                                            <div>
-                                                                <span style="color: #000;">{{item.member
-                                                                    .real_name}}</span>
-                                                                <span class="team-badge"
-                                                                        :style="{'background-color':'#' +
-                                                                        item.member.teamObj.color}">{{item.member.teamObj.team_name}}</span>
-                                                            </div>
-                                                            <span v-if="item.liveType == 1">直播</span>
-                                                            <span v-else>电台</span>
-                                                        </div>
-                                                    </Card>
+                                                <div class="cover-box">
+                                                    <img ref="cover" class="cover" :src="item.cover">
                                                 </div>
-                                            </Col>
-                                        </Row>
-                                        <Page :current="livePage" :total="liveTotal" :page-size="pageSize"
-                                                show-total
-                                                @on-change="onLivePageChange"></Page>
-                                    </TabPane>
-
-                                    <TabPane label="回放">
-                                        <Row v-for="index in Math.ceil(currentReviewList.length / 8)"
-                                                :key="index">
-                                            <Col style="padding: 4px;" span="3" v-for="(item, i) in currentReviewList"
-                                                    v-if="i <  index * 8 && i >= (index - 1) * 8" :key="item.liveId">
-                                                <div @click="openLive(item)">
-                                                    <Card>
-                                                        <p slot="title">{{item.subTitle}}</p>
-
-                                                        <img ref="cover" class="cover" :src="item.cover">
-                                                        <p style="color:#ccc;">{{item.date}}</p>
-                                                        <div style="display: flex;justify-content: space-between;">
-                                                            <div>
-                                                                <span style="color: #000;">{{item.member
-                                                                    .real_name}}</span>
-                                                                <span class="team-badge"
-                                                                        :style="{'background-color':'#' +
-                                                                        item.member.teamObj.color}">
-                                                            {{item.member.teamObj.team_name}}</span>
-                                                            </div>
-                                                            <span v-if="item.liveType == 1">直播</span>
-                                                            <span v-else>电台</span>
-                                                        </div>
-                                                    </Card>
+                                                <p class="date-text">{{item.date}}</p>
+                                                <div class="member-box">
+                                                    <div>
+                                                        <span class="member-name">{{item.member.real_name}}</span>
+                                                        <span class="team-badge"
+                                                                :style="{'background-color':'#' + item.member.teamObj.color}">
+                                                            {{item.member.teamObj.team_name}}
+                                                        </span>
+                                                    </div>
+                                                    <span v-if="item.liveType == 1">直播</span>
+                                                    <span v-else>电台</span>
                                                 </div>
-                                            </Col>
-                                        </Row>
-                                        <Page :current="reviewPage" :total="reviewTotal" :page-size="pageSize"
-                                                show-total
-                                                @on-change="onReviewPageChange"></Page>
-                                    </TabPane>
-                                </Tabs>
-                            </div>
-                        </Card>
-                    </Content>
-                    <Footer class="layout-footer-center">2018 &copy; Jarvay 超绝可爱黄婷婷</Footer>
-                </Layout>
-            </TabPane>
+                                            </Card>
+                                        </a>
+                                    </Col>
+                                </Row>
+                                <Page :current="livePage" :total="liveTotal" :page-size="pageSize"
+                                        show-total
+                                        @on-change="onLivePageChange"></Page>
+                            </TabPane>
 
-            <TabPane v-for="liveTab in liveTabs" :label="liveTab.title">
-                <FlvJs v-if="liveTab.type == 'flvjs'" :liveId="liveTab.id" @change-player="changePlayer"></FlvJs>
-                <VideoJs v-else-if="liveTab.type == 'videojs'" :liveId="liveTab.id"
-                        @change-player="changePlayer"></VideoJs>
-            </TabPane>
-        </Tabs>
+                            <TabPane label="回放">
+                                <Row v-for="index in Math.ceil(currentReviewList.length / 8)"
+                                        :key="index">
+                                    <Col style="padding: 4px;" span="3" v-for="(item, i) in currentReviewList"
+                                            v-if="i <  index * 8 && i >= (index - 1) * 8" :key="item.liveId">
+                                        <a :href="getUrl(item)" target="_blank">
+                                            <Card>
+                                                <p slot="title">{{item.subTitle}}</p>
+
+                                                <div class="cover-box">
+                                                    <img ref="cover" class="cover" :src="item.cover">
+                                                </div>
+                                                <p class="date-text">{{item.date}}</p>
+                                                <div class="member-box">
+                                                    <div>
+                                                        <span class="member-name">{{item.member.real_name}}</span>
+                                                        <span class="team-badge"
+                                                                :style="{'background-color':'#' + item.member.teamObj.color}">
+                                                            {{item.member.teamObj.team_name}}
+                                                        </span>
+                                                    </div>
+                                                    <span v-if="item.liveType == 1">直播</span>
+                                                    <span v-else>电台</span>
+                                                </div>
+                                            </Card>
+                                        </a>
+                                    </Col>
+                                </Row>
+                                <Page :current="reviewPage" :total="reviewTotal" :page-size="pageSize"
+                                        show-total
+                                        @on-change="onReviewPageChange"></Page>
+                            </TabPane>
+                        </Tabs>
+                    </div>
+                </Card>
+            </Content>
+        </Layout>
     </div>
 </template>
 
@@ -136,9 +129,6 @@
                 reviewTotal:0,
                 livePage:1,
                 reviewPage:1,
-                homeClosable:false,
-                liveTabs:[],
-                activeTab:0,
                 syncing:false,
             }
         },
@@ -146,8 +136,6 @@
             if(!LiveApi.db().has('members').value()){
                 await LiveApi.syncInfo();
             }
-
-            this.getList();
 
             this.members = LiveApi.groups().map(group => {
                 return {
@@ -168,21 +156,19 @@
                 }
             });
 
+            this.getList();
         },
         updated:function(){
-            this.reSize();
+
         },
         mounted:function(){
-            window.onresize = () => {
-                this.reSize();
-            };
+
         },
         methods:{
             getList:function(){
                 this.spinShow = true;
 
                 LiveApi.lives(this.selectedMember[2], this.limit).then((responseBody) => {
-                    console.log('getList', responseBody.content);
                     this.liveList = responseBody.content.liveList.map(item => {
                         item.cover = Tools.pictureUrls(item.picPath)[0];
                         item.date = new Date(item.startTime).format('yyyy-MM-dd hh:mm');
@@ -229,29 +215,6 @@
                     return '';
                 }
             },
-            handleTabRemove:function(index){
-                this.liveTabs.splice(index - 1, 1);
-                this.activeTab = index - 1;
-            },
-            openLive:function(item){
-                this.liveTabs.push({
-                    title:item.title.replace('（回放生成中）', ''),
-                    type:this.getType(item),
-                    id:item.liveId
-                });
-                this.activeTab = this.liveTabs.length;
-            },
-            reSize:function(){
-                if(this.$refs.cover){
-                    if(this.coverWidth == -1){
-                        this.coverWidth = this.$refs.cover[0].offsetWidth;
-                    }
-
-                    this.$refs.cover.forEach(item => {
-                        item.style.height = this.coverWidth + 'px';
-                    });
-                }
-            },
             syncInfo:function(){
                 this.syncing = true;
                 LiveApi.syncInfo().then(() => {
@@ -261,21 +224,31 @@
                     this.syncing = false;
                 })
             },
-            changePlayer:function(newPlayer, liveId){
-                console.log('change-player', liveId);
-                const index = this.liveTabs.findIndex(tab => {
-                    return tab.id == liveId;
-                });
-
-                this.liveTabs[index].type = newPlayer;
-            }
+            getUrl:function(item){
+                if(item.streamPath.includes('.flv') || item.streamPath.includes('.mp4')){
+                    return '/#/flvjs/' + item.liveId;
+                }else if(item.streamPath.includes('.m3u8')){
+                    return '/#/videojs/' + item.liveId;
+                }else{
+                    return '/#/';
+                }
+            },
         }
     }
 </script>
 
 <style scoped>
-    .cover {
+    .cover-box {
         width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .cover {
+        width: 125px;
+        height: 125px;
     }
 
     .layout-footer-center {
@@ -291,6 +264,19 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
+    }
+
+    .member-name {
+        color: #000;
+    }
+
+    .member-box {
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .date-text {
+        color: #ccc;
     }
 
     .ivu-layout-header {

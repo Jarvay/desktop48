@@ -39,7 +39,9 @@
         },
         methods:{
             nextPlayer:function(){
-                this.$emit('change-player', this.otherPlayer);
+                this.$router.push({
+                    path:this.otherPlayer
+                })
             }
         }
     }
