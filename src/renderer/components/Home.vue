@@ -66,7 +66,7 @@
                                         :key="index">
                                     <Col style="padding: 4px;" span="3" v-for="(item, i) in currentReviewList"
                                             v-if="i <  index * 8 && i >= (index - 1) * 8" :key="item.liveId">
-                                        <a :href="getUrl(item)" target="_blank">
+                                        <a :href="getUrl(item)" target="_blank" @click="openLive(item)">
                                             <Card>
                                                 <p slot="title">{{item.subTitle}}</p>
 
@@ -226,13 +226,13 @@
             },
             getUrl:function(item){
                 if(item.streamPath.includes('.flv') || item.streamPath.includes('.mp4')){
-                    return '/#/flvjs/' + item.liveId;
+                    return '#flvjs/' + item.liveId;
                 }else if(item.streamPath.includes('.m3u8')){
-                    return '/#/videojs/' + item.liveId;
+                    return '#videojs/' + item.liveId;
                 }else{
-                    return '/#/';
+                    return '#';
                 }
-            },
+            }
         }
     }
 </script>
