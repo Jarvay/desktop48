@@ -16,21 +16,21 @@ class LiveApi {
         if(LiveApi._membersDB == null){
             LiveApi._membersDB = LiveApi.db().get('members');
         }
-        return LiveApi._membersDB.cloneDeep();
+        return LiveApi._membersDB;
     }
 
     static teamsDB(){
         if(LiveApi._teamsDB == null){
             LiveApi._teamsDB = LiveApi.db().get('teams');
         }
-        return LiveApi._teamsDB.cloneDeep();
+        return LiveApi._teamsDB;
     }
 
     static groupsDB(){
         if(LiveApi._groupsDB == null){
             LiveApi._groupsDB = LiveApi.db().get('groups');
         }
-        return LiveApi._groupsDB.cloneDeep();
+        return LiveApi._groupsDB;
     }
 
     /**
@@ -105,7 +105,7 @@ class LiveApi {
      * @returns {Array}
      */
     static groups(){
-        const groups = LiveApi.groupsDB().value();
+        const groups = (LiveApi.groupsDB().value());
         const result = [];
         for(let i = 0; i < groups.length; i++){
             result.push(LiveApi.group(groups[i].group_id));
@@ -187,13 +187,16 @@ class LiveApi {
 
     static chatRoomToken(){
         const cookieVal = '48web' + Math.random().toString(36).substr(2);
+        const body = {
+            timestamp:new Date().getTime(),
+            cookie_val:cookieVal,
+            type:2
+        };
 
         const formData = new FormData();
-        formData.append('cookie_val', cookieVal);
-        formData.append('type', 2);
+        formData.append('cookie_val', '48web_fdhdrdfgdfd');
 
-        return new Promise(async (resolve, reject) => {
-            await axios.post('http://zhibo.ckg48.com/Server/do_ajax_setcookie', formData);
+        return new Promise((resolve, reject) => {
             axios.post('http://zhibo.ckg48.com/Server/do_ajax_setcookie', formData).then(response => {
                 resolve(response.data);
             }).catch(error => {

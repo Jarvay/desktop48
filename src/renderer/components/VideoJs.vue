@@ -1,7 +1,7 @@
 <template>
     <div class="layout">
         <Layout>
-            <PlayerHeader :other-player="'/flvjs/' + liveId" :video-url="streamPath"></PlayerHeader>
+            <PlayerHeader other-player="flvjs" :video-url="streamPath" @change-player="changePlayer"></PlayerHeader>
             <Content style="padding: 16px;">
                 <div class="player-container">
                     <Spin size="large" fix v-if="spinShow"></Spin>
@@ -15,6 +15,8 @@
                                 <img class="picture" :src="picture">
                             </CarouselItem>
                         </Carousel>
+
+                        <!--<video-player ref="videoPlayer" class="video" :options="playerOptions" v-else></video-player>-->
 
                         <video id="video-js" class="video" v-else></video>
 
@@ -47,7 +49,6 @@
     import Tools from "../assets/js/tools";
     import LiveApi from "../assets/js/live-api";
     import videojs from 'video.js';
-    import 'video.js/dist/video-js.css'
     import 'videojs-flash'
 
     const STATUS_PLAYING = 1;
@@ -57,7 +58,7 @@
         name:'VideoJs',
         components:{Barrage, PlayerControls, PlayerHeader},
         props:{
-            // liveId:''
+            liveId:''
         },
         data(){
             return {
@@ -94,14 +95,16 @@
                 isRadio:false,
                 pictures:[],
                 number:0,
-                player:{},
-                liveId:''
+                player:{}
             }
         },
         computed:{
             isPlaying:function(){
                 return this.status === STATUS_PLAYING;
             },
+            // player(){
+            //     return this.$refs.videoPlayer.player;
+            // }
         },
         watch:{
             volume:function(newVolume){
@@ -112,14 +115,9 @@
             this.$Notice.config({
                 top:80
             });
-
-            this.liveId = this.$route.params.liveId;
         },
         mounted:function(){
             this.getOne();
-        },
-        destroyed:function(){
-            this.player.dispose();
         },
         methods:{
             getOne:function(){

@@ -10,9 +10,11 @@ import 'iview/dist/styles/iview.css'
 
 import flvjs from 'flv.js'
 
+// import VueVideoPlayer from 'vue-video-player'
 
 
 Vue.use(iView);
+// Vue.use(VueVideoPlayer);
 Vue.prototype.$flvjs = flvjs;
 
 if (!process.env.IS_WEB) Vue.use(require('vue-electron'))
