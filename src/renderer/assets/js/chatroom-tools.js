@@ -12,6 +12,7 @@ class ChatRoomTools {
     static chatroom(options){
         return new Promise((resolve, reject) => {
             LiveApi.chatRoomToken().then(responseBody => {
+                console.log(options);
                 const chatroom = new Chatroom({
                     appKey:'632feff1f4c838541ab75195d1ceb3fa',      //从官网公演直播网页代码获取
                     account:responseBody.account,

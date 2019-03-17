@@ -10,39 +10,39 @@
     const BORDER_WIDTH = 4;
 
     export default {
-        name:'Barrage',
-        data(){
+        name: 'Barrage',
+        data() {
             return {
-                context:null,
-                width:-1,
-                height:-1,
-                barrageList:[],
-                randomCount:0,
+                context: null,
+                width: -1,
+                height: -1,
+                barrageList: [],
+                randomCount: 0,
             };
         },
-        mounted:function(){
+        mounted: function () {
             this.init();
         },
-        methods:{
-            shoot:function(barrage){
+        methods: {
+            shoot: function (barrage) {
                 const top = this.randomTop();
                 const left = this.width;
                 const level = barrage.level || 1;
                 const color = level == 1 ? '#000' : this.randomColor();
                 this.barrageList.push({
-                    top:top,
-                    left:left,
-                    color:color,
-                    content:barrage.content,
-                    username:barrage.username,
-                    level:barrage.level,
+                    top: top,
+                    left: left,
+                    color: color,
+                    content: barrage.content,
+                    username: barrage.username,
+                    level: barrage.level,
                 });
             },
-            start:function(){
+            start: function () {
                 setInterval(() => {
                     this.context.clearRect(0, 0, this.width, this.height);
                     this.barrageList.forEach(barrage => {
-                        switch(barrage.level){
+                        switch (barrage.level) {
                             default:
                                 //弹幕发送者
                                 this.context.fillStyle = USERNAME_COLOR;
@@ -74,16 +74,16 @@
                     });
 
                     this.barrageList.forEach((barrage, index) => {
-                        if(barrage.left + this.context.measureText(barrage.username + '：' + barrage.content).width < 0){
+                        if (barrage.left + this.context.measureText(barrage.username + '：' + barrage.content).width < 0) {
                             this.barrageList.splice(index, 1);
                         }
                     });
                 }, 8);
             },
-            randomColor:function(){
+            randomColor: function () {
                 return '#' + Math.floor(Math.random() * 0xffffff).toString(16);
             },
-            init:function(){
+            init: function () {
                 const canvas = this.$refs.canvas;
                 canvas.width = canvas.offsetWidth;
                 canvas.height = canvas.offsetHeight;
@@ -98,27 +98,27 @@
 
                 this.start();
             },
-            randomTop:function(){
+            randomTop: function () {
                 let top = Math.floor(Math.random() * (this.height - TEXT_SIZE)) + TEXT_SIZE - 4;
                 const isSuperimposed = this.barrageList.some(barrage => {
                     return top < barrage.top + TEXT_SIZE && top > barrage.top - TEXT_SIZE;
                 });
                 //尽量避免重叠
-                if(isSuperimposed && this.randomCount < 4){
+                if (isSuperimposed && this.randomCount < 4) {
                     this.randomCount++;
                     return this.randomTop();
                 }
                 this.randomCount = 0;
                 return top;
             },
-            drawQuadratic:function(x, y, width, radius, color){
+            drawQuadratic: function (x, y, width, radius, color) {
                 this.context.fillStyle = color || '#04ebff';
 
                 const height = TEXT_SIZE + BORDER_WIDTH * 4;
-                if(width < 2 * radius){
+                if (width < 2 * radius) {
                     radius = width / 2;
                 }
-                if(height < 2 * radius){
+                if (height < 2 * radius) {
                     radius = height / 2;
                 }
                 this.context.beginPath();

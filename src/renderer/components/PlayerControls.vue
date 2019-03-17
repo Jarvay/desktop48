@@ -1,23 +1,23 @@
 <template>
     <div>
         <div class="progress-container" v-if="showProgress"
-                @mousedown="dragging = true" @mouseup="dragging = false">
+             @mousedown="dragging = true" @mouseup="dragging = false">
             <Slider :max="duration" class="progress-slider" v-model="progress"
                     @on-change="progressChange" :tip-format="timeFormat"></Slider>
             <span class="progress-text">{{timeFormat(currentTime)}} / {{timeFormat(duration)}}</span>
         </div>
 
         <div class="button-box">
-            <Icon class="button" @click="play" type="md-play" v-if="!isPlaying && showPlayButton"></Icon>
+            <Icon class="button" @click="play" type="play" v-if="!isPlaying && showPlayButton"></Icon>
 
-            <Icon class="button" @click="pause" type="md-pause" v-if="isPlaying && showPlayButton"></Icon>
+            <Icon class="button" @click="pause" type="pause" v-if="isPlaying && showPlayButton"></Icon>
 
             <div class="volume-box">
-                <Icon style="margin-right:8px;" class="volume-icon" type="md-volume-up" @click="mute"
-                        v-if="!isMuted"></Icon>
+                <Icon style="margin-right:8px;" class="volume-icon" type="volume-high" @click="mute"
+                      v-if="!isMuted"></Icon>
 
-                <Icon style="margin-right:8px;" class="volume-icon" type="md-volume-mute" @click="unmute"
-                        v-if="isMuted"></Icon>
+                <Icon style="margin-right:8px;" class="volume-icon" type="volume-mute" @click="unmute"
+                      v-if="isMuted"></Icon>
 
                 <Slider class="volume-slider" :disabled="volumeDisabled" v-model="volume"
                         @on-change="volumeChange"></Slider>
@@ -28,58 +28,58 @@
 
 <script>
     export default {
-        name:'PlayerControls',
-        data(){
+        name: 'PlayerControls',
+        data() {
             return {
-                progress:0,
-                dragging:false,
-                volume:80
+                progress: 0,
+                dragging: false,
+                volume: 80
             }
         },
-        props:{
-            isPlaying:{
-                type:Boolean,
-                required:true
+        props: {
+            isPlaying: {
+                type: Boolean,
+                required: true
             },
-            isMuted:{
-                type:Boolean,
-                required:true
+            isMuted: {
+                type: Boolean,
+                required: true
             },
-            volumeDisabled:{
-                type:Boolean,
-                required:true
+            volumeDisabled: {
+                type: Boolean,
+                required: true
             },
-            showProgress:{
-                type:Boolean,
-                required:true
+            showProgress: {
+                type: Boolean,
+                required: true
             },
-            duration:{
-                type:Number,
-                required:true
+            duration: {
+                type: Number,
+                required: true
             },
-            currentTime:{
-                type:Number,
-                required:true
+            currentTime: {
+                type: Number,
+                required: true
             },
-            showPlayButton:{
-                type:Boolean,
-                default:true
+            showPlayButton: {
+                type: Boolean,
+                default: true
             }
         },
-        watch:{
-            currentTime:function(currentTime){
-                if(!this.dragging){
+        watch: {
+            currentTime: function (currentTime) {
+                if (!this.dragging) {
                     this.progress = currentTime;
                 }
             }
         },
-        created:function(){
-            if(localStorage.getItem('volume') != null){
+        created: function () {
+            if (localStorage.getItem('volume') != null) {
                 this.volume = parseInt(localStorage.getItem('volume'));
             }
         },
-        methods:{
-            timeFormat:function(seconds){
+        methods: {
+            timeFormat: function (seconds) {
                 seconds = Math.round(seconds);
                 let minutes = Math.floor(seconds / 60);
                 let hours = Math.floor(minutes / 60);
@@ -90,22 +90,22 @@
                 seconds = seconds < 10 ? '0' + seconds : seconds;
                 return hours + ':' + minutes + ':' + seconds;
             },
-            play:function(){
+            play: function () {
                 this.$emit('play')
             },
-            pause:function(){
+            pause: function () {
                 this.$emit('pause')
             },
-            mute:function(){
+            mute: function () {
                 this.$emit('mute')
             },
-            unmute:function(){
+            unmute: function () {
                 this.$emit('unmute')
             },
-            progressChange:function(progress){
+            progressChange: function (progress) {
                 this.$emit('progress', progress);
             },
-            volumeChange:function(volume){
+            volumeChange: function (volume) {
                 localStorage.setItem('volume', volume);
                 this.$emit('volume', volume);
             },

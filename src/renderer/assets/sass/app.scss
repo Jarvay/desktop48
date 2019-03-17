@@ -24,11 +24,28 @@ div[id^="vjs_video_"] {
 }
 
 .layout {
+  padding: 4px 0;
   border: 1px solid #d7dde4;
   background: #f5f7f9;
   position: relative;
   border-radius: 4px;
   overflow: hidden;
+}
+
+
+.barrage-input-box {
+  display: flex;
+}
+
+.barrage-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  .barrage-box {
+    flex: 1 0 auto;
+    height: 640px;
+  }
 }
 
 .barrage {
