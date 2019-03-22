@@ -18,7 +18,8 @@
                             </CarouselItem>
                         </Carousel>
 
-                        <video :id="'video-js-' + liveId" class="video" v-show="!isRadio"></video>
+                        <video :id="'video-js-' + liveId" class="video video-js" preload="auto"
+                               v-show="!isRadio"></video>
 
                         <PlayerControls ref="controls" :is-muted="isMuted" :show-progress="isReview"
                                         :show-play-button="isReview"
@@ -30,7 +31,9 @@
                                         :duration="duration"></PlayerControls>
                     </Card>
 
-                    <BarrageBox :ref="'barrage-box-' + liveId" :number="number" :send-disabled="sendDisabled"
+                    <BarrageBox :ref="'barrage-box-' + liveId" :number="number"
+                                :chat-room-status="chatRoomStatus"
+                                :send-disabled="sendDisabled"
                                 :send-text="sendText"
                                 :sender-name-readonly="senderNameReadonly" :show-input="!isReview"
                                 :send-barrage="sendBarrage"></BarrageBox>
@@ -48,9 +51,10 @@
     import ChatRoomTools from '../assets/js/chatroom-tools';
     import LiveApi from "../assets/js/live-api";
     import BarrageBox from "./BarrageBox";
+
     import videojs from 'video.js';
     import 'video.js/src/css/video-js.scss';
-    import 'videojs-flash'
+    import 'videojs-flash';
 
     const STATUS_PLAYING = 1;
     const STATUS_PREPARED = 0;
@@ -105,13 +109,17 @@
                 seconds: Tools.BARRAGE_SEND_INTERVAL,
                 chatroom: null,
                 endTipsShow: false,
-                number: 0,   //观看人数
+                number: 0,   //观看人数,
+                chatRoomStatus: 0
             }
         },
         computed: {
             isPlaying: function () {
                 return this.status === STATUS_PLAYING;
             },
+            barrageBox() {
+                return this.$refs['barrage-box-' + this.liveId];
+            }
         },
         watch: {
             volume: function (newVolume) {
@@ -148,22 +156,17 @@
                         this.number = data.number;
                         this.roomId = data.roomId;
 
-                        this.player = videojs('video-js-' + this.liveId, this.playerOptions);
-
                         const member = LiveApi.member(data.memberId);
-                        this.$refs['barrage-box-' + this.liveId].senderName = Tools.getSenderName() || '超绝可爱' + member.real_name;
+                        this.barrageBox.senderName = Tools.getSenderName() || '超绝可爱' + member.real_name;
 
                         this.pictures = Tools.pictureUrls(data.picPath);
 
+                        this.player = videojs('video-js-' + this.liveId, this.playerOptions);
                         this.player.volume(this.$refs.controls.volume * 0.01);
 
                         //时长
                         this.player.on('loadeddata', event => {
                             this.duration = event.target.player.duration();
-
-                            if (this.isReview) {
-                                this.getBarrages();
-                            }
                         });
                         //当前进度
                         this.player.on('timeupdate', event => {
@@ -183,6 +186,8 @@
                         if (!this.isReview) {
                             this.play();
                             this.connectChatroom();
+                        } else {
+                            this.getBarrages();
                         }
 
                         this.spinShow = false;
@@ -235,7 +240,7 @@
                 } else if (url.includes('.m3u8')) {
                     return 'application/x-mpegURL';
                 } else if (url.includes('.flv')) {
-                    return 'video/flv';
+                    return 'video/x-flv';
                 }
             },
             progressChange: function (progress) {
@@ -253,7 +258,7 @@
                 if (this.barrageList.length == 0) return;
                 const barrageTime = Tools.timeToSecond(this.currentBarrage.time);
                 if (barrageTime > this.currentTime - 1 && barrageTime < this.currentTime + 1) { //弹幕可误差1秒
-                    this.$refs['barrage-box-' + this.liveId].shoot({
+                    this.barrageBox.shoot({
                         content: this.currentBarrage.content,
                         username: this.currentBarrage.username
                     });
@@ -265,7 +270,7 @@
                 this.$emit('change-player', 'flvjs', this.liveId);
             },
             sendBarrage: function () {
-                if (this.seconds != Tools.BARRAGE_SEND_INTERVAL || this.$refs['barrage-box-' + this.liveId].content.length == 0 || this.$refs['barrage-box-' + this.liveId].senderName.length
+                if (this.seconds != Tools.BARRAGE_SEND_INTERVAL || this.barrageBox.content.length == 0 || this.barrageBox.senderName.length
                     == 0) {
                     return;
                 }
@@ -280,31 +285,31 @@
                     isBarrage: 0,
                     contentType: 1,
                     senderRole: 0,
-                    content: this.$refs['barrage-box-' + this.liveId].content,
-                    senderName: this.$refs['barrage-box-' + this.liveId].senderName,
+                    content: this.barrageBox.content,
+                    senderName: this.barrageBox.senderName,
                     isGuardMan: 0,
                     senderAvatar: '',
                     platform: 'android',
                     liveStartTime: '',
-                    text: this.$refs['barrage-box-' + this.liveId].content,
+                    text: this.barrageBox.content,
                     senderHonor: ';',
 
                 };
                 const message = {
-                    text: this.$refs['barrage-box-' + this.liveId].content,
+                    text: this.barrageBox.content,
                     custom: JSON.stringify(custom),
                     type: 'text',
                     chatroomId: this.roomId,
                     done: (error) => {
                         if (error == null) {
-                            this.$refs['barrage-box-' + this.liveId].shoot({
-                                username: this.$refs['barrage-box-' + this.liveId].senderName,
-                                content: this.$refs['barrage-box-' + this.liveId].content
+                            this.barrageBox.shoot({
+                                username: this.barrageBox.senderName,
+                                content: this.barrageBox.content
                             });
                             this.senderNameReadonly = true;
                         }
                         this.sendDisabled = true;
-                        this.$refs['barrage-box-' + this.liveId].content = '';
+                        this.barrageBox.content = '';
                         const timer = setInterval(() => {
                             this.sendText = '发送(' + this.seconds + ')';
                             this.seconds--;
@@ -327,16 +332,10 @@
                 const options = {
                     roomId: this.roomId,
                     onConnect: () => {
-                        this.$Notice.success({
-                            title: '聊天室连接成功',
-                            desc: ''
-                        });
+                        this.chatRoomStatus = 1;
                     },
                     onDisconnect: (message) => {
-                        this.$Notice.success({
-                            title: '聊天室连接断开',
-                            desc: ''
-                        });
+                        this.chatRoomStatus = 0;
                         console.log(message);
                     },
                     onWillConnect: () => {
@@ -358,14 +357,14 @@
                                         } else if (custom.isBarrage) {
                                             level = 2;
                                         }
-                                        this.$refs['barrage-box-' + this.liveId].shoot({
+                                        this.barrageBox.shoot({
                                             content: custom.content,
                                             username: custom.senderName,
                                             level: level
                                         });
                                         break;
                                     case 3: //礼物信息
-                                        this.$refs['barrage-box-' + this.liveId].shoot({
+                                        this.barrageBox.shoot({
                                             username: custom.senderName,
                                             content: '送出了' + custom.giftCount + '个' + custom.giftName,
                                             level: 0
@@ -376,7 +375,12 @@
                                         this.number = custom.content.number;
                                         break;
                                     case 8:
-                                        this.endTipsShow = true;
+                                        if (custom.liveStatus == 1) {
+                                            this.$Modal.info({
+                                                title: '温馨提示',
+                                                content: '当前直播已结束'
+                                            });
+                                        }
                                         break;
                                     default:
                                         break;

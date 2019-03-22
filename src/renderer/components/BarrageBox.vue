@@ -1,6 +1,10 @@
 <template>
     <Card style="flex: 1 0 auto;margin-left: 16px;">
-        <p slot="title">弹幕</p>
+        <p slot="title">
+            <span>弹幕</span>
+            <span style="color: #ccc;" v-if="chatRoomStatus == 0">未连接</span>
+            <span style="color: #19be6b;" v-else>已连接</span>
+        </p>
         <p slot="extra">观看人数：{{number}}</p>
 
         <div class="barrage-container">
@@ -9,15 +13,12 @@
             <div class="barrage-input-box" v-if="showInput">
                 <Poptip trigger="hover" title="发送者名称" style="margin-left:8px;">
                     <div slot="content">
-                        <p>第一次发送弹幕后将变为只读</p>
-                        <p>刷新页面后可再次更改</p>
                         <p>请勿滥用</p>
-                        <p>请勿diss小偶像</p>
-                        <p>请勿ky</p>
+                        <p>请勿Diss小偶像</p>
+                        <p>请勿KY</p>
                     </div>
                     <Input style="width:160px;" v-model="senderName"
-                           placeholder="发送者名称"
-                           :readonly="senderNameReadonly"/>
+                           placeholder="发送者名称"/>
                 </Poptip>
 
                 <Input v-model="content" placeholder="请填写弹幕内容"
@@ -45,11 +46,6 @@
                 required: true,
                 default: 0
             },
-            senderNameReadonly: {
-                type: Boolean,
-                required: true,
-                default: false
-            },
             sendDisabled: {
                 type: Boolean,
                 required: true,
@@ -57,10 +53,7 @@
             },
             sendBarrage: {
                 type: Function,
-                required: false,
-                default: function () {
-
-                }
+                required: true
             },
             sendText: {
                 type: String,
@@ -72,6 +65,11 @@
                 required: true,
                 default: false
             },
+            chatRoomStatus: {
+                type: Number,
+                required: true,
+                default: ''
+            }
         },
         components: {Barrage},
         data() {

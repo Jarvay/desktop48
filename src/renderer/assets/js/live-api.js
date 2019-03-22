@@ -188,11 +188,6 @@ class LiveApi {
 
     static async chatRoomToken() {
         const cookieVal = '48web' + Math.random().toString(36).substr(2);
-        const body = {
-            timestamp: new Date().getTime(),
-            cookie_val: cookieVal,
-            type: 2
-        };
 
         const formData = new FormData();
         formData.append('cookie_val', cookieVal);
