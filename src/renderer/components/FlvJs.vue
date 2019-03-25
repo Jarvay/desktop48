@@ -53,6 +53,7 @@
     import ChatRoomTools from '../assets/js/chatroom-tools';
     import LiveApi from "../assets/js/live-api";
     import BarrageBox from "./BarrageBox";
+    import Constants from '../assets/js/constants';
 
     const STATUS_PLAYING = 1;
     const STATUS_PREPARED = 0;
@@ -93,7 +94,7 @@
                 content: '',
                 sendDisabled: false,
                 sendText: '发送',
-                seconds: Tools.BARRAGE_SEND_INTERVAL,
+                seconds: Constants.BARRAGE_SEND_INTERVAL,
                 chatroom: null,
                 endTipsShow: false,
                 number: 0,   //观看人数,
@@ -186,7 +187,6 @@
                         });
                     });
 
-                    this.spinShow = false;
                     this.flvPlayer.load();
 
                     if (this.isReview) {  //录播
@@ -194,8 +194,10 @@
                         //时长
                         this.flvPlayer.on(this.$flvjs.Events.MEDIA_INFO, media => {
                             this.duration = media.duration / 1000;
+                            this.spinShow = false;
                         });
                     } else {              //直播
+                        this.spinShow = false;
                         this.flvPlayer.on(this.$flvjs.Events.MEDIA_INFO, media => {
                             this.play();
                         });
@@ -271,7 +273,7 @@
                 }
             },
             sendBarrage: function () {
-                if (this.seconds != Tools.BARRAGE_SEND_INTERVAL || this.barrageBox.content.length == 0 || this.barrageBox.senderName.length == 0) {
+                if (this.seconds != Constants.BARRAGE_SEND_INTERVAL || this.barrageBox.content.length == 0 || this.barrageBox.senderName.length == 0) {
                     alert();
                     return;
                 }
@@ -317,7 +319,7 @@
                             if (this.seconds == 0) {
                                 this.sendText = '发送';
                                 clearInterval(timer);
-                                this.seconds = Tools.BARRAGE_SEND_INTERVAL;
+                                this.seconds = Constants.BARRAGE_SEND_INTERVAL;
                                 this.sendDisabled = false;
                             }
                         }, 1000);
@@ -329,7 +331,7 @@
                 this.chatroom.sendText(message);
             },
             changePlayer: function () {
-                this.$emit('change-player', 'videojs', this.liveId);
+                this.$emit('change-player', Constants.VIDEO_JS, this.liveId);
             },
             //连接聊天室
             connectChatroom: function () {

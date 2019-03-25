@@ -44,7 +44,8 @@
                                                         <p slot="title">{{item.subTitle}}</p>
 
                                                         <div class="cover-container">
-                                                            <img ref="cover" class="cover" :src="item.cover">
+                                                            <img ref="cover" class="cover"
+                                                                 :src="item.cover">
                                                         </div>
                                                         <p style="color:#ccc;">{{item.date}}</p>
                                                         <div style="display: flex;justify-content: space-between;">
@@ -78,7 +79,8 @@
                                                         <p slot="title">{{item.subTitle}}</p>
 
                                                         <div class="cover-container">
-                                                            <img ref="cover" class="cover" :src="item.cover">
+                                                            <img ref="cover" class="cover"
+                                                                 :src="item.cover">
                                                         </div>
                                                         <p style="color:#ccc;">{{item.date}}</p>
                                                         <div style="display: flex;justify-content: space-between;">
@@ -106,16 +108,16 @@
                             </div>
                         </Card>
                     </Content>
-                    <Footer class="layout-footer-center">2018 &copy; Jarvay 超绝可爱黄婷婷</Footer>
+                    <Footer class="layout-footer-center">2018 &copy; Jarvay</Footer>
                 </Layout>
             </TabPane>
 
             <TabPane v-for="liveTab in liveTabs" :label="liveTab.title" v-if="liveTab.show"
                      :name="liveTab.name">
-                <FlvJs v-if="liveTab.type == 'flvjs'" :liveId="liveTab.liveId"
+                <FlvJs v-if="liveTab.type == 'flv.js'" :liveId="liveTab.liveId"
                        :stream-path="liveTab.streamPath"
                        @change-player="changePlayer"></FlvJs>
-                <VideoJs v-else-if="liveTab.type == 'videojs'" :liveId="liveTab.liveId"
+                <VideoJs v-else-if="liveTab.type == 'video.js'" :liveId="liveTab.liveId"
                          :stream-path="liveTab.streamPath"
                          @change-player="changePlayer"></VideoJs>
             </TabPane>
@@ -124,13 +126,11 @@
 </template>
 
 <script>
+    import Constants from '../assets/js/constants';
     import Tools from "../assets/js/tools";
     import FlvJs from "./FlvJs";
     import VideoJs from "./VideoJs";
     import LiveApi from "../assets/js/live-api";
-
-    const VIDEO_JS = 'videojs';
-    const FLV_JS = 'flvjs';
 
     export default {
         name: 'Home',
@@ -202,6 +202,7 @@
                         item.date = new Date(item.startTime).format('yyyy-MM-dd hh:mm');
                         item.member = LiveApi.member(item.memberId);
                         item.member.teamObj.team_name = item.member.teamObj.team_name.replace('TEAM ', '');
+                        item.isReview = false;
                         return item;
                     });
                     this.liveTotal = this.liveList.length;
@@ -211,6 +212,7 @@
                         item.date = new Date(item.startTime).format('yyyy-MM-dd hh:mm');
                         item.member = LiveApi.member(item.memberId);
                         item.member.teamObj.team_name = item.member.teamObj.team_name.replace('TEAM ', '');
+                        item.isReview = true;
                         return item;
                     });
 
@@ -236,9 +238,11 @@
             },
             getType: function (item) {
                 if (!item.isReview && item.streamPath.includes('.flv')) {
-                    return FLV_JS;
+                    return Constants.FLV_JS;
+                } else if (item.streamPath.includes('.mp4') && item.isReview) {
+                    return Constants.FLV_JS;
                 } else {
-                    return VIDEO_JS;
+                    return Constants.VIDEO_JS;
                 }
             },
             handleTabRemove: function (name) {

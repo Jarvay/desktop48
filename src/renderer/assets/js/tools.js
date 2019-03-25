@@ -93,8 +93,8 @@ class Tools {
     static streamPathHandle(streamPath, timestamp) {
         const date = new Date(timestamp);
         const liveDate = `${date.getFullYear()}${date.getMonth() + 1}${date.getDate()}`;
-        return streamPath.replace(/^(http|https):\/\/([^\/]+)\/(\d+)/, function(pathPrefix, protocol, host) {
-            if (host.toLowerCase() != YI_ZHI_BO_HOST){
+        return streamPath.replace(/^(http|https):\/\/([^\/]+)\/(\d+)/, function (pathPrefix, protocol, host) {
+            if (host.toLowerCase() != YI_ZHI_BO_HOST) {
                 return pathPrefix;
             }
 
@@ -102,7 +102,5 @@ class Tools {
         })
     }
 }
-
-Tools.BARRAGE_SEND_INTERVAL = 5;   //弹幕发送间隔
 
 export default Tools;
