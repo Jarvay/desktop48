@@ -297,7 +297,7 @@
             changePlayer: function (newPlayer, liveId) {
                 console.log('change-player', newPlayer);
                 const index = this.liveTabs.findIndex(tab => {
-                    return tab.liveId == liveId;
+                    return tab.liveId == liveId && tab.show;
                 });
 
                 this.liveTabs[index].type = newPlayer;

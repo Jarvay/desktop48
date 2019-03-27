@@ -13,15 +13,25 @@ const winURL = process.env.NODE_ENV === 'development'
     ? `http://localhost:9080`
     : `file://${__dirname}/index.html`
 
+app.commandLine.appendSwitch('ppapi-flash-path', app.getPath('pepperFlashSystemPlugin'))
+
 let template = [{
     label: '帮助',
     role: 'help',
-    submenu: [{
-        label: 'Github',
-        click: function () {
-            shell.openExternal('https://github.com/Jarvay/48Live')
+    submenu: [
+        {
+            label: 'Github',
+            click: function () {
+                shell.openExternal('https://github.com/Jarvay/48live-electron')
+            }
+        },
+        {
+            label: '下载Flash',
+            click: function () {
+                shell.openExternal('https://www.flash.cn/')
+            }
         }
-    }]
+    ]
 }]
 
 function createWindow() {
@@ -50,21 +60,6 @@ function createWindow() {
         mainWindow = null
     })
 }
-
-const path = require('path')
-let pluginName
-switch (process.platform) {
-    case 'win32':
-        pluginName = 'pepflashplayer.dll'
-        break
-    case 'darwin':
-        pluginName = 'PepperFlashPlayer.plugin'
-        break
-    case 'linux':
-        pluginName = 'libpepflashplayer.so'
-        break
-}
-app.commandLine.appendSwitch('ppapi-flash-path', path.join(__static, pluginName))
 
 app.on('ready', function () {
     const menu = Menu.buildFromTemplate(template)

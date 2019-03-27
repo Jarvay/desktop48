@@ -98,7 +98,8 @@
                 chatroom: null,
                 endTipsShow: false,
                 number: 0,   //观看人数,
-                chatRoomStatus: 0
+                chatRoomStatus: 0,
+                noDecodedFramesCount: 0
             }
         },
         computed: {
@@ -190,11 +191,11 @@
                     this.flvPlayer.load();
 
                     if (this.isReview) {  //录播
+                        this.spinShow = false;
                         this.getBarrages();
                         //时长
                         this.flvPlayer.on(this.$flvjs.Events.MEDIA_INFO, media => {
                             this.duration = media.duration / 1000;
-                            this.spinShow = false;
                         });
                     } else {              //直播
                         this.spinShow = false;
@@ -274,7 +275,6 @@
             },
             sendBarrage: function () {
                 if (this.seconds != Constants.BARRAGE_SEND_INTERVAL || this.barrageBox.content.length == 0 || this.barrageBox.senderName.length == 0) {
-                    alert();
                     return;
                 }
                 const custom = {
