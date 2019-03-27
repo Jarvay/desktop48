@@ -1,4 +1,4 @@
-import {app, BrowserWindow} from 'electron'
+import {app, BrowserWindow, Menu, shell} from 'electron'
 
 /**
  * Set `__static` path to static files in production
@@ -12,6 +12,17 @@ let mainWindow
 const winURL = process.env.NODE_ENV === 'development'
     ? `http://localhost:9080`
     : `file://${__dirname}/index.html`
+
+let template = [{
+    label: '帮助',
+    role: 'help',
+    submenu: [{
+        label: 'Github',
+        click: function () {
+            shell.openExternal('https://github.com/Jarvay/48Live')
+        }
+    }]
+}]
 
 function createWindow() {
     /**
@@ -55,7 +66,12 @@ switch (process.platform) {
 }
 app.commandLine.appendSwitch('ppapi-flash-path', path.join(__static, pluginName))
 
-app.on('ready', createWindow)
+app.on('ready', function () {
+    const menu = Menu.buildFromTemplate(template)
+    Menu.setApplicationMenu(menu)
+
+    createWindow()
+})
 
 app.on('window-all-closed', () => {
     app.quit()

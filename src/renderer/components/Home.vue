@@ -11,11 +11,11 @@
                                       :data="members"
                                       v-model="selectedMember"></Cascader>
 
-                            <span style="margin-left:16px;color:white;">获取条数</span>
+                            <span style="margin-left:16px;color:white;">获取页数</span>
 
-                            <Tooltip content="最大值：4800" placement="bottom">
-                                <InputNumber style="margin-left:8px;" :max="4800" :min="1"
-                                             :step="160" v-model="limit"></InputNumber>
+                            <Tooltip content="最大值：50" placement="bottom">
+                                <InputNumber style="margin-left:8px;" :max="50" :min="5"
+                                             :step="5" v-model="pageCount"></InputNumber>
                             </Tooltip>
 
                             <Button type="primary" @click="getList">搜索</Button>
@@ -61,10 +61,13 @@
                                                 </div>
                                             </Col>
                                         </Row>
-                                        <Page :current="livePage" :total="liveTotal"
-                                              :page-size="pageSize" size="small"
-                                              show-total
-                                              @on-change="onLivePageChange"></Page>
+                                        <div style="margin: 8px;">
+                                            <Page :current="livePage" :total="liveTotal"
+                                                  :page-size="pageSize" size="small"
+                                                  show-total
+                                                  show-elevator=""
+                                                  @on-change="onLivePageChange"></Page>
+                                        </div>
                                     </TabPane>
 
                                     <TabPane label="回放">
@@ -99,16 +102,18 @@
                                                 </div>
                                             </Col>
                                         </Row>
-                                        <Page :current="reviewPage" :total="reviewTotal"
-                                              :page-size="pageSize" size="small"
-                                              show-total
-                                              @on-change="onReviewPageChange"></Page>
+                                        <div style="margin: 8px;">
+                                            <Page :current="reviewPage" :total="reviewTotal"
+                                                  :page-size="pageSize" size="small"
+                                                  show-total
+                                                  show-elevator=""
+                                                  @on-change="onReviewPageChange"></Page>
+                                        </div>
                                     </TabPane>
                                 </Tabs>
                             </div>
                         </Card>
                     </Content>
-                    <Footer class="layout-footer-center">2018 &copy; Jarvay</Footer>
                 </Layout>
             </TabPane>
 
@@ -146,7 +151,7 @@
                 pageSize: 16,
                 members: [],
                 selectedMember: [],
-                limit: 80,
+                pageCount: 5,
                 liveTotal: 0,
                 reviewTotal: 0,
                 livePage: 1,
@@ -196,7 +201,7 @@
             getList: function () {
                 this.spinShow = true;
 
-                LiveApi.lives(this.selectedMember[2], this.limit).then((responseBody) => {
+                LiveApi.lives(this.selectedMember[2], this.pageCount * this.pageSize).then((responseBody) => {
                     this.liveList = responseBody.content.liveList.map(item => {
                         item.cover = Tools.pictureUrls(item.picPath)[0];
                         item.date = new Date(item.startTime).format('yyyy-MM-dd hh:mm');
