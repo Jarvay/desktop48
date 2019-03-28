@@ -15,6 +15,7 @@ npm run build
 ```
 
 #### 用到的一些开源项目
+* [electron-vue](https://github.com/SimulatedGREG/electron-vue)
 * [video.js](https://github.com/videojs/video.js)
 * [flv.js](https://github.com/Bilibili/flv.js)
 * [iview](https://github.com/iview/iview)
