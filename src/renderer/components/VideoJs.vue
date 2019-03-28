@@ -414,4 +414,8 @@
         position: absolute !important;
         background-color: #fff;
     }
+
+    .video-js{
+        background-color: unset;
+    }
 </style>

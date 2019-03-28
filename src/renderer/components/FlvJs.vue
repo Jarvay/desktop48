@@ -5,9 +5,8 @@
                           @change-player="changePlayer"></PlayerHeader>
             <Content style="padding: 16px;">
                 <div class="player-container">
-                    <Spin size="large" fix v-if="spinShow"></Spin>
-
                     <Card>
+                        <Spin size="large" fix v-if="spinShow"></Spin>
                         <p slot="title">{{subTitle}}</p>
                         <p slot="extra">
                             <span>{{title}}</span>
@@ -191,11 +190,11 @@
                     this.flvPlayer.load();
 
                     if (this.isReview) {  //录播
-                        this.spinShow = false;
                         this.getBarrages();
                         //时长
                         this.flvPlayer.on(this.$flvjs.Events.MEDIA_INFO, media => {
                             this.duration = media.duration / 1000;
+                            this.spinShow = false;
                         });
                     } else {              //直播
                         this.spinShow = false;
