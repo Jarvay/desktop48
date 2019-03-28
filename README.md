@@ -1,5 +1,6 @@
-#### [48Live](https://github.com/Jarvay/48Live)的electron版
-(web版大概IP被关小黑屋了？)
+#### [48Live](https://github.com/Jarvay/48Live)的electron版(web版大概IP被关小黑屋了？)
+- 需要安装Flash,可在帮助->下载Flash中打开官方下载页
+- 如果遇到视频一直在加载请尝试切换播放器
 
 #### 安装步骤
 ``` bash
