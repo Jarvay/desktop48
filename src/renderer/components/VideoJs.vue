@@ -372,7 +372,7 @@
                                         this.number = custom.content.number;
                                         break;
                                     case 8:
-                                        if (custom.liveStatus == 1) {
+                                        if (custom.liveStatus == 1 || custom.liveStatus == 2) {
                                             this.$Modal.info({
                                                 title: '温馨提示',
                                                 content: '当前直播已结束'
