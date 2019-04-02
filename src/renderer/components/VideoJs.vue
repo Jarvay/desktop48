@@ -5,9 +5,8 @@
                           @change-player="changePlayer"></PlayerHeader>
             <Content style="padding: 16px;">
                 <div class="player-container">
-                    <Spin size="large" fix v-if="spinShow"></Spin>
-
                     <Card>
+                        <Spin size="large" fix v-if="spinShow"></Spin>
                         <p slot="title">{{subTitle}}</p>
                         <p slot="extra">{{title}}</p>
 
@@ -19,7 +18,9 @@
                         </Carousel>
 
                         <video :id="'video-js-' + liveId" class="video video-js" preload="auto"
-                               v-show="!isRadio"></video>
+                               v-show="!isRadio">
+                            <source :src="streamPath" :type="getType(streamPath)">
+                        </video>
 
                         <PlayerControls ref="controls" :is-muted="isMuted" :show-progress="isReview"
                                         :show-play-button="isReview"
@@ -80,11 +81,6 @@
                     controls: false, // 是否显示控制栏
                     techOrder: ['flash', 'html5'], // 兼容顺序
                     sourceOrder: true, //
-                    sources: [{
-                        withCredentials: false,
-                        type: this.getType(this.streamPath),
-                        src: this.streamPath
-                    }],
                 },
                 spinShow: true,
                 barrageUrl: '',
