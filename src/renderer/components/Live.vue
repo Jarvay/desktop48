@@ -6,7 +6,7 @@
                 <div class="player-container">
                     <Card>
                         <Spin size="large" fix v-if="spinShow"></Spin>
-                        <p slot="title">{{title}}</p>
+                        <p slot="title">{{liveTitle}}</p>
                         <p slot="extra">
                             <span>{{user.userName}}</span>
                         </p>
@@ -35,6 +35,7 @@
                     </Card>
 
                     <BarrageBox :ref="'barrage-box-' + liveId" :number="number"
+                                :start-time="startTime"
                                 :chat-room-status="chatRoomStatus"
                                 :send-disabled="sendDisabled"
                                 :send-text="sendText"
@@ -67,7 +68,6 @@
         components: {BarrageBox, PlayerControls, PlayerHeader},
         data() {
             return {
-                title: '',
                 user: {},
                 isRadio: false,
                 carousels: [],
@@ -103,6 +103,10 @@
             startTime: {
                 type: Number,
                 required: true
+            },
+            title: {
+                type: String,
+                required: true
             }
         },
         watch: {
@@ -113,6 +117,9 @@
         computed: {
             barrageBox() {
                 return this.$refs['barrage-box-' + this.liveId];
+            },
+            liveTitle() {
+                return this.title;
             }
         },
         created: function () {
@@ -134,7 +141,6 @@
                         const data = responseBody.content;
 
                         this.playStreamPath = Tools.streamPathHandle(data.playStreamPath, this.startTime);
-                        this.title = data.title;
                         this.subTitle = data.subTitle;
                         this.isReview = data.review;
                         this.barrageUrl = data.msgFilePath;
@@ -333,17 +339,17 @@
                 this.volume = volume;
             },
             sendBarrage: function () {
-                if (this.barrageBox.senderName.length == 0){
+                if (this.barrageBox.senderName.length == 0) {
                     this.$Notice.info({
-                       title:'首次发送弹幕请输入昵称'
+                        title: '首次发送弹幕请输入昵称'
                     });
                     return;
-                }else if (this.barrageBox.content.length == 0) {
+                } else if (this.barrageBox.content.length == 0) {
                     this.$Notice.info({
-                        title:'请输入发送内容'
+                        title: '请输入发送内容'
                     });
                     return;
-                }else if (this.seconds != this.Constants.BARRAGE_SEND_INTERVAL) {
+                } else if (this.seconds != this.Constants.BARRAGE_SEND_INTERVAL) {
                     return;
                 }
                 const custom = {
@@ -398,7 +404,7 @@
                                 content: this.barrageBox.content
                             });
                             this.$refs['barrage-box-' + this.liveId].senderNameReadonly = true;
-                        }else {
+                        } else {
                             console.error(error);
                         }
                         this.sendDisabled = true;

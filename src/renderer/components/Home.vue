@@ -17,11 +17,19 @@
                         <Button :loading="syncing" @click="syncInfo">同步成员信息</Button>
 
                     </Header>
-                    <Content style="padding: 8px 16px;">
-                        <Card>
-                            <div>
-                                <Tabs type="card">
-                                    <TabPane label="直播">
+
+                    <Layout>
+                        <Sider style="background-color: white;" hide-trigger width="120">
+                            <Menu active-name="1" theme="light" width="auto" @on-select="onMenuSelect">
+                                <MenuItem :name="Constants.MENU.LIVE">直播</MenuItem>
+                                <MenuItem :name="Constants.MENU.REVIEW">回放</MenuItem>
+                            </Menu>
+                        </Sider>
+
+                        <Content style="padding: 8px 16px;min-height: 600px;">
+                            <Card>
+                                <div>
+                                    <div v-show="liveShow">
                                         <Card v-if="liveList.length == 0"
                                               style="margin-bottom:8px">
                                             <p slot="title">当前没有直播</p>
@@ -29,11 +37,11 @@
 
                                         <Scroll :on-reach-bottom="onLiveReachBottom" height="720"
                                                 :distance-to-edge="distance" v-else>
-                                            <Row v-for="index in Math.ceil(liveList.length / 8)"
+                                            <Row v-for="index in Math.ceil(liveList.length / colNum)"
                                                  :key="index">
-                                                <Col style="padding: 4px;" span="3"
+                                                <Col style="padding: 4px;" span="4"
                                                      v-for="(item, i) in liveList"
-                                                     v-if="i <  index * 8 && i >= (index - 1) * 8"
+                                                     v-if="i <  index * colNum && i >= (index - 1) * colNum"
                                                      :key="item.liveId">
                                                     <div class="live-card" @click="openLive(item)">
                                                         <Card>
@@ -42,11 +50,12 @@
                                                             <div class="cover-container">
                                                                 <img ref="cover" class="cover" :src="item.cover">
                                                             </div>
-                                                            <p style="color:#ccc;">{{item.date}}</p>
+                                                            <p class="live-date">{{item.date}}</p>
                                                             <div style="display: flex;justify-content: space-between;">
                                                                 <div class="member-info">
                                                                     <span style="color: #000;">{{item.userInfo.nickname}}</span>
-                                                                    <span class="team-badge" :style="{'background-color':`#${item.member.team.teamColor}`}">{{item.member.team.teamName.replace('TEAM ', '')}}</span>
+                                                                    <span class="team-badge"
+                                                                          :style="{'background-color':`#${item.member.team.teamColor}`}">{{item.member.team.teamName.replace('TEAM ', '')}}</span>
                                                                 </div>
                                                                 <span v-if="item.liveType == 1">直播</span>
                                                                 <span v-else>电台</span>
@@ -56,16 +65,16 @@
                                                 </Col>
                                             </Row>
                                         </Scroll>
-                                    </TabPane>
+                                    </div>
 
-                                    <TabPane label="回放">
+                                    <div v-show="reviewShow">
                                         <Scroll :on-reach-bottom="onReviewReachBottom" height="720"
                                                 :distance-to-edge="distance">
-                                            <Row v-for="index in Math.ceil(reviewList.length / 8)"
+                                            <Row v-for="index in Math.ceil(reviewList.length / colNum)"
                                                  :key="index">
                                                 <Col style="padding: 4px;" span="3"
                                                      v-for="(item, i) in reviewList"
-                                                     v-if="i <  index * 8 && i >= (index - 1) * 8"
+                                                     v-if="i <  index * colNum && i >= (index - 1) * colNum"
                                                      :key="item.liveId">
                                                     <div class="live-card" @click="openLive(item)">
                                                         <Card>
@@ -74,11 +83,12 @@
                                                             <div class="cover-container">
                                                                 <img ref="cover" class="cover" :src="item.cover">
                                                             </div>
-                                                            <p style="color:#ccc;">{{item.date}}</p>
+                                                            <p class="live-date">{{item.date}}</p>
                                                             <div class="live-info">
                                                                 <div class="member-info">
                                                                     <span style="color: #000;">{{item.userInfo.nickname}}</span>
-                                                                    <span class="team-badge" :style="{'background-color':`#${item.member.team.teamColor}`}">{{item.member.team.teamName.replace('TEAM ', '')}}</span>
+                                                                    <span class="team-badge"
+                                                                          :style="{'background-color':`#${item.member.team.teamColor}`}">{{item.member.team.teamName.replace('TEAM ', '')}}</span>
                                                                 </div>
                                                                 <span v-if="item.liveType == 1">直播</span>
                                                                 <span v-else>电台</span>
@@ -88,17 +98,18 @@
                                                 </Col>
                                             </Row>
                                         </Scroll>
-                                    </TabPane>
-                                </Tabs>
-                            </div>
-                        </Card>
-                    </Content>
+                                    </div>
+                                </div>
+                            </Card>
+                        </Content>
+
+                    </Layout>
                 </Layout>
             </TabPane>
 
-            <TabPane v-for="liveTab in liveTabs" :label="liveTab.title" v-if="liveTab.show"
+            <TabPane v-for="liveTab in liveTabs" :label="liveTab.label" v-if="liveTab.show"
                      :name="liveTab.name">
-                <Live :live-id="liveTab.liveId" :start-time="liveTab.startTime"></Live>
+                <Live :live-id="liveTab.liveId" :start-time="liveTab.startTime" :title="liveTab.title"></Live>
             </TabPane>
         </Tabs>
     </div>
@@ -108,6 +119,7 @@
     import Tools from "../assets/js/tools";
     import Live from "./Live";
     import Apis from "../assets/js/apis";
+    import Constants from "../assets/js/constants";
 
     export default {
         name: 'Home',
@@ -135,6 +147,9 @@
                 reviewNext: '0',
                 distance: -10,
                 selectedUser: [],
+                liveShow: true,
+                reviewShow: false,
+                colNum: 8
             }
         },
         created: async function () {
@@ -247,7 +262,8 @@
                 if (exists) return;
                 const typeText = item.liveType == 1 ? '直播视频' : '直播电台';
                 const liveTab = {
-                    title: `${item.userInfo.nickname}的${typeText}`,
+                    label: `${item.userInfo.nickname}的${typeText}`,
+                    title: item.title,
                     liveId: item.liveId,
                     show: true,
                     name: item.liveId + '_' + Math.random().toString(36).substr(2),
@@ -299,6 +315,20 @@
                 this.$Notice.info({
                     title: '没有更多了'
                 })
+            },
+            onMenuSelect: function (name) {
+                switch (name) {
+                    case Constants.MENU.LIVE:
+                        this.liveShow = true;
+                        this.reviewShow = false;
+                        break;
+                    case Constants.MENU.REVIEW:
+                        this.reviewShow = true;
+                        this.liveShow = false;
+                        break;
+                    default:
+                        break;
+                }
             }
         }
     }
@@ -313,7 +343,7 @@
 
     .cover {
         width: 180px;
-        height: 180px;
+        height: 180px !important;
     }
 
     .layout-footer-center {
@@ -349,8 +379,13 @@
         align-items: center;
     }
 
-    .team-logo {
-        margin-left: 8px;
-        height: 16px;
+    .member-info > span {
+        font-size: 13px;
+    }
+
+    .live-date {
+        margin-top: 4px;
+        color: #cccccc;
+        font-size: 13px;
     }
 </style>

@@ -5,7 +5,10 @@
             <span style="color: #ccc;" v-if="chatRoomStatus == 0">未连接</span>
             <span style="color: #19be6b;" v-else>已连接</span>
         </p>
-        <p slot="extra">观看人数：{{number}}</p>
+        <p slot="extra">
+            <span>观看人数：{{number}} </span>
+            <span style="margin-left: 8px;color: #19be6b">开始时间：{{startDate}}</span>
+        </p>
 
         <div class="barrage-container">
             <Barrage class="barrage-box" ref="barrage"></Barrage>
@@ -70,6 +73,10 @@
                 type: Number,
                 required: true,
                 default: ''
+            },
+            startTime: {
+                type: Number,
+                required: true
             }
         },
         components: {Barrage},
@@ -78,6 +85,11 @@
                 senderName: Tools.getSenderName() == undefined || Tools.getSenderName() == null ? '' : Tools.getSenderName(),
                 content: ''
             };
+        },
+        computed: {
+            startDate() {
+                return new Date(this.startTime).format('yyyy-MM-dd');
+            }
         },
         methods: {
             shoot: function (barrage) {
