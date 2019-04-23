@@ -10,14 +10,6 @@ export default new Router({
           component:require('../components/Home').default
       },
       {
-          path:'/flvjs/:liveId',
-          component:require('../components/FlvJs').default
-      },
-      {
-          path:'/videojs/:liveId',
-          component:require('../components/VideoJs').default
-      },
-      {
           path: '*',
           redirect: '/'
       }

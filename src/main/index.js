@@ -26,9 +26,9 @@ let template = [{
             }
         },
         {
-            label: '下载Flash',
+            label: '调试',
             click: function () {
-                shell.openExternal('https://www.flash.cn/')
+                mainWindow.webContents.openDevTools()
             }
         }
     ]
@@ -50,8 +50,6 @@ function createWindow() {
     })
 
     mainWindow.loadURL(winURL)
-
-    // mainWindow.webContents.openDevTools()
 
     mainWindow.maximize()
     mainWindow.show()

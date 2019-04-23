@@ -102,8 +102,8 @@
             unmute: function () {
                 this.$emit('unmute')
             },
-            progressChange: function (progress) {
-                this.$emit('progress', progress);
+            progressChange: function (newTime) {
+                this.$emit('progress', newTime);
             },
             volumeChange: function (volume) {
                 localStorage.setItem('volume', volume);

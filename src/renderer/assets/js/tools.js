@@ -39,6 +39,14 @@ class Tools {
         });
     }
 
+    static sourceUrl(sourcePath) {
+        if (sourcePath.includes('http')) {
+            return sourcePath;
+        } else {
+            return 'https://source.48.cn' + sourcePath;
+        }
+    }
+
     static timeToSecond(time) {
         if (!time) return;
         const hours = time.split(':')[0];
@@ -73,7 +81,7 @@ class Tools {
 
     static lyricsParse(lyrics) {
         const barrages = [];
-        const lines = lyrics.split('\r\n');
+        const lines = lyrics.split('\n');
         lines.forEach(line => {
             if (line) {
                 const tmp = line.split(']');

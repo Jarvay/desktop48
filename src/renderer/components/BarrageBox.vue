@@ -37,6 +37,7 @@
 
 <script>
     import Barrage from './Barrage';
+    import Tools from "../assets/js/tools";
 
     export default {
         name: "BarrageBox",
@@ -74,7 +75,7 @@
         components: {Barrage},
         data() {
             return {
-                senderName: '',
+                senderName: Tools.getSenderName() == undefined || Tools.getSenderName() == null ? '' : Tools.getSenderName(),
                 content: ''
             };
         },

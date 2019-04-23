@@ -1,7 +1,7 @@
 import './48sdk/base-v2.8.0';
 import './48sdk/nim-v2.8.0';
 import Chatroom from './48sdk/chatroom-v2.8.0';
-import LiveApi from "./live-api";
+import Apis from "./apis";
 
 class ChatRoomTools {
     /**
@@ -11,7 +11,7 @@ class ChatRoomTools {
      */
     static chatroom(options){
         return new Promise((resolve, reject) => {
-            LiveApi.chatRoomToken().then(responseBody => {
+            Apis.chatRoomToken().then(responseBody => {
                 console.log(options);
                 const chatroom = new Chatroom({
                     appKey:'632feff1f4c838541ab75195d1ceb3fa',      //从官网公演直播网页代码获取
