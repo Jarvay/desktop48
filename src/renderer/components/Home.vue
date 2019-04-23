@@ -1,145 +1,129 @@
 <template>
     <div class="layout">
-        <Spin size="large" fix v-if="spinShow"></Spin>
-
         <Tabs type="card" closable @on-tab-remove="handleTabRemove" :value="activeTab">
             <TabPane label="Home" :closable="homeClosable">
                 <Layout>
+                    <Spin size="large" fix v-if="spinShow"></Spin>
+
                     <Header class="header">
                         <div>
                             <Cascader filterable="" class="cascader" placeholder="请选择成员"
                                       :data="members"
-                                      v-model="selectedMember"></Cascader>
+                                      v-model="selectedUser"></Cascader>
 
-                            <span style="margin-left:16px;color:white;">获取页数</span>
-
-                            <Tooltip content="最大值：50" placement="bottom">
-                                <InputNumber style="margin-left:8px;" :max="50" :min="5"
-                                             :step="5" v-model="pageCount"></InputNumber>
-                            </Tooltip>
-
-                            <Button type="primary" @click="getList">搜索</Button>
+                            <Button type="primary" @click="refresh">搜索</Button>
                         </div>
 
                         <Button :loading="syncing" @click="syncInfo">同步成员信息</Button>
+
                     </Header>
-                    <Content style="padding: 8px 16px;">
-                        <Card>
-                            <div style="min-height: 200px;">
-                                <Tabs type="card">
-                                    <TabPane label="直播">
-                                        <Card v-if="currentLiveList.length === 0"
+
+                    <Layout>
+                        <Sider style="background-color: white;" hide-trigger width="120">
+                            <Menu active-name="1" theme="light" width="auto" @on-select="onMenuSelect">
+                                <MenuItem :name="Constants.MENU.LIVE">直播</MenuItem>
+                                <MenuItem :name="Constants.MENU.REVIEW">回放</MenuItem>
+                            </Menu>
+                        </Sider>
+
+                        <Content style="padding: 8px 16px;min-height: 600px;">
+                            <Card>
+                                <div>
+                                    <div v-show="liveShow">
+                                        <Card v-if="liveList.length == 0"
                                               style="margin-bottom:8px">
                                             <p slot="title">当前没有直播</p>
                                         </Card>
 
-                                        <Row v-for="index in Math.ceil(currentLiveList.length / 8)"
-                                             :key="index">
-                                            <Col style="padding: 4px;" span="3"
-                                                 v-for="(item, i) in currentLiveList"
-                                                 v-if="i <  index * 8 && i >= (index - 1) * 8"
-                                                 :key="item.liveId">
-                                                <div class="live-card" @click="openLive(item)">
-                                                    <Card>
-                                                        <p slot="title">{{item.subTitle}}</p>
+                                        <Scroll :on-reach-bottom="onLiveReachBottom" height="720"
+                                                :distance-to-edge="distance" v-else>
+                                            <Row v-for="index in Math.ceil(liveList.length / colNum)"
+                                                 :key="index">
+                                                <Col style="padding: 4px;" span="4"
+                                                     v-for="(item, i) in liveList"
+                                                     v-if="i <  index * colNum && i >= (index - 1) * colNum"
+                                                     :key="item.liveId">
+                                                    <div class="live-card" @click="openLive(item)">
+                                                        <Card>
+                                                            <p slot="title">{{item.title}}</p>
 
-                                                        <div class="cover-container">
-                                                            <img ref="cover" class="cover"
-                                                                 :src="item.cover">
-                                                        </div>
-                                                        <p style="color:#ccc;">{{item.date}}</p>
-                                                        <div style="display: flex;justify-content: space-between;">
-                                                            <div>
-                                                                <span style="color: #000;">{{item.member.real_name}}</span>
-                                                                <span class="team-badge"
-                                                                      :style="{'background-color':'#' + item.member.teamObj.color}">{{item.member.teamObj.team_name}}</span>
+                                                            <div class="cover-container">
+                                                                <img ref="cover" class="cover" :src="item.cover">
                                                             </div>
-                                                            <span v-if="item.liveType == 1">直播</span>
-                                                            <span v-else>电台</span>
-                                                        </div>
-                                                    </Card>
-                                                </div>
-                                            </Col>
-                                        </Row>
-                                        <div style="margin: 8px;">
-                                            <Page :current="livePage" :total="liveTotal"
-                                                  :page-size="pageSize" size="small"
-                                                  show-total
-                                                  show-elevator=""
-                                                  @on-change="onLivePageChange"></Page>
-                                        </div>
-                                    </TabPane>
-
-                                    <TabPane label="回放">
-                                        <Row v-for="index in Math.ceil(currentReviewList.length / 8)"
-                                             :key="index">
-                                            <Col style="padding: 4px;" span="3"
-                                                 v-for="(item, i) in currentReviewList"
-                                                 v-if="i <  index * 8 && i >= (index - 1) * 8"
-                                                 :key="item.liveId">
-                                                <div class="live-card" @click="openLive(item)">
-                                                    <Card>
-                                                        <p slot="title">{{item.subTitle}}</p>
-
-                                                        <div class="cover-container">
-                                                            <img ref="cover" class="cover"
-                                                                 :src="item.cover">
-                                                        </div>
-                                                        <p style="color:#ccc;">{{item.date}}</p>
-                                                        <div style="display: flex;justify-content: space-between;">
-                                                            <div>
-                                                                <span style="color: #000;">{{item.member
-                                                                    .real_name}}</span>
-                                                                <span class="team-badge"
-                                                                      :style="{'background-color':'#' +
-                                                                        item.member.teamObj.color}">
-                                                            {{item.member.teamObj.team_name}}</span>
+                                                            <p class="live-date">{{item.date}}</p>
+                                                            <div style="display: flex;justify-content: space-between;">
+                                                                <div class="member-info">
+                                                                    <span style="color: #000;">{{item.userInfo.nickname}}</span>
+                                                                    <span class="team-badge"
+                                                                          :style="{'background-color':`#${item.member.team.teamColor}`}">{{item.member.team.teamName.replace('TEAM ', '')}}</span>
+                                                                </div>
+                                                                <span v-if="item.liveType == 1">直播</span>
+                                                                <span v-else>电台</span>
                                                             </div>
-                                                            <span v-if="item.liveType == 1">直播</span>
-                                                            <span v-else>电台</span>
-                                                        </div>
-                                                    </Card>
-                                                </div>
-                                            </Col>
-                                        </Row>
-                                        <div style="margin: 8px;">
-                                            <Page :current="reviewPage" :total="reviewTotal"
-                                                  :page-size="pageSize" size="small"
-                                                  show-total
-                                                  show-elevator=""
-                                                  @on-change="onReviewPageChange"></Page>
-                                        </div>
-                                    </TabPane>
-                                </Tabs>
-                            </div>
-                        </Card>
-                    </Content>
+                                                        </Card>
+                                                    </div>
+                                                </Col>
+                                            </Row>
+                                        </Scroll>
+                                    </div>
+
+                                    <div v-show="reviewShow">
+                                        <Scroll :on-reach-bottom="onReviewReachBottom" height="720"
+                                                :distance-to-edge="distance">
+                                            <Row v-for="index in Math.ceil(reviewList.length / colNum)"
+                                                 :key="index">
+                                                <Col style="padding: 4px;" span="3"
+                                                     v-for="(item, i) in reviewList"
+                                                     v-if="i <  index * colNum && i >= (index - 1) * colNum"
+                                                     :key="item.liveId">
+                                                    <div class="live-card" @click="openLive(item)">
+                                                        <Card>
+                                                            <p slot="title">{{item.title}}</p>
+
+                                                            <div class="cover-container">
+                                                                <img ref="cover" class="cover" :src="item.cover">
+                                                            </div>
+                                                            <p class="live-date">{{item.date}}</p>
+                                                            <div class="live-info">
+                                                                <div class="member-info">
+                                                                    <span style="color: #000;">{{item.userInfo.nickname}}</span>
+                                                                    <span class="team-badge"
+                                                                          :style="{'background-color':`#${item.member.team.teamColor}`}">{{item.member.team.teamName.replace('TEAM ', '')}}</span>
+                                                                </div>
+                                                                <span v-if="item.liveType == 1">直播</span>
+                                                                <span v-else>电台</span>
+                                                            </div>
+                                                        </Card>
+                                                    </div>
+                                                </Col>
+                                            </Row>
+                                        </Scroll>
+                                    </div>
+                                </div>
+                            </Card>
+                        </Content>
+
+                    </Layout>
                 </Layout>
             </TabPane>
 
-            <TabPane v-for="liveTab in liveTabs" :label="liveTab.title" v-if="liveTab.show"
+            <TabPane v-for="liveTab in liveTabs" :label="liveTab.label" v-if="liveTab.show"
                      :name="liveTab.name">
-                <FlvJs v-if="liveTab.type == 'flv.js'" :liveId="liveTab.liveId"
-                       :stream-path="liveTab.streamPath"
-                       @change-player="changePlayer"></FlvJs>
-                <VideoJs v-else-if="liveTab.type == 'video.js'" :liveId="liveTab.liveId"
-                         :stream-path="liveTab.streamPath"
-                         @change-player="changePlayer"></VideoJs>
+                <Live :live-id="liveTab.liveId" :start-time="liveTab.startTime" :title="liveTab.title"></Live>
             </TabPane>
         </Tabs>
     </div>
 </template>
 
 <script>
-    import Constants from '../assets/js/constants';
     import Tools from "../assets/js/tools";
-    import FlvJs from "./FlvJs";
-    import VideoJs from "./VideoJs";
-    import LiveApi from "../assets/js/live-api";
+    import Live from "./Live";
+    import Apis from "../assets/js/apis";
+    import Constants from "../assets/js/constants";
 
     export default {
         name: 'Home',
-        components: {VideoJs, FlvJs},
+        components: {Live},
         data() {
             return {
                 spinShow: true,
@@ -150,7 +134,6 @@
                 coverWidth: -1,
                 pageSize: 16,
                 members: [],
-                selectedMember: [],
                 pageCount: 5,
                 liveTotal: 0,
                 reviewTotal: 0,
@@ -160,27 +143,32 @@
                 liveTabs: [],
                 activeTab: 0,
                 syncing: false,
+                liveNext: '0',
+                reviewNext: '0',
+                distance: -10,
+                selectedUser: [],
+                liveShow: true,
+                reviewShow: false,
+                colNum: 8
             }
         },
         created: async function () {
-            if (!LiveApi.db().has('members').value()) {
-                await LiveApi.syncInfo();
+            if (!Apis.db().has('members').value()) {
+                await Apis.syncInfo();
             }
 
-            this.getList();
-
-            this.members = LiveApi.groups().map(group => {
+            this.members = Apis.groups().map(group => {
                 return {
-                    value: group.group_id,
-                    label: group.group_name,
+                    value: group.groupId,
+                    label: group.groupName,
                     children: group.teams.map(team => {
                         return {
-                            value: team.team_id,
-                            label: team.team_name,
+                            value: team.teamId,
+                            label: team.teamName,
                             children: team.members.map(member => {
                                 return {
-                                    value: member.member_id,
-                                    label: member.real_name
+                                    value: member.userId,
+                                    label: member.realName
                                 }
                             })
                         }
@@ -188,6 +176,8 @@
                 }
             });
 
+            this.getLiveList();
+            this.getReviewList();
         },
         updated: function () {
             this.reSize();
@@ -198,57 +188,65 @@
             };
         },
         methods: {
-            getList: function () {
+            getLiveList: function () {
                 this.spinShow = true;
 
-                LiveApi.lives(this.selectedMember[2], this.pageCount * this.pageSize).then((responseBody) => {
-                    this.liveList = responseBody.content.liveList.map(item => {
-                        item.cover = Tools.pictureUrls(item.picPath)[0];
-                        item.date = new Date(item.startTime).format('yyyy-MM-dd hh:mm');
-                        item.member = LiveApi.member(item.memberId);
-                        item.member.teamObj.team_name = item.member.teamObj.team_name.replace('TEAM ', '');
-                        item.isReview = false;
-                        return item;
-                    });
-                    this.liveTotal = this.liveList.length;
-
-                    this.reviewList = responseBody.content.reviewList.map(item => {
-                        item.cover = Tools.pictureUrls(item.picPath)[0];
-                        item.date = new Date(item.startTime).format('yyyy-MM-dd hh:mm');
-                        item.member = LiveApi.member(item.memberId);
-                        item.member.teamObj.team_name = item.member.teamObj.team_name.replace('TEAM ', '');
-                        item.isReview = true;
-                        return item;
-                    });
-
-                    this.reviewTotal = this.reviewList.length;
-
-                    this.onLivePageChange(1);
-                    this.onReviewPageChange(1);
+                Apis.lives(this.selectedUser[2], this.liveNext).then((responseBody) => {
                     this.spinShow = false;
+                    if (this.liveNext == responseBody.content.next && this.liveNext != '0') {
+                        this.showListEndTips();
+                        return;
+                    }
+
+                    this.liveNext = responseBody.content.next;
+                    const newList = responseBody.content.liveList.map(item => {
+                        item.cover = Tools.pictureUrls(item.coverPath);
+                        item.date = new Date(parseInt(item.ctime)).format('yyyy-MM-dd hh:mm');
+                        item.userInfo.teamLogo = Tools.pictureUrls(item.userInfo.teamLogo);
+                        item.isReview = false;
+                        item.member = Apis.member(item.userInfo.userId);
+                        return item;
+                    });
+                    this.liveList = this.liveList.concat(newList);
                 }).catch(error => {
                     this.spinShow = false;
                     console.log(error);
                 });
             },
-            onLivePageChange: function (page) {
-                this.livePage = page;
-                const start = (page - 1) * this.pageSize;
-                this.currentLiveList = this.liveList.slice(start, start + this.pageSize);
+            getReviewList: function () {
+                Apis.reviews(this.selectedUser[2], this.reviewNext).then(responseBody => {
+                    console.log('reviews', responseBody);
+                    this.spinShow = false;
+                    if (this.reviewNext == responseBody.content.next) {
+                        this.showListEndTips();
+                        return;
+                    }
+
+                    this.reviewNext = responseBody.content.next;
+                    const newList = responseBody.content.liveList.map(item => {
+                        item.cover = Tools.pictureUrls(item.coverPath);
+                        item.date = new Date(parseInt(item.ctime)).format('yyyy-MM-dd hh:mm');
+                        item.userInfo.teamLogo = Tools.pictureUrls(item.userInfo.teamLogo);
+                        item.isReview = false;
+                        item.member = Apis.member(item.userInfo.userId);
+                        return item;
+                    });
+                    this.reviewList = this.reviewList.concat(newList);
+                    console.log(this.reviewList);
+                }).catch(error => {
+                    this.spinShow = false;
+                    console.log(error);
+                });
             },
-            onReviewPageChange: function (page) {
-                this.reviewPage = page;
-                const start = (page - 1) * this.pageSize;
-                this.currentReviewList = this.reviewList.slice(start, start + this.pageSize);
-            },
-            getType: function (item) {
-                if (!item.isReview && item.streamPath.includes('.flv')) {
-                    return Constants.FLV_JS;
-                } else if (item.streamPath.includes('.mp4') && item.isReview) {
-                    return Constants.FLV_JS;
-                } else {
-                    return Constants.VIDEO_JS;
-                }
+            refresh: function () {
+                this.liveNext = "0";
+                this.reviewNext = "0";
+
+                this.liveList = [];
+                this.reviewList = [];
+
+                this.getLiveList();
+                this.getReviewList();
             },
             handleTabRemove: function (name) {
                 const index = this.liveTabs.findIndex(item => {
@@ -262,13 +260,14 @@
                     return tab.liveId == item.liveId && tab.show == true;
                 });
                 if (exists) return;
+                const typeText = item.liveType == 1 ? '直播视频' : '直播电台';
                 const liveTab = {
-                    title: item.title.replace('（回放生成中）', ''),
-                    type: this.getType(item),
+                    label: `${item.userInfo.nickname}的${typeText}`,
+                    title: item.title,
                     liveId: item.liveId,
                     show: true,
                     name: item.liveId + '_' + Math.random().toString(36).substr(2),
-                    streamPath: Tools.streamPathHandle(item.streamPath, item.startTime)
+                    startTime: parseInt(item.ctime)
                 };
                 this.liveTabs.push(liveTab);
                 this.activeTab = liveTab.name;
@@ -286,21 +285,50 @@
             },
             syncInfo: function () {
                 this.syncing = true;
-                LiveApi.syncInfo().then(() => {
+                Apis.syncInfo().then(() => {
                     this.syncing = false;
-                    this.getList();
                 }).catch(error => {
                     console.log(error);
                     this.syncing = false;
                 })
             },
             changePlayer: function (newPlayer, liveId) {
-                console.log('change-player', newPlayer);
                 const index = this.liveTabs.findIndex(tab => {
                     return tab.liveId == liveId && tab.show;
                 });
 
                 this.liveTabs[index].type = newPlayer;
+            },
+            onLiveReachBottom: function () {
+                return new Promise(resolve => {
+                    this.getLiveList(this.liveNext);
+                    resolve();
+                });
+            },
+            onReviewReachBottom: function () {
+                return new Promise(resolve => {
+                    this.getReviewList(this.reviewNext);
+                    resolve();
+                });
+            },
+            showListEndTips: function () {
+                this.$Notice.info({
+                    title: '没有更多了'
+                })
+            },
+            onMenuSelect: function (name) {
+                switch (name) {
+                    case Constants.MENU.LIVE:
+                        this.liveShow = true;
+                        this.reviewShow = false;
+                        break;
+                    case Constants.MENU.REVIEW:
+                        this.reviewShow = true;
+                        this.liveShow = false;
+                        break;
+                    default:
+                        break;
+                }
             }
         }
     }
@@ -314,8 +342,8 @@
     }
 
     .cover {
-        width: 150px;
-        height: 150px;
+        width: 180px;
+        height: 180px !important;
     }
 
     .layout-footer-center {
@@ -339,5 +367,25 @@
 
     .live-card {
         cursor: pointer;
+    }
+
+    .live-info {
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .member-info {
+        display: flex;
+        align-items: center;
+    }
+
+    .member-info > span {
+        font-size: 13px;
+    }
+
+    .live-date {
+        margin-top: 4px;
+        color: #cccccc;
+        font-size: 13px;
     }
 </style>

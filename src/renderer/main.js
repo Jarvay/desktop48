@@ -8,11 +8,11 @@ import router from './router'
 import iView from 'iview'
 import 'iview/dist/styles/iview.css'
 
-import flvjs from 'flv.js'
-
+import Constant from '../renderer/assets/js/constants'
 
 Vue.use(iView);
-Vue.prototype.$flvjs = flvjs;
+
+Vue.prototype.Constants = Constant;
 
 if (!process.env.IS_WEB) Vue.use(require('vue-electron'))
 Vue.http = Vue.prototype.$http = axios

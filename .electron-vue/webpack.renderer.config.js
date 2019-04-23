@@ -75,6 +75,14 @@ let rendererConfig = {
         }
       },
       {
+        test: /\.ts$/,
+        loader: 'ts-loader',
+        exclude: /node_modules|vue\/src/,
+        options: {
+          appendTsSuffixTo: [/\.vue$/]
+        }
+      },
+      {
         test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
         use: {
           loader: 'url-loader',

@@ -51,8 +51,6 @@ function createWindow() {
 
     mainWindow.loadURL(winURL)
 
-    // mainWindow.webContents.openDevTools()
-
     mainWindow.maximize()
     mainWindow.show()
 

@@ -3,16 +3,13 @@
         <Header>
             <div class="header-box">
                 <div class="layout-nav">
-                    <Button type="primary" @click="nextPlayer">不能播放，切换播放器</Button>
-
                     <Button style="margin-left: 8px;" type="primary" @click="showUrl = true">视频地址
                     </Button>
                 </div>
             </div>
         </Header>
 
-        <Modal v-model="showUrl"
-               title="视频地址">
+        <Modal v-model="showUrl" title="视频地址">
             <p>
                 <span>{{videoUrl}}</span>
             </p>
@@ -29,7 +26,7 @@
             }
         },
         props: {
-            otherPlayer: {
+            currentPlayer: {
                 type: String,
                 required: true
             },
@@ -39,9 +36,7 @@
             }
         },
         methods: {
-            nextPlayer: function () {
-                this.$emit('change-player', this.otherPlayer);
-            }
+
         }
     }
 </script>
