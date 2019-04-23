@@ -1,8 +1,8 @@
-### [48Live](https://github.com/Jarvay/48Live)的electron版(web版大概IP被关小黑屋了？)
-- 需要安装Flash,可在帮助->下载Flash中打开官方下载页
-- 如果遇到视频一直在加载请尝试切换播放器
+# 网页版可以使用[pocket48-grab](https://github.com/xsaiting/pocket48-grab/)
 
-### 安装步骤
+# [点此下载构建好的压缩包](https://github.com/Jarvay/48live-electron/releases)
+
+# 安装步骤
 ``` bash
 # 安装依赖
 npm install
@@ -14,10 +14,10 @@ npm run dev
 npm run build
 ```
 
-### 已知问题
+# 已知问题
 1. 异常结束的直播回放不能播放
 
-### 用到的一些开源项目
+# 用到的一些开源项目
 * [electron-vue](https://github.com/SimulatedGREG/electron-vue)
 * [video.js](https://github.com/videojs/video.js)
 * [flv.js](https://github.com/Bilibili/flv.js)
