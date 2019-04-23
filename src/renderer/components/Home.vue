@@ -46,7 +46,7 @@
                                                             <div style="display: flex;justify-content: space-between;">
                                                                 <div class="member-info">
                                                                     <span style="color: #000;">{{item.userInfo.nickname}}</span>
-                                                                    <span class="team-badge" :style="{'background-color':`#${item.member.team.teamColor}`}">{{item.member.team.teamName.replace('TEAM ')}}</span>
+                                                                    <span class="team-badge" :style="{'background-color':`#${item.member.team.teamColor}`}">{{item.member.team.teamName.replace('TEAM ', '')}}</span>
                                                                 </div>
                                                                 <span v-if="item.liveType == 1">直播</span>
                                                                 <span v-else>电台</span>
