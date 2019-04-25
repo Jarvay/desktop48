@@ -375,6 +375,11 @@
                         title: '请输入发送内容'
                     });
                     return;
+                }else if (this.chatRoomStatus == 0){
+                    this.$Notice.info({
+                        title: '尚未连接到聊天室'
+                    });
+                    return;
                 } else if (this.seconds != this.Constants.BARRAGE_SEND_INTERVAL) {
                     return;
                 }

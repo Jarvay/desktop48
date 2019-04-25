@@ -14,6 +14,7 @@
                         <Header class="header">
                             <div>
                                 <Cascader v-if="activeMenu == Constants.MENU.REVIEW"
+                                          transfer
                                           filterable="" class="cascader" placeholder="请选择成员"
                                           :data="members"
                                           v-model="selectedUser"></Cascader>
@@ -155,16 +156,16 @@
 
             this.members = Apis.groups().map(group => {
                 return {
-                    value: group.groupId,
+                    value: group.groupId + "",
                     label: group.groupName,
                     children: group.teams.map(team => {
                         return {
-                            value: team.teamId,
+                            value: team.teamId + "",
                             label: team.teamName,
                             children: team.members.map(member => {
                                 return {
-                                    value: member.userId,
-                                    label: member.realName
+                                    value: member.userId + "",
+                                    label: `${member.realName}(${member.abbr})`
                                 }
                             })
                         }
