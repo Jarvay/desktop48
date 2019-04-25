@@ -303,6 +303,12 @@
                                     case this.Constants.MESSAGE_TYPE.LIVEUPDATE: //观看人数
                                         this.number = custom.liveUpdateInfo.online;
                                         break;
+                                    case this.Constants.MESSAGE_TYPE.CLOSELIVE: //直播结束
+                                        this.$Modal.info({
+                                           title:'温馨提示',
+                                           content: '当前直播已结束'
+                                        });
+                                        break;
                                     default:
                                         break;
                                 }
