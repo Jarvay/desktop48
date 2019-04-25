@@ -88,7 +88,7 @@
         },
         computed: {
             startDate() {
-                return new Date(this.startTime).format('yyyy-MM-dd');
+                return new Date(this.startTime).format('yyyy-MM-dd hh:mm');
             }
         },
         methods: {

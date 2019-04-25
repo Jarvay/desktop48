@@ -1,12 +1,15 @@
 <template>
     <div class="layout">
         <Layout>
-            <PlayerHeader :video-url="playStreamPath" :current-player="currentPlayer"></PlayerHeader>
+            <PlayerHeader :video-url="playStreamPath" :current-player="currentPlayer" @try-to-fix="createVideoServer"></PlayerHeader>
             <Content style="padding: 16px;">
                 <div class="player-container">
                     <Card>
                         <Spin size="large" fix v-if="spinShow"></Spin>
-                        <p slot="title">{{liveTitle}}</p>
+
+                        <p slot="title" style="max-width: 160px;">
+                            <Tooltip :content="liveTitle"><span>{{liveTitle}}</span></Tooltip>
+                        </p>
                         <p slot="extra">
                             <span>{{user.userName}}</span>
                         </p>
@@ -18,9 +21,11 @@
                         </Carousel>
 
                         <div v-else>
-                            <video class="video" :id="'flv-js-' + liveId" ref="video" v-if="flvJsShow"></video>
+                            <video class="video" :id="'flv-js-' + liveId" ref="video" v-show="flvJsShow"></video>
                             <video :id="'video-js-' + liveId" class="video video-js" preload="auto"
-                                   v-if="videoJsShow"></video>
+                                   v-show="videoJsShow">
+                                <source :src="playStreamPath" :type="getType(playStreamPath)">
+                            </video>
                         </div>
 
                         <PlayerControls ref="controls" :show-play-button="isReview"
@@ -57,7 +62,6 @@
 
     import VideoJs from 'video.js';
     import 'video.js/src/css/video-js.scss';
-    import 'videojs-flash';
 
     import FlvJs from 'flv.js';
 
@@ -92,7 +96,9 @@
                 status: this.Constants.STATUS_PREPARED,
                 currentPlayer: '',
                 chatroom: null,
-                seconds: this.Constants.BARRAGE_SEND_INTERVAL
+                seconds: this.Constants.BARRAGE_SEND_INTERVAL,
+                videoServer: null,
+                port: 8800
             };
         },
         props: {
@@ -106,6 +112,10 @@
             },
             title: {
                 type: String,
+                required: true
+            },
+            index: {
+                type: Number,
                 required: true
             }
         },
@@ -123,6 +133,8 @@
             }
         },
         created: function () {
+            this.port = this.port + this.index;
+
             this.getOne();
         },
         destroyed: function () {
@@ -132,6 +144,10 @@
 
             if (this.chatroom != null) {
                 this.chatroom.disconnect();
+            }
+
+            if (this.videoServer != null){
+                this.videoServer.close();
             }
         },
         methods: {
@@ -155,7 +171,6 @@
                         }
                         this.user = data.user;
 
-                        this.spinShow = false;
                         this.initPlayer();
                     } else {
                         this.$Message.error(responseBody.message);
@@ -166,6 +181,12 @@
                 });
             },
             initPlayer: function () {
+                this.spinShow = false;
+
+                if (this.player != null) {
+                    this.player.destroy();
+                }
+
                 if (!this.isReview && this.playStreamPath.includes('.flv')) {
                     this.initFlvJs();
                 } else if (this.playStreamPath.includes('.mp4') && this.isReview) {
@@ -176,9 +197,14 @@
 
                 this.player.volume(Tools.getVolume());
 
+                Tools.videoInfo(this.playStreamPath).then(result => {
+                    this.duration = result.duration;
+                }).catch(error => {
+                   console.error(error);
+                });
+
                 //时长
                 this.player.onGotDuration(duration => {
-                    this.duration = duration;
                     if (!this.isReview) {
                         this.connectChatroom();
                         this.play();
@@ -434,7 +460,6 @@
                     return;
                 }
                 Apis.barrage(this.barrageUrl).then(response => {
-                    console.log(response.data);
                     this.finalBarrageList = this.barrageList = Tools.lyricsParse(response.data);
                     this.currentBarrage = this.barrageList.shift();
 
@@ -460,6 +485,12 @@
                     this.currentBarrage = this.barrageList.shift();
                     this.loadBarrages();
                 }
+            },
+            createVideoServer: function () {
+                this.spinShow = true;
+                this.videoServer = Tools.createVideoServer(this.playStreamPath, this.port);
+                this.playStreamPath = `http://127.0.0.1:${this.port}?.mp4`;
+                this.initPlayer();
             },
         }
     }

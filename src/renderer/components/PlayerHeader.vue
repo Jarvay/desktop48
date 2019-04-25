@@ -3,8 +3,9 @@
         <Header>
             <div class="header-box">
                 <div class="layout-nav">
-                    <Button style="margin-left: 8px;" type="primary" @click="showUrl = true">视频地址
-                    </Button>
+                    <Button type="primary" @click="tryToFix">不能播放，尝试修复</Button>
+
+                    <Button style="margin-left: 8px;" type="primary" @click="showUrl = true">视频地址</Button>
                 </div>
             </div>
         </Header>
@@ -36,7 +37,9 @@
             }
         },
         methods: {
-
+            tryToFix: function () {
+                this.$emit('try-to-fix');
+            }
         }
     }
 </script>

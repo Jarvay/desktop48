@@ -3,33 +3,34 @@
         <Tabs type="card" closable @on-tab-remove="handleTabRemove" :value="activeTab">
             <TabPane label="Home" :closable="homeClosable">
                 <Layout>
-                    <Spin size="large" fix v-if="spinShow"></Spin>
-
-                    <Header class="header">
-                        <div>
-                            <Cascader filterable="" class="cascader" placeholder="请选择成员"
-                                      :data="members"
-                                      v-model="selectedUser"></Cascader>
-
-                            <Button type="primary" @click="refresh">搜索</Button>
-                        </div>
-
-                        <Button :loading="syncing" @click="syncInfo">同步成员信息</Button>
-
-                    </Header>
+                    <Sider hide-trigger width="120">
+                        <Menu :active-name="Constants.MENU.LIVE" theme="dark" width="auto" @on-select="onMenuSelect">
+                            <MenuItem :name="Constants.MENU.LIVE">直播</MenuItem>
+                            <MenuItem :name="Constants.MENU.REVIEW">回放</MenuItem>
+                        </Menu>
+                    </Sider>
 
                     <Layout>
-                        <Sider style="background-color: white;" hide-trigger width="120">
-                            <Menu active-name="1" theme="light" width="auto" @on-select="onMenuSelect">
-                                <MenuItem :name="Constants.MENU.LIVE">直播</MenuItem>
-                                <MenuItem :name="Constants.MENU.REVIEW">回放</MenuItem>
-                            </Menu>
-                        </Sider>
+                        <Header class="header">
+                            <div>
+                                <Cascader v-if="activeMenu == Constants.MENU.REVIEW"
+                                          filterable="" class="cascader" placeholder="请选择成员"
+                                          :data="members"
+                                          v-model="selectedUser"></Cascader>
+
+                                <Button type="primary" @click="refresh">刷新</Button>
+                            </div>
+
+                            <Button :loading="syncing" @click="syncInfo">同步成员信息</Button>
+
+                        </Header>
 
                         <Content style="padding: 8px 16px;min-height: 600px;">
                             <Card>
                                 <div>
                                     <div v-show="liveShow">
+                                        <Spin size="large" fix v-if="liveSpinShow"></Spin>
+
                                         <Card v-if="liveList.length == 0"
                                               style="margin-bottom:8px">
                                             <p slot="title">当前没有直播</p>
@@ -39,7 +40,7 @@
                                                 :distance-to-edge="distance" v-else>
                                             <Row v-for="index in Math.ceil(liveList.length / colNum)"
                                                  :key="index">
-                                                <Col style="padding: 4px;" span="4"
+                                                <Col style="padding: 4px;" span="3"
                                                      v-for="(item, i) in liveList"
                                                      v-if="i <  index * colNum && i >= (index - 1) * colNum"
                                                      :key="item.liveId">
@@ -68,6 +69,8 @@
                                     </div>
 
                                     <div v-show="reviewShow">
+                                        <Spin size="large" fix v-if="reviewSpinShow"></Spin>
+
                                         <Scroll :on-reach-bottom="onReviewReachBottom" height="720"
                                                 :distance-to-edge="distance">
                                             <Row v-for="index in Math.ceil(reviewList.length / colNum)"
@@ -107,9 +110,9 @@
                 </Layout>
             </TabPane>
 
-            <TabPane v-for="liveTab in liveTabs" :label="liveTab.label" v-if="liveTab.show"
+            <TabPane v-for="(liveTab, index) in liveTabs" :label="liveTab.label" v-if="liveTab.show"
                      :name="liveTab.name">
-                <Live :live-id="liveTab.liveId" :start-time="liveTab.startTime" :title="liveTab.title"></Live>
+                <Live :index="index" :live-id="liveTab.liveId" :start-time="liveTab.startTime" :title="liveTab.title"></Live>
             </TabPane>
         </Tabs>
     </div>
@@ -126,19 +129,11 @@
         components: {Live},
         data() {
             return {
-                spinShow: true,
+                liveSpinShow: true,
+                reviewSpinShow: true,
                 liveList: [],
                 reviewList: [],
-                currentLiveList: [],
-                currentReviewList: [],
-                coverWidth: -1,
-                pageSize: 16,
                 members: [],
-                pageCount: 5,
-                liveTotal: 0,
-                reviewTotal: 0,
-                livePage: 1,
-                reviewPage: 1,
                 homeClosable: false,
                 liveTabs: [],
                 activeTab: 0,
@@ -149,7 +144,8 @@
                 selectedUser: [],
                 liveShow: true,
                 reviewShow: false,
-                colNum: 8
+                colNum: 8,
+                activeMenu: this.Constants.MENU.LIVE
             }
         },
         created: async function () {
@@ -179,20 +175,12 @@
             this.getLiveList();
             this.getReviewList();
         },
-        updated: function () {
-            this.reSize();
-        },
-        mounted: function () {
-            window.onresize = () => {
-                this.reSize();
-            };
-        },
         methods: {
             getLiveList: function () {
-                this.spinShow = true;
+                this.liveSpinShow = true;
 
                 Apis.lives(this.selectedUser[2], this.liveNext).then((responseBody) => {
-                    this.spinShow = false;
+                    this.liveSpinShow = false;
                     if (this.liveNext == responseBody.content.next && this.liveNext != '0') {
                         this.showListEndTips();
                         return;
@@ -209,14 +197,15 @@
                     });
                     this.liveList = this.liveList.concat(newList);
                 }).catch(error => {
-                    this.spinShow = false;
-                    console.log(error);
+                    this.liveSpinShow = false;
+                    console.error(error);
                 });
             },
             getReviewList: function () {
+                this.reviewSpinShow = true;
+
                 Apis.reviews(this.selectedUser[2], this.reviewNext).then(responseBody => {
-                    console.log('reviews', responseBody);
-                    this.spinShow = false;
+                    this.reviewSpinShow = false;
                     if (this.reviewNext == responseBody.content.next) {
                         this.showListEndTips();
                         return;
@@ -232,21 +221,26 @@
                         return item;
                     });
                     this.reviewList = this.reviewList.concat(newList);
-                    console.log(this.reviewList);
                 }).catch(error => {
-                    this.spinShow = false;
-                    console.log(error);
+                    this.reviewSpinShow = false;
+                    console.error(error);
                 });
             },
             refresh: function () {
-                this.liveNext = "0";
-                this.reviewNext = "0";
-
-                this.liveList = [];
-                this.reviewList = [];
-
-                this.getLiveList();
-                this.getReviewList();
+                switch (this.activeMenu) {
+                    case this.Constants.MENU.LIVE:
+                        this.liveNext = "0";
+                        this.liveList = [];
+                        this.getLiveList();
+                        break;
+                    case this.Constants.MENU.REVIEW:
+                        this.reviewNext = "0";
+                        this.reviewList = [];
+                        this.getReviewList();
+                        break;
+                    default:
+                        break;
+                }
             },
             handleTabRemove: function (name) {
                 const index = this.liveTabs.findIndex(item => {
@@ -272,32 +266,14 @@
                 this.liveTabs.push(liveTab);
                 this.activeTab = liveTab.name;
             },
-            reSize: function () {
-                if (this.$refs.cover) {
-                    if (this.coverWidth == -1) {
-                        this.coverWidth = this.$refs.cover[0].offsetWidth;
-                    }
-
-                    this.$refs.cover.forEach(item => {
-                        item.style.height = this.coverWidth + 'px';
-                    });
-                }
-            },
             syncInfo: function () {
                 this.syncing = true;
                 Apis.syncInfo().then(() => {
                     this.syncing = false;
                 }).catch(error => {
-                    console.log(error);
+                    console.error(error);
                     this.syncing = false;
                 })
-            },
-            changePlayer: function (newPlayer, liveId) {
-                const index = this.liveTabs.findIndex(tab => {
-                    return tab.liveId == liveId && tab.show;
-                });
-
-                this.liveTabs[index].type = newPlayer;
             },
             onLiveReachBottom: function () {
                 return new Promise(resolve => {
@@ -329,6 +305,7 @@
                     default:
                         break;
                 }
+                this.activeMenu = name;
             }
         }
     }

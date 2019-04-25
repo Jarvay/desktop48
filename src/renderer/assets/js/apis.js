@@ -41,7 +41,6 @@ class Apis {
             this.request('https://pocketapi.48.cn/user/api/v1/client/update/group_team_star').then(responseBody => {
                 if (responseBody.status == 200) {
                     const content = responseBody.content;
-                    console.log(content);
                     Apis.db().set('members', content.starInfo).write();
                     Apis.db().set('teams', content.teamInfo).write();
                     Apis.db().set('groups', content.groupInfo).write();
@@ -132,8 +131,6 @@ class Apis {
             "groupId": "0",
             "record": "true"
         };
-
-        console.log(body);
 
         return Apis.list(body);
     }
