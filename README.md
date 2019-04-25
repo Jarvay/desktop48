@@ -15,10 +15,12 @@ npm run build
 ```
 
 # 已知问题
-1. 异常结束的直播回放不能播放
+1. 尝试修复后虽然能播放，但拖动进度条功能失效
 
 # 用到的一些开源项目
 * [electron-vue](https://github.com/SimulatedGREG/electron-vue)
 * [video.js](https://github.com/videojs/video.js)
 * [flv.js](https://github.com/Bilibili/flv.js)
 * [iview](https://github.com/iview/iview)
+* [fluent-ffmpeg](https://github.com/fluent-ffmpeg/node-fluent-ffmpeg)
+* [node-ffmpeg-installer](https://github.com/kribblo/node-ffmpeg-installer)

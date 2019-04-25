@@ -13,8 +13,6 @@ const winURL = process.env.NODE_ENV === 'development'
     ? `http://localhost:9080`
     : `file://${__dirname}/index.html`
 
-app.commandLine.appendSwitch('ppapi-flash-path', app.getPath('pepperFlashSystemPlugin'))
-
 let template = [{
     label: '帮助',
     role: 'help',
@@ -58,6 +56,8 @@ function createWindow() {
         mainWindow = null
     })
 }
+
+app.commandLine.appendSwitch('ppapi-flash-path', app.getPath('pepperFlashSystemPlugin'))
 
 app.on('ready', function () {
     const menu = Menu.buildFromTemplate(template)
