@@ -1,7 +1,7 @@
 {
   "name": "48live-electron",
   "productName": "48live-electron",
-  "version": "0.1.0",
+  "version": "0.1.1.1",
   "author": "jarvay <157140483@qq.com>",
   "description": "An electron-vue project",
   "license": null,
