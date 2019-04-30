@@ -55,7 +55,8 @@ class Apis {
     }
 
     static member(memberId) {
-        const member = Apis.membersDB().find({userId: parseInt(memberId)}).value();
+        memberId = parseInt(memberId);
+        const member = Apis.membersDB().find({userId: memberId}).value();
         member.team = Apis.teamsDB().find({teamId: member.teamId}).value();
         return member;
     }

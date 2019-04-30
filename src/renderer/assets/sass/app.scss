@@ -80,6 +80,7 @@ div[id^="vjs_video_"] {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+
   .barrage-box {
     flex: 1 0 auto;
     height: 640px;
@@ -97,3 +98,52 @@ div[id^="vjs_video_"] {
   color: white;
   font-size: 12px;
 }
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.ivu-layout-header {
+  padding: 0 32px;
+}
+
+.cover-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.cover {
+  width: 180px;
+  height: 180px !important;
+}
+
+.live-card {
+  cursor: pointer;
+
+  .live-title {
+    max-width: 90px;
+    overflow: hidden;
+    text-overflow:ellipsis;
+    white-space: nowrap;
+  }
+
+  .live-info {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .member-info {
+    display: flex;
+    align-items: center;
+  }
+
+  .live-date {
+    margin-top: 4px;
+    color: #cccccc;
+  }
+}
+
+

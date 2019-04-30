@@ -11,97 +11,15 @@
                     </Sider>
 
                     <Layout>
-                        <Header class="header">
-                            <div>
-                                <Cascader v-if="activeMenu == Constants.MENU.REVIEW"
-                                          filterable="" class="cascader" placeholder="请选择成员"
-                                          :data="members"
-                                          v-model="selectedUser"></Cascader>
-
-                                <Button type="primary" @click="refresh">刷新</Button>
-                            </div>
-
-                            <Button :loading="syncing" @click="syncInfo">同步成员信息</Button>
-
-                        </Header>
-
                         <Content style="padding: 8px 16px;min-height: 600px;">
                             <Card>
                                 <div>
-                                    <div v-show="liveShow">
-                                        <Spin size="large" fix v-if="liveSpinShow"></Spin>
+                                    <Lives ref="lives" v-show="liveShow" :col="colNum"
+                                           @on-item-click="openLive"></Lives>
 
-                                        <Card v-if="liveList.length == 0"
-                                              style="margin-bottom:8px">
-                                            <p slot="title">当前没有直播</p>
-                                        </Card>
-
-                                        <Scroll :on-reach-bottom="onLiveReachBottom" height="720"
-                                                :distance-to-edge="distance" v-else>
-                                            <Row v-for="index in Math.ceil(liveList.length / colNum)"
-                                                 :key="index">
-                                                <Col style="padding: 4px;" span="3"
-                                                     v-for="(item, i) in liveList"
-                                                     v-if="i <  index * colNum && i >= (index - 1) * colNum"
-                                                     :key="item.liveId">
-                                                    <div class="live-card" @click="openLive(item)">
-                                                        <Card>
-                                                            <p slot="title">{{item.title}}</p>
-
-                                                            <div class="cover-container">
-                                                                <img ref="cover" class="cover" :src="item.cover">
-                                                            </div>
-                                                            <p class="live-date">{{item.date}}</p>
-                                                            <div style="display: flex;justify-content: space-between;">
-                                                                <div class="member-info">
-                                                                    <span style="color: #000;">{{item.userInfo.nickname}}</span>
-                                                                    <span class="team-badge"
-                                                                          :style="{'background-color':`#${item.member.team.teamColor}`}">{{item.member.team.teamName.replace('TEAM ', '')}}</span>
-                                                                </div>
-                                                                <span v-if="item.liveType == 1">直播</span>
-                                                                <span v-else>电台</span>
-                                                            </div>
-                                                        </Card>
-                                                    </div>
-                                                </Col>
-                                            </Row>
-                                        </Scroll>
-                                    </div>
-
-                                    <div v-show="reviewShow">
-                                        <Spin size="large" fix v-if="reviewSpinShow"></Spin>
-
-                                        <Scroll :on-reach-bottom="onReviewReachBottom" height="720"
-                                                :distance-to-edge="distance">
-                                            <Row v-for="index in Math.ceil(reviewList.length / colNum)"
-                                                 :key="index">
-                                                <Col style="padding: 4px;" span="3"
-                                                     v-for="(item, i) in reviewList"
-                                                     v-if="i <  index * colNum && i >= (index - 1) * colNum"
-                                                     :key="item.liveId">
-                                                    <div class="live-card" @click="openLive(item)">
-                                                        <Card>
-                                                            <p slot="title">{{item.title}}</p>
-
-                                                            <div class="cover-container">
-                                                                <img ref="cover" class="cover" :src="item.cover">
-                                                            </div>
-                                                            <p class="live-date">{{item.date}}</p>
-                                                            <div class="live-info">
-                                                                <div class="member-info">
-                                                                    <span style="color: #000;">{{item.userInfo.nickname}}</span>
-                                                                    <span class="team-badge"
-                                                                          :style="{'background-color':`#${item.member.team.teamColor}`}">{{item.member.team.teamName.replace('TEAM ', '')}}</span>
-                                                                </div>
-                                                                <span v-if="item.liveType == 1">直播</span>
-                                                                <span v-else>电台</span>
-                                                            </div>
-                                                        </Card>
-                                                    </div>
-                                                </Col>
-                                            </Row>
-                                        </Scroll>
-                                    </div>
+                                    <Reviews ref="reviews" v-show="reviewShow" :col="colNum"
+                                             @on-item-click="openLive"
+                                             :members="members"></Reviews>
                                 </div>
                             </Card>
                         </Content>
@@ -112,136 +30,43 @@
 
             <TabPane v-for="(liveTab, index) in liveTabs" :label="liveTab.label" v-if="liveTab.show"
                      :name="liveTab.name">
-                <Live :index="index" :live-id="liveTab.liveId" :start-time="liveTab.startTime" :title="liveTab.title"></Live>
+                <Live :index="index" :live-id="liveTab.liveId" :start-time="liveTab.startTime"
+                      :title="liveTab.title"></Live>
             </TabPane>
         </Tabs>
     </div>
 </template>
 
 <script>
-    import Tools from "../assets/js/tools";
     import Live from "./Live";
     import Apis from "../assets/js/apis";
     import Constants from "../assets/js/constants";
+    import Reviews from "./Reviews";
+    import Lives from "./Lives";
 
     export default {
         name: 'Home',
-        components: {Live},
+        components: {Lives, Reviews, Live},
         data() {
             return {
-                liveSpinShow: true,
-                reviewSpinShow: true,
-                liveList: [],
-                reviewList: [],
-                members: [],
                 homeClosable: false,
                 liveTabs: [],
                 activeTab: 0,
                 syncing: false,
-                liveNext: '0',
-                reviewNext: '0',
-                distance: -10,
-                selectedUser: [],
+                colNum: 8,
                 liveShow: true,
                 reviewShow: false,
-                colNum: 8,
-                activeMenu: this.Constants.MENU.LIVE
+                activeMenu: this.Constants.MENU.LIVE,
+                members: []
             }
         },
         created: async function () {
-            if (!Apis.db().has('members').value()) {
-                await Apis.syncInfo();
-            }
+            await this.initMembers();
 
-            this.members = Apis.groups().map(group => {
-                return {
-                    value: group.groupId,
-                    label: group.groupName,
-                    children: group.teams.map(team => {
-                        return {
-                            value: team.teamId,
-                            label: team.teamName,
-                            children: team.members.map(member => {
-                                return {
-                                    value: member.userId,
-                                    label: member.realName
-                                }
-                            })
-                        }
-                    })
-                }
-            });
-
-            this.getLiveList();
-            this.getReviewList();
+            this.$refs.reviews.getReviewList();
+            this.$refs.lives.getLiveList();
         },
         methods: {
-            getLiveList: function () {
-                this.liveSpinShow = true;
-
-                Apis.lives(this.selectedUser[2], this.liveNext).then((responseBody) => {
-                    this.liveSpinShow = false;
-                    if (this.liveNext == responseBody.content.next && this.liveNext != '0') {
-                        this.showListEndTips();
-                        return;
-                    }
-
-                    this.liveNext = responseBody.content.next;
-                    const newList = responseBody.content.liveList.map(item => {
-                        item.cover = Tools.pictureUrls(item.coverPath);
-                        item.date = new Date(parseInt(item.ctime)).format('yyyy-MM-dd hh:mm');
-                        item.userInfo.teamLogo = Tools.pictureUrls(item.userInfo.teamLogo);
-                        item.isReview = false;
-                        item.member = Apis.member(item.userInfo.userId);
-                        return item;
-                    });
-                    this.liveList = this.liveList.concat(newList);
-                }).catch(error => {
-                    this.liveSpinShow = false;
-                    console.error(error);
-                });
-            },
-            getReviewList: function () {
-                this.reviewSpinShow = true;
-
-                Apis.reviews(this.selectedUser[2], this.reviewNext).then(responseBody => {
-                    this.reviewSpinShow = false;
-                    if (this.reviewNext == responseBody.content.next) {
-                        this.showListEndTips();
-                        return;
-                    }
-
-                    this.reviewNext = responseBody.content.next;
-                    const newList = responseBody.content.liveList.map(item => {
-                        item.cover = Tools.pictureUrls(item.coverPath);
-                        item.date = new Date(parseInt(item.ctime)).format('yyyy-MM-dd hh:mm');
-                        item.userInfo.teamLogo = Tools.pictureUrls(item.userInfo.teamLogo);
-                        item.isReview = false;
-                        item.member = Apis.member(item.userInfo.userId);
-                        return item;
-                    });
-                    this.reviewList = this.reviewList.concat(newList);
-                }).catch(error => {
-                    this.reviewSpinShow = false;
-                    console.error(error);
-                });
-            },
-            refresh: function () {
-                switch (this.activeMenu) {
-                    case this.Constants.MENU.LIVE:
-                        this.liveNext = "0";
-                        this.liveList = [];
-                        this.getLiveList();
-                        break;
-                    case this.Constants.MENU.REVIEW:
-                        this.reviewNext = "0";
-                        this.reviewList = [];
-                        this.getReviewList();
-                        break;
-                    default:
-                        break;
-                }
-            },
             handleTabRemove: function (name) {
                 const index = this.liveTabs.findIndex(item => {
                     return item.name == name;
@@ -306,63 +131,35 @@
                         break;
                 }
                 this.activeMenu = name;
+            },
+            initMembers: async function () {
+                if (!Apis.db().has('members').value()) {
+                    await Apis.syncInfo();
+                }
+
+                this.members = Apis.groups().map(group => {
+                    return {
+                        value: group.groupId + "",
+                        label: group.groupName,
+                        children: group.teams.map(team => {
+                            return {
+                                value: team.teamId + "",
+                                label: team.teamName,
+                                children: team.members.map(member => {
+                                    return {
+                                        value: member.userId + "",
+                                        label: `${member.realName}(${member.abbr})`
+                                    }
+                                })
+                            }
+                        })
+                    }
+                });
             }
         }
     }
 </script>
 
 <style scoped>
-    .cover-container {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
 
-    .cover {
-        width: 180px;
-        height: 180px !important;
-    }
-
-    .layout-footer-center {
-        text-align: center;
-    }
-
-    .cascader {
-        display: inline-flex;
-        min-width: 240px;
-    }
-
-    .header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    .ivu-layout-header {
-        padding: 0 32px;
-    }
-
-    .live-card {
-        cursor: pointer;
-    }
-
-    .live-info {
-        display: flex;
-        justify-content: space-between;
-    }
-
-    .member-info {
-        display: flex;
-        align-items: center;
-    }
-
-    .member-info > span {
-        font-size: 13px;
-    }
-
-    .live-date {
-        margin-top: 4px;
-        color: #cccccc;
-        font-size: 13px;
-    }
 </style>

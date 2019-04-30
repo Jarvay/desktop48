@@ -3,7 +3,14 @@
         <Header>
             <div class="header-box">
                 <div class="layout-nav">
-                    <Button type="primary" @click="tryToFix">不能播放，尝试修复</Button>
+                    <Poptip trigger="hover">
+                        <div slot="content">
+                            <p>可能需要5s左右才生效</p>
+                            <p>由于经过ffmpeg转换，直播进度可能会更慢一些</p>
+                            <p>修复后回放拖动进度条功能将失效</p>
+                        </div>
+                        <Button type="primary" @click="tryToFix" :loading="isFixing">不能播放，尝试修复</Button>
+                    </Poptip>
 
                     <Button style="margin-left: 8px;" type="primary" @click="showUrl = true">视频地址</Button>
                 </div>
@@ -34,6 +41,10 @@
             videoUrl: {
                 type: String,
                 require: true
+            },
+            isFixing: {
+                type: Boolean,
+                required: true
             }
         },
         methods: {

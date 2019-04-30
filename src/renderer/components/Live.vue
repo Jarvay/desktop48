@@ -1,7 +1,9 @@
 <template>
     <div class="layout">
         <Layout>
-            <PlayerHeader :video-url="playStreamPath" :current-player="currentPlayer" @try-to-fix="createVideoServer"></PlayerHeader>
+            <PlayerHeader :video-url="playStreamPath" :current-player="currentPlayer"
+                          @try-to-fix="createVideoServer"
+                          :is-fixing="isFixing"></PlayerHeader>
             <Content style="padding: 16px;">
                 <div class="player-container">
                     <Card>
@@ -98,7 +100,8 @@
                 chatroom: null,
                 seconds: this.Constants.BARRAGE_SEND_INTERVAL,
                 videoServer: null,
-                port: 8800
+                port: 8800,
+                isFixing: false
             };
         },
         props: {
@@ -146,7 +149,7 @@
                 this.chatroom.disconnect();
             }
 
-            if (this.videoServer != null){
+            if (this.videoServer != null) {
                 this.videoServer.close();
             }
         },
@@ -181,8 +184,6 @@
                 });
             },
             initPlayer: function () {
-                this.spinShow = false;
-
                 if (this.player != null) {
                     this.player.destroy();
                 }
@@ -191,20 +192,27 @@
                     this.initFlvJs();
                 } else if (this.playStreamPath.includes('.mp4') && this.isReview) {
                     this.initFlvJs();
+                } else if (this.playStreamPath.includes('from=ffmpeg')) {
+                    this.initFlvJs();
                 } else {
                     this.initVideoJs();
                 }
 
                 this.player.volume(Tools.getVolume());
 
-                Tools.videoInfo(this.playStreamPath).then(result => {
-                    this.duration = result.duration;
-                }).catch(error => {
-                   console.error(error);
-                });
+                if (this.isReview) {
+                    Tools.videoInfo(this.playStreamPath).then(result => {
+                        this.duration = result.duration;
+                    }).catch(error => {
+                        console.error(error);
+                    });
+                }
 
                 //时长
                 this.player.onGotDuration(duration => {
+                    this.spinShow = false;
+                    this.isFixing = false;
+
                     if (!this.isReview) {
                         this.connectChatroom();
                         this.play();
@@ -248,7 +256,7 @@
                 const videoJsPlayer = VideoJs('video-js-' + this.liveId, {
                     autoplay: false, // 自动播放
                     controls: false, // 是否显示控制栏
-                    techOrder: ['flash', 'html5'], // 兼容顺序
+                    techOrder: ['html5'], // 兼容顺序
                     sourceOrder: true, //
                     sources: [{
                         withCredentials: false,
@@ -302,6 +310,12 @@
                                         break;
                                     case this.Constants.MESSAGE_TYPE.LIVEUPDATE: //观看人数
                                         this.number = custom.liveUpdateInfo.online;
+                                        break;
+                                    case this.Constants.MESSAGE_TYPE.CLOSELIVE: //直播结束
+                                        this.$Modal.info({
+                                            title: '温馨提示',
+                                            content: '当前直播已结束'
+                                        });
                                         break;
                                     default:
                                         break;
@@ -373,6 +387,11 @@
                 } else if (this.barrageBox.content.length == 0) {
                     this.$Notice.info({
                         title: '请输入发送内容'
+                    });
+                    return;
+                } else if (this.chatRoomStatus == 0) {
+                    this.$Notice.info({
+                        title: '尚未连接到聊天室'
                     });
                     return;
                 } else if (this.seconds != this.Constants.BARRAGE_SEND_INTERVAL) {
@@ -488,8 +507,9 @@
             },
             createVideoServer: function () {
                 this.spinShow = true;
+                this.isFixing = true;
                 this.videoServer = Tools.createVideoServer(this.playStreamPath, this.port);
-                this.playStreamPath = `http://127.0.0.1:${this.port}?.mp4`;
+                this.playStreamPath = `http://127.0.0.1:${this.port}?.mp4&from=ffmpeg`;
                 this.initPlayer();
             },
         }
