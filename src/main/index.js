@@ -57,6 +57,8 @@ function createWindow() {
     })
 }
 
+app.commandLine.appendSwitch('ppapi-flash-path', app.getPath('pepperFlashSystemPlugin'))
+
 app.on('ready', function () {
     const menu = Menu.buildFromTemplate(template)
     Menu.setApplicationMenu(menu)
