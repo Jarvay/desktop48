@@ -58,6 +58,7 @@
 <script>
     import Apis from '../assets/js/apis';
     import Tools from '../assets/js/tools';
+    import Database from "../assets/js/database";
 
     export default {
         name: "Reviews",
@@ -100,7 +101,7 @@
                         item.date = new Date(parseInt(item.ctime)).format('yyyy-MM-dd hh:mm');
                         item.userInfo.teamLogo = Tools.pictureUrls(item.userInfo.teamLogo);
                         item.isReview = false;
-                        item.member = Apis.member(item.userInfo.userId);
+                        item.member = Database.member(item.userInfo.userId);
                         return item;
                     });
                     this.reviewList = this.reviewList.concat(newList);

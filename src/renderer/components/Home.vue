@@ -4,9 +4,11 @@
             <TabPane label="Home" :closable="homeClosable">
                 <Layout>
                     <Sider hide-trigger width="120">
-                        <Menu :active-name="Constants.MENU.LIVE" theme="dark" width="auto" @on-select="onMenuSelect">
-                            <MenuItem :name="Constants.MENU.LIVE">直播</MenuItem>
-                            <MenuItem :name="Constants.MENU.REVIEW">回放</MenuItem>
+                        <Menu :active-name="Constants.MENU.LIVES" theme="dark" width="auto" @on-select="onMenuSelect">
+                            <MenuItem :name="Constants.MENU.LIVES">直播</MenuItem>
+                            <MenuItem :name="Constants.MENU.REVIEWS">回放</MenuItem>
+                            <MenuItem :name="Constants.MENU.ME">我的</MenuItem>
+                            <MenuItem :name="Constants.MENU.SETTINGS">设置</MenuItem>
                         </Menu>
                     </Sider>
 
@@ -14,16 +16,17 @@
                         <Content style="padding: 8px 16px;min-height: 600px;">
                             <Card>
                                 <div>
-                                    <Lives ref="lives" v-show="liveShow" :col="colNum"
+                                    <Lives ref="lives" v-show="menuShow.lives" :col="colNum"
                                            @on-item-click="openLive"></Lives>
 
-                                    <Reviews ref="reviews" v-show="reviewShow" :col="colNum"
+                                    <Reviews ref="reviews" v-show="menuShow.reviews" :col="colNum"
                                              @on-item-click="openLive"
                                              :members="members"></Reviews>
+
+                                    <Account v-show="menuShow.settings"></Account>
                                 </div>
                             </Card>
                         </Content>
-
                     </Layout>
                 </Layout>
             </TabPane>
@@ -34,6 +37,10 @@
                       :title="liveTab.title"></Live>
             </TabPane>
         </Tabs>
+
+        <Drawer title="个人信息" closable v-model="userInfoShow">
+            <Account></Account>
+        </Drawer>
     </div>
 </template>
 
@@ -43,10 +50,12 @@
     import Constants from "../assets/js/constants";
     import Reviews from "./Reviews";
     import Lives from "./Lives";
+    import Account from "./Account";
+    import Database from "../assets/js/database";
 
     export default {
         name: 'Home',
-        components: {Lives, Reviews, Live},
+        components: {Account, Lives, Reviews, Live},
         data() {
             return {
                 homeClosable: false,
@@ -54,10 +63,14 @@
                 activeTab: 0,
                 syncing: false,
                 colNum: 8,
-                liveShow: true,
-                reviewShow: false,
-                activeMenu: this.Constants.MENU.LIVE,
-                members: []
+                menuShow: {
+                    lives: true,
+                    reviews: false,
+                    settings: false
+                },
+                activeMenu: this.Constants.MENU.LIVES,
+                members: [],
+                userInfoShow: false
             }
         },
         created: async function () {
@@ -79,7 +92,8 @@
                     return tab.liveId == item.liveId && tab.show == true;
                 });
                 if (exists) return;
-                const typeText = item.liveType == 1 ? '直播视频' : '直播电台';
+                let typeText = item.liveType == 1 ? '视频' : '电台';
+                typeText = this.isReview ? `${typeText}回放` : `${typeText}直播`;
                 const liveTab = {
                     label: `${item.userInfo.nickname}的${typeText}`,
                     title: item.title,
@@ -119,25 +133,36 @@
             },
             onMenuSelect: function (name) {
                 switch (name) {
-                    case Constants.MENU.LIVE:
-                        this.liveShow = true;
-                        this.reviewShow = false;
+                    case Constants.MENU.LIVES:
+                        this.menuShow.lives = true;
+                        this.menuShow.reviews = false;
+                        this.menuShow.settings = false;
                         break;
-                    case Constants.MENU.REVIEW:
-                        this.reviewShow = true;
-                        this.liveShow = false;
+                    case Constants.MENU.REVIEWS:
+                        this.menuShow.lives = false;
+                        this.menuShow.reviews = true;
+                        this.menuShow.settings = false;
+                        break;
+                    case Constants.MENU.ME:
+                        this.userInfoShow = true;
+                        break;
+                    case Constants.MENU.SETTINGS:
+                        this.menuShow.lives = false;
+                        this.menuShow.reviews = false;
+                        this.menuShow.settings = true;
                         break;
                     default:
                         break;
                 }
+
                 this.activeMenu = name;
             },
             initMembers: async function () {
-                if (!Apis.db().has('members').value()) {
+                if (!Database.db().has('members').value()) {
                     await Apis.syncInfo();
                 }
 
-                this.members = Apis.groups().map(group => {
+                this.members = Database.groups().map(group => {
                     return {
                         value: group.groupId + "",
                         label: group.groupName,

@@ -455,7 +455,7 @@
                         this.sendDisabled = true;
                         this.barrageBox.content = '';
                         const timer = setInterval(() => {
-                            this.sendText = '发送(' + this.seconds + ')';
+                            this.sendText =  `发送(${this.seconds})`;
                             this.seconds--;
                             if (this.seconds == 0) {
                                 this.sendText = '发送';

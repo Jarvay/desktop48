@@ -47,7 +47,7 @@ class Tools {
     }
 
     static sourceUrl(sourcePath) {
-        if (sourcePath.includes('http')) {
+        if (sourcePath.includes('http://')) {
             return sourcePath;
         } else {
             return 'https://source.48.cn' + sourcePath;
