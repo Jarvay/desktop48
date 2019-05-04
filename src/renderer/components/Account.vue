@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div style="margin-top: 32px;">
         <div v-if="isLogin">
             <UserInfo :user-info="userInfo"></UserInfo>
 
@@ -113,6 +113,7 @@
         },
         created() {
             this.userInfo = Database.getLoginUserInfo();
+            this.registerEvent();
         },
         methods: {
             login: function () {
@@ -164,6 +165,7 @@
                     content: '登陆成功'
                 });
                 Database.setLoginUserInfo(content.userInfo);
+                Database.setToken(content.userInfo.token);
                 this.userInfo = content.userInfo;
                 this.$eventBus.$emit(this.Constants.EVENT.LOGIN);
             },
@@ -178,7 +180,15 @@
                 this.loginDisabled = false;
                 this.verifyLoginDisabled = false;
                 Database.removeLoginUserInfo();
+                Database.removeToken();
                 this.userInfo = undefined;
+
+                this.$eventBus.$emit(this.Constants.EVENT.LOGOUT);
+            },
+            registerEvent: function () {
+                this.$eventBus.$on(this.Constants.EVENT.USER_INFO, () => {
+                    this.userInfo = Database.getLoginUserInfo();
+                });
             }
         }
     }

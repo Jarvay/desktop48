@@ -41,7 +41,9 @@
         created() {
             this.teams = Database.teamsDB().value();
 
-            this.followMemberList();
+            if (Database.isLogin()) {
+                this.followMemberList();
+            }
         },
         methods: {
             followMemberList: function () {

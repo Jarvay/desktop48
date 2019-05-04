@@ -1,4 +1,5 @@
 import Constants from "./constants";
+import Dev from "./dev";
 
 class Database {
     static db() {
@@ -89,7 +90,6 @@ class Database {
 
     static setLoginUserInfo(userInfo) {
         Database._db.set('loginUserInfo', userInfo).write();
-        Database.setToken(userInfo.token);
     }
 
     static getLoginUserInfo() {
@@ -101,11 +101,19 @@ class Database {
     }
 
     static getToken() {
-        return Database._db.get('token').cloneDeep().value();
+        const token = Database._db.get('token').value();
+        if (typeof token === "undefined" || token == null){
+            return '';
+        }
+        return token;
     }
 
     static setToken(token) {
         Database._db.set('token', token).write();
+    }
+
+    static removeToken() {
+        Database._db.unset('token').write();
     }
 
     static isLogin() {
@@ -143,7 +151,7 @@ class Database {
     }
 
     static clearBadgeCount(ownerId) {
-        Database._db.get('badgeCount').remove({ownerId: ownerId});
+        Database._db.get('badgeCount').remove({ownerId: ownerId}).write();
     }
 
     static getBadgeCount(ownerId) {
@@ -152,6 +160,14 @@ class Database {
             return 0;
         }
         return item.count;
+    }
+
+    static setLastCheckInTime(lastCheckInTime) {
+        Database._db.set('lastCheckInTime', lastCheckInTime).write();
+    }
+
+    static getLastCheckInTime() {
+        Database._db.get('lastCheckInTime').cloneDeep().value();
     }
 }
 

@@ -1,6 +1,6 @@
 {
-  "name": "48live-electron",
-  "version": "0.1.2",
+  "name": "desktop48",
+  "version": "1.0.0",
   "author": "jarvay <157140483@qq.com>",
   "description": "",
   "license": null,
@@ -18,7 +18,7 @@
   },
   "build": {
     "productName": "Desktop48",
-    "appId": "com.example.yourapp",
+    "appId": "cn.jarvay.desktop48",
     "directories": {
       "output": "build"
     },
@@ -48,6 +48,11 @@
     },
     "linux": {
       "icon": "build/icons"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "perMachine": true
     }
   },
   "dependencies": {

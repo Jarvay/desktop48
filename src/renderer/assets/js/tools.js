@@ -160,6 +160,22 @@ class Tools {
                 .pipe(response);
         }).listen(port);
     }
+
+    static checkForUpdate() {
+        return new Promise((resolve, reject) => {
+            axios.get('https://raw.githubusercontent.com/Jarvay/desktop48/master/package.json').then(response => {
+                const latestVersion = response.data.version;
+                const hasUpdate = require('../../../../package').version != latestVersion;
+                if (hasUpdate) {
+                    resolve();
+                } else {
+                    reject();
+                }
+            }).catch(error => {
+                reject();
+            });
+        });
+    }
 }
 
 export default Tools;

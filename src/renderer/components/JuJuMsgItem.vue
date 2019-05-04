@@ -121,7 +121,7 @@
             flex: 0 1 auto;
             flex-direction: column;
             padding: 6px 16px;
-            background-color: white;
+            background-color: #efefef;
             border-radius: 8px;
 
             .icon-answer {

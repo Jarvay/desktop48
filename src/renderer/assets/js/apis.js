@@ -199,6 +199,14 @@ class Apis {
         return Apis.request(ApiUrls.IM_USER_INFO, {}, Apis.headersWithToken());
     }
 
+    static checkIn() {
+        return Apis.request(ApiUrls.CHECK_IN_URL, {}, Apis.headersWithToken());
+    }
+
+    static reloadUserInfo() {
+        return Apis.request(ApiUrls.USER_INFO_URL, {}, Apis.headersWithToken());
+    }
+
     static headersWithToken() {
         const headers = Apis.loginHeaders();
         headers.token = Database.getToken();

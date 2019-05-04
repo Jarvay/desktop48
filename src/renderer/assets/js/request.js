@@ -3,7 +3,7 @@ import Database from './database';
 class Request {
     static send(url, body = {}, headers = {'Content-Type': 'application/json'}) {
         return new Promise((resolve, reject) => {
-            const request = require('electron').remote.net.request({
+            const request = Request.net.request({
                 url: url,
                 method: 'POST'
             });
@@ -37,5 +37,7 @@ class Request {
         });
     }
 }
+
+Request.net = require('electron').remote.net
 
 export default Request;

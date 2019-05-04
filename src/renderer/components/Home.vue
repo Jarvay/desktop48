@@ -58,6 +58,7 @@
     import Settings from "./Settings";
     import JuJu from "./JuJu";
     import Dev from "../assets/js/dev";
+    import Tools from "../assets/js/tools";
 
     const menus = {};
     Object.keys(Constants.MENU).forEach(key => {
@@ -91,6 +92,8 @@
             await this.initMembers();
             this.$refs.reviews.getReviewList();
             this.$refs.lives.getLiveList();
+
+            this.checkForUpdate();
 
             if (Database.isLogin()){
                 this.imUserInfo();
@@ -201,6 +204,14 @@
                         Dev.error(error);
                     });
                 }
+            },
+            checkForUpdate: function () {
+                Tools.checkForUpdate().then(() => {
+                   this.$Notice.info({
+                       title: '检测到新版本',
+                      desc:'可在【设置】菜单中打开下载页面'
+                   });
+                });
             }
         }
     }

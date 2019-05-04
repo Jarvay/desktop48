@@ -165,6 +165,10 @@
                                     Database.incrementBadgeCount(matchedItem.ownerId);
                                     this.list.splice(index, 1);
                                     this.list.unshift(matchedItem);
+
+                                    if (custom.msg == '[直播消息]') {
+                                        this.notification(matchedItem.ownerId);
+                                    }
                                 }
                             }
                         });
@@ -180,6 +184,12 @@
             registerEvent: function () {
                 this.$eventBus.$on(this.Constants.EVENT.LOGIN, () => {
                     this.init();
+                });
+            },
+            notification: function (userId) {
+                const user = Database.member(userId);
+                const notification = new Notification('直播提示', {
+                    body: `${user.realName}的直播开始啦`
                 });
             }
         }
