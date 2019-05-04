@@ -1,3 +1,5 @@
+import Constants from "./constants";
+
 class Database {
     static db() {
         if (Database._db == null) {
@@ -33,8 +35,16 @@ class Database {
 
     static member(memberId) {
         memberId = parseInt(memberId);
-        const member = Database.membersDB().find({userId: memberId}).value();
-        member.team = Database.teamsDB().find({teamId: member.teamId}).value();
+        let member = Database.membersDB().find({userId: memberId}).value();
+        if (typeof member === "undefined") {
+            member = Constants.UNKNOWN_USER;
+            member.team = {
+                teamName: 'unknown',
+                teamColor: 'ccc'
+            };
+        } else {
+            member.team = Database.teamsDB().find({teamId: member.teamId}).value();
+        }
         return member;
     }
 
@@ -79,6 +89,7 @@ class Database {
 
     static setLoginUserInfo(userInfo) {
         Database._db.set('loginUserInfo', userInfo).write();
+        Database.setToken(userInfo.token);
     }
 
     static getLoginUserInfo() {
@@ -87,6 +98,60 @@ class Database {
 
     static removeLoginUserInfo() {
         Database._db.unset('loginUserInfo').write();
+    }
+
+    static getToken() {
+        return Database._db.get('token').cloneDeep().value();
+    }
+
+    static setToken(token) {
+        Database._db.set('token', token).write();
+    }
+
+    static isLogin() {
+        return Database._db.has('token').value();
+    }
+
+    static setAccid(accid) {
+        Database._db.set('accid', accid).write();
+    }
+
+    static getAccid() {
+        return Database._db.get('accid').cloneDeep().value();
+    }
+
+    static setIMPwd(accid) {
+        Database._db.set('imPwd', accid).write();
+    }
+
+    static getIMPwd() {
+        return Database._db.get('imPwd').cloneDeep().value();
+    }
+
+    static incrementBadgeCount(ownerId) {
+        if (!Database._db.has('badgeCount').value()) {
+            Database._db.set('badgeCount', []).write();
+        }
+        if (typeof Database._db.get('badgeCount').find({ownerId: ownerId}).value() === "undefined") {
+            Database._db.get('badgeCount').push({
+                ownerId: ownerId,
+                count: 1
+            }).write();
+        } else {
+            Database._db.get('badgeCount').find({ownerId: ownerId}).update('count', n => n + 1).write();
+        }
+    }
+
+    static clearBadgeCount(ownerId) {
+        Database._db.get('badgeCount').remove({ownerId: ownerId});
+    }
+
+    static getBadgeCount(ownerId) {
+        const item = Database._db.get('badgeCount').find({ownerId: ownerId}).value();
+        if (typeof item === "undefined") {
+            return 0;
+        }
+        return item.count;
     }
 }
 

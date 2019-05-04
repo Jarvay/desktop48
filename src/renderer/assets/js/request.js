@@ -1,3 +1,5 @@
+import Database from './database';
+
 class Request {
     static send(url, body = {}, headers = {'Content-Type': 'application/json'}) {
         return new Promise((resolve, reject) => {

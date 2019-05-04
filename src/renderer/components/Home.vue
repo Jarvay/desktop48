@@ -7,7 +7,8 @@
                         <Menu :active-name="Constants.MENU.LIVES" theme="dark" width="auto" @on-select="onMenuSelect">
                             <MenuItem :name="Constants.MENU.LIVES">直播</MenuItem>
                             <MenuItem :name="Constants.MENU.REVIEWS">回放</MenuItem>
-                            <MenuItem :name="Constants.MENU.ME">我的</MenuItem>
+                            <MenuItem :name="Constants.MENU.JUJU">聚聚</MenuItem>
+                            <MenuItem :name="Constants.MENU.MESSAGES">消息</MenuItem>
                             <MenuItem :name="Constants.MENU.SETTINGS">设置</MenuItem>
                         </Menu>
                     </Sider>
@@ -16,14 +17,20 @@
                         <Content style="padding: 8px 16px;min-height: 600px;">
                             <Card>
                                 <div>
-                                    <Lives ref="lives" v-show="menuShow.lives" :col="colNum"
+                                    <Lives ref="lives" v-show="menus[Constants.MENU.LIVES]" :col="colNum"
                                            @on-item-click="openLive"></Lives>
 
-                                    <Reviews ref="reviews" v-show="menuShow.reviews" :col="colNum"
+                                    <Reviews ref="reviews" v-show="menus[Constants.MENU.REVIEWS]" :col="colNum"
                                              @on-item-click="openLive"
-                                             :members="members"></Reviews>
+                                             :members="members"
+                                             :teams="teams"
+                                             :groups="groups"></Reviews>
 
-                                    <Account v-show="menuShow.settings"></Account>
+                                    <MessageBox v-show="menus[Constants.MENU.MESSAGES]"></MessageBox>
+
+                                    <JuJu v-show="menus[Constants.MENU.JUJU]"></JuJu>
+
+                                    <Settings v-show="menus[Constants.MENU.SETTINGS]"></Settings>
                                 </div>
                             </Card>
                         </Content>
@@ -37,10 +44,6 @@
                       :title="liveTab.title"></Live>
             </TabPane>
         </Tabs>
-
-        <Drawer title="个人信息" closable v-model="userInfoShow">
-            <Account></Account>
-        </Drawer>
     </div>
 </template>
 
@@ -50,12 +53,20 @@
     import Constants from "../assets/js/constants";
     import Reviews from "./Reviews";
     import Lives from "./Lives";
-    import Account from "./Account";
     import Database from "../assets/js/database";
+    import MessageBox from "./MessageBox";
+    import Settings from "./Settings";
+    import JuJu from "./JuJu";
+    import Dev from "../assets/js/dev";
+
+    const menus = {};
+    Object.keys(Constants.MENU).forEach(key => {
+        menus[key] = Constants.MENU[key] == Constants.MENU.LIVES;
+    });
 
     export default {
         name: 'Home',
-        components: {Account, Lives, Reviews, Live},
+        components: {JuJu, Settings, MessageBox, Lives, Reviews, Live},
         data() {
             return {
                 homeClosable: false,
@@ -66,18 +77,24 @@
                 menuShow: {
                     lives: true,
                     reviews: false,
-                    settings: false
+                    settings: false,
+                    messages: false
                 },
+                menus: menus,
                 activeMenu: this.Constants.MENU.LIVES,
                 members: [],
-                userInfoShow: false
+                teams: [],
+                groups: []
             }
         },
-        created: async function () {
+        async created() {
             await this.initMembers();
-
             this.$refs.reviews.getReviewList();
             this.$refs.lives.getLiveList();
+
+            if (Database.isLogin()){
+                this.imUserInfo();
+            }
         },
         methods: {
             handleTabRemove: function (name) {
@@ -110,51 +127,25 @@
                 Apis.syncInfo().then(() => {
                     this.syncing = false;
                 }).catch(error => {
-                    console.error(error);
                     this.syncing = false;
-                })
-            },
-            onLiveReachBottom: function () {
-                return new Promise(resolve => {
-                    this.getLiveList(this.liveNext);
-                    resolve();
-                });
-            },
-            onReviewReachBottom: function () {
-                return new Promise(resolve => {
-                    this.getReviewList(this.reviewNext);
-                    resolve();
-                });
-            },
-            showListEndTips: function () {
-                this.$Notice.info({
-                    title: '没有更多了'
                 })
             },
             onMenuSelect: function (name) {
                 switch (name) {
-                    case Constants.MENU.LIVES:
-                        this.menuShow.lives = true;
-                        this.menuShow.reviews = false;
-                        this.menuShow.settings = false;
-                        break;
-                    case Constants.MENU.REVIEWS:
-                        this.menuShow.lives = false;
-                        this.menuShow.reviews = true;
-                        this.menuShow.settings = false;
-                        break;
-                    case Constants.MENU.ME:
-                        this.userInfoShow = true;
-                        break;
-                    case Constants.MENU.SETTINGS:
-                        this.menuShow.lives = false;
-                        this.menuShow.reviews = false;
-                        this.menuShow.settings = true;
-                        break;
-                    default:
+                    case this.Constants.MENU.JUJU:
+                    case this.Constants.MENU.MESSAGES:
+                        if (!Database.isLogin()) {
+                            this.$Message.warning({
+                                content: '登录后才能使用'
+                            });
+                            return;
+                        }
                         break;
                 }
 
+                Object.keys(this.menus).forEach(key => {
+                    this.menus[key] = key == name;
+                });
                 this.activeMenu = name;
             },
             initMembers: async function () {
@@ -180,6 +171,36 @@
                         })
                     }
                 });
+
+                this.teams = Database.groups().map(group => {
+                    return {
+                        value: group.groupId + "",
+                        label: group.groupName,
+                        children: group.teams.map(team => {
+                            return {
+                                value: team.teamId + "",
+                                label: team.teamName
+                            }
+                        })
+                    }
+                });
+
+                this.groups = Database.groups().map(group => {
+                    return {
+                        value: group.groupId + "",
+                        label: group.groupName
+                    }
+                });
+            },
+            imUserInfo: function () {
+                if (typeof Database.getToken() !== "undefined" && typeof Database.getAccid() === "undefined") {
+                    Apis.IMUserInfo().then(content => {
+                        Database.setAccid(content.accid);
+                        Database.setIMPwd(content.pwd);
+                    }).catch(error => {
+                        Dev.error(error);
+                    });
+                }
             }
         }
     }

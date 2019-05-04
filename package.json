@@ -27,6 +27,7 @@
     "axios": "^0.18.0",
     "fluent-ffmpeg": "^2.1.2",
     "flv.js": "^1.4.2",
+    "img-vuer": "^0.17.2",
     "iview": "^3.4.0",
     "lowdb": "^1.0.0",
     "m3u8-parser": "^4.3.0",

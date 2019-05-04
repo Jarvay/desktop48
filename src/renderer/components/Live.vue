@@ -155,32 +155,28 @@
         },
         methods: {
             getOne: function () {
-                Apis.live(this.liveId).then(responseBody => {
-                    if (responseBody.status == 200) {
-                        const data = responseBody.content;
-
-                        this.playStreamPath = Tools.streamPathHandle(data.playStreamPath, this.startTime);
-                        this.subTitle = data.subTitle;
-                        this.isReview = data.review;
-                        this.barrageUrl = data.msgFilePath;
-                        this.roomId = data.roomId;
-                        this.isRadio = data.liveType == 2;
-                        this.number = data.onlineNum;
-                        if (this.isRadio) {
-                            this.carousels = data.carousels.carousels.map(carousel => {
-                                return Tools.sourceUrl(carousel);
-                            });
-                            this.carouselTime = parseInt(data.carousels.carouselTime);
-                        }
-                        this.user = data.user;
-
-                        this.initPlayer();
-                    } else {
-                        this.$Message.error(responseBody.message);
+                Apis.live(this.liveId).then(data => {
+                    this.playStreamPath = Tools.streamPathHandle(data.playStreamPath, this.startTime);
+                    this.subTitle = data.subTitle;
+                    this.isReview = data.review;
+                    this.barrageUrl = data.msgFilePath;
+                    this.roomId = data.roomId;
+                    this.isRadio = data.liveType == 2;
+                    this.number = data.onlineNum;
+                    if (this.isRadio) {
+                        this.carousels = data.carousels.carousels.map(carousel => {
+                            return Tools.sourceUrl(carousel);
+                        });
+                        this.carouselTime = parseInt(data.carousels.carouselTime);
                     }
+                    this.user = data.user;
+
+                    this.initPlayer();
                 }).catch(error => {
                     this.spinShow = false;
-                    console.log(error);
+                    this.$Message.error({
+                        content: error
+                    });
                 });
             },
             initPlayer: function () {
@@ -455,7 +451,7 @@
                         this.sendDisabled = true;
                         this.barrageBox.content = '';
                         const timer = setInterval(() => {
-                            this.sendText =  `发送(${this.seconds})`;
+                            this.sendText = `发送(${this.seconds})`;
                             this.seconds--;
                             if (this.seconds == 0) {
                                 this.sendText = '发送';

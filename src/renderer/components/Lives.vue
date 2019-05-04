@@ -82,15 +82,15 @@
             getLiveList: function () {
                 this.liveSpinShow = true;
 
-                Apis.lives("0", this.liveNext).then((responseBody) => {
+                Apis.lives("0", this.liveNext).then(content => {
                     this.liveSpinShow = false;
-                    if (this.liveNext == responseBody.content.next && this.liveNext != '0') {
+                    if (this.liveNext == content.next && this.liveNext != '0') {
                         this.showListEndTips();
                         return;
                     }
 
-                    this.liveNext = responseBody.content.next;
-                    const newList = responseBody.content.liveList.map(item => {
+                    this.liveNext = content.next;
+                    const newList = content.liveList.map(item => {
                         item.cover = Tools.pictureUrls(item.coverPath);
                         item.date = new Date(parseInt(item.ctime)).format('yyyy-MM-dd hh:mm');
                         item.userInfo.teamLogo = Tools.pictureUrls(item.userInfo.teamLogo);
@@ -101,6 +101,9 @@
                     this.liveList = this.liveList.concat(newList);
                 }).catch(error => {
                     this.liveSpinShow = false;
+                    this.$Message.error({
+                        content: error
+                    });
                     console.error(error);
                 });
             },

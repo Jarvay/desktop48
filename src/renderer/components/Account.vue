@@ -108,7 +108,7 @@
         },
         computed: {
             isLogin() {
-              return typeof this.userInfo !== "undefined";
+                return typeof this.userInfo !== "undefined";
             }
         },
         created() {
@@ -118,65 +118,45 @@
             login: function () {
                 if (this.form.mobile.length == 0 || this.form.password.length == 0) return;
                 this.loginDisabled = true;
-                Apis.login(this.form.mobile, this.form.password).then(responseBody => {
-                    if (responseBody.success) {
-                        this.loginSuccess(responseBody.content)
-                    } else {
-                        this.loginFailed(responseBody.message);
-                    }
+                Apis.login(this.form.mobile, this.form.password).then(data => {
+                    this.loginSuccess(data)
                 }).catch(error => {
-                    this.loginFailed();
-                    console.error('login error', error);
+                    this.loginFailed(error);
                 });
             },
             getVerifyCode: function () {
                 this.gettingVerifyCode = true;
                 this.disabled = true;
-                Apis.verifyCode(this.form.mobileVerify, this.form.area).then(responseBody => {
-                    if (responseBody.success) {
-                        this.$Message.success({
-                            content: '发送成功'
-                        });
-                        this.gettingVerifyCode = false;
-                        const timer = setInterval(() => {
-                            this.sendText = `重新获取(${this.seconds})`;
-                            this.seconds--;
-                            if (this.seconds == 0) {
-                                this.sendText = '获取验证码';
-                                clearInterval(timer);
-                                this.seconds = this.Constants.VERIFY_CODE_INTERVAL;
-                                this.disabled = false;
-                            }
-                        }, 1000);
-                    } else {
-                        this.$Message.error({
-                            content: '发送失败，请稍后重试'
-                        });
-                        this.gettingVerifyCode = false;
-                        this.disabled = false;
-                    }
-                    console.log(responseBody);
+                Apis.verifyCode(this.form.mobileVerify, this.form.area).then(data => {
+                    this.$Message.success({
+                        content: '发送成功'
+                    });
+                    this.gettingVerifyCode = false;
+                    const timer = setInterval(() => {
+                        this.sendText = `重新获取(${this.seconds})`;
+                        this.seconds--;
+                        if (this.seconds == 0) {
+                            this.sendText = '获取验证码';
+                            clearInterval(timer);
+                            this.seconds = this.Constants.VERIFY_CODE_INTERVAL;
+                            this.disabled = false;
+                        }
+                    }, 1000);
                 }).catch(error => {
                     this.$Message.error({
-                        content: '发送失败，请稍后重试'
+                        content: error
                     });
                     this.gettingVerifyCode = false;
                     this.disabled = false;
-                    console.error(error);
                 })
             },
             verifyCodeLogin: function () {
                 if (this.form.mobileVerify.length == 0 || this.form.verifyCode.length == 0) return;
                 this.verifyLoginDisabled = true;
-                Apis.verifyCodeLogin(this.form.mobileVerify, this.form.verifyCode).then(responseBody => {
-                    if (responseBody.success) {
-                        this.loginSuccess(responseBody.content)
-                    } else {
-                        this.loginFailed(responseBody.message);
-                    }
+                Apis.verifyCodeLogin(this.form.mobileVerify, this.form.verifyCode).then(data => {
+                    this.loginSuccess(data)
                 }).catch(error => {
-                    this.loginFailed();
-                    console.error('verify code login error', error);
+                    this.loginFailed(error);
                 });
             },
             loginSuccess: function (content) {
@@ -185,13 +165,13 @@
                 });
                 Database.setLoginUserInfo(content.userInfo);
                 this.userInfo = content.userInfo;
-                console.log(content);
+                this.$eventBus.$emit(this.Constants.EVENT.LOGIN);
             },
-            loginFailed: function (message = '登陆失败，请稍后重试') {
+            loginFailed: function (error) {
                 this.loginDisabled = false;
                 this.verifyLoginDisabled = false;
                 this.$Message.error({
-                    content: message
+                    content: error
                 });
             },
             logout: function () {

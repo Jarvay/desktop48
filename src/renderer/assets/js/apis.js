@@ -1,6 +1,8 @@
 import axios from 'axios';
 import Request from './request';
 import Database from "./database";
+import ApiUrls from './api-urls';
+import Dev from './dev';
 
 class Apis {
     /**
@@ -8,16 +10,11 @@ class Apis {
      */
     static syncInfo() {
         return new Promise((resolve, reject) => {
-            Request.send('https://pocketapi.48.cn/user/api/v1/client/update/group_team_star').then(responseBody => {
-                if (responseBody.status == 200) {
-                    const content = responseBody.content;
-                    Database.db().set('members', content.starInfo).write();
-                    Database.db().set('teams', content.teamInfo).write();
-                    Database.db().set('groups', content.groupInfo).write();
-                    resolve();
-                } else {
-                    reject(responseBody.message);
-                }
+            Apis.request(ApiUrls.UPDATE_INFO_URL).then(content => {
+                Database.db().set('members', content.starInfo).write();
+                Database.db().set('teams', content.teamInfo).write();
+                Database.db().set('groups', content.groupInfo).write();
+                resolve();
             }).catch(error => {
                 reject(error);
             })
@@ -44,16 +41,15 @@ class Apis {
 
     /**
      * 回放列表
-     * @param userId
-     * @param next
+     * @param options
      */
-    static reviews(userId, next) {
+    static reviews(options) {
         const data = {
-            "next": next == undefined ? "0" : next,
+            "next": options.next == undefined ? "0" : options.next,
             "loadMore": "true",
-            "userId": userId == undefined ? "0" : userId,
-            "teamId": "0",
-            "groupId": "0",
+            "userId": options.userId == undefined ? "0" : options.userId,
+            "teamId": options.teamId,
+            "groupId": options.groupId,
             "record": "true"
         };
 
@@ -61,7 +57,7 @@ class Apis {
     }
 
     static list(data) {
-        return Request.send('https://pocketapi.48.cn/live/api/v1/live/getLiveList', data);
+        return Apis.request(ApiUrls.LIVE_LIST_URL, data);
     }
 
     /**
@@ -76,7 +72,7 @@ class Apis {
             "liveId": liveId
         };
 
-        return Request.send('https://pocketapi.48.cn/live/api/v1/live/getLiveOne', data);
+        return Apis.request(ApiUrls.LIVE_ONE_URL, data);
     }
 
     static barrage(barrageUrl) {
@@ -95,9 +91,9 @@ class Apis {
         const formData = new FormData();
         formData.append('cookie_val', cookieVal);
 
-        await axios.post('https://live.48.cn/Server/do_ajax_setcookie', formData);
+        await axios.post(ApiUrls.SET_COOKIE_URL, formData);
         return new Promise((resolve, reject) => {
-            axios.post('https://live.48.cn/Server/do_ajax_setcookie', formData).then(response => {
+            axios.post(ApiUrls.SET_COOKIE_URL, formData).then(response => {
                 resolve(response.data);
             }).catch(error => {
                 reject(error);
@@ -112,7 +108,7 @@ class Apis {
      * @returns {*|Promise<any>}
      */
     static login(mobile, password) {
-        return Request.send('https://pocketapi.48.cn/user/api/v1/login/app/mobile', {
+        return Apis.request(ApiUrls.MOBILE_LOGIN_URL, {
             mobile: mobile,
             pwd: password
         }, Apis.loginHeaders());
@@ -125,17 +121,88 @@ class Apis {
      * @returns {*|Promise|Promise<any>}
      */
     static verifyCode(mobile, area) {
-        return Request.send('https://pocketapi.48.cn/user/api/v1/sms/send2', {
+        return Apis.request(ApiUrls.SEND_SMS_URL, {
             mobile: mobile,
             area: area
         });
     }
 
     static verifyCodeLogin(mobile, verifyCode) {
-        return Request.send('https://pocketapi.48.cn/user/api/v1/login/app/mobile/code', {
+        return Apis.request(ApiUrls.VERIFY_CODE_LOGIN_URL, {
             mobile: mobile,
             code: verifyCode
         }, Apis.loginHeaders());
+    }
+
+    static messageBox(lastTime, limit) {
+        return Apis.request(ApiUrls.MESSAGE_BOX_URL, {
+            lastTime: lastTime,
+            limit: limit
+        }, Apis.headersWithToken());
+    }
+
+    static messageInfo(targetUserId, lastTime) {
+        return Apis.request(ApiUrls.MESSAGE_INFO_URL, {
+            lastTime: lastTime,
+            targetUserId: targetUserId
+        }, Apis.headersWithToken());
+    }
+
+    static juJuList() {
+        return Apis.request(ApiUrls.JUJU_LIST_URL, {}, Apis.headersWithToken());
+    }
+
+    static juJuSource(userId, type = '0') {
+        return Apis.request(ApiUrls.JUJU_SOURCE_URL, {
+            sourceId: userId,
+            type: type
+        }, Apis.headersWithToken());
+    }
+
+    static juJuOwner(userId, roomId, nextTime, needTop1Msg = "false") {
+        return Apis.request(ApiUrls.JUJU_OWNER_URL, {
+            ownerId: userId.toString(),
+            roomId: roomId,
+            nextTime: nextTime,
+            needTop1Msg: needTop1Msg
+        }, Apis.headersWithToken());
+    }
+
+    static juJuAll(userId, roomId, nextTime, needTop1Msg = "false") {
+        return Apis.request(ApiUrls.JUJU_ALL_URL, {
+            ownerId: userId.toString(),
+            roomId: roomId,
+            nextTime: nextTime,
+            needTop1Msg: needTop1Msg
+        }, Apis.headersWithToken());
+    }
+
+    static addSingleAttention(toUserId) {
+        return Apis.request(ApiUrls.ADD_SINGLE_ATTENTION_URL, {
+            toUserId: toUserId
+        }, this.headersWithToken());
+    }
+
+    static removeSingleAttention(toUserId) {
+        return Apis.request(ApiUrls.REMOVE_SINGLE_ATTENTION_URL, {
+            toUserId: toUserId
+        }, this.headersWithToken());
+    }
+
+    static followMemberList() {
+        return Apis.request(ApiUrls.FOLLOW_MEMBERS_URL, {
+            limit: 500
+        }, Apis.headersWithToken());
+    }
+
+    static IMUserInfo() {
+        return Apis.request(ApiUrls.IM_USER_INFO, {}, Apis.headersWithToken());
+    }
+
+    static headersWithToken() {
+        const headers = Apis.loginHeaders();
+        headers.token = Database.getToken();
+        return headers;
     }
 
     static loginHeaders() {
@@ -143,7 +210,7 @@ class Apis {
             'Content-Type': 'application/json',
             'appinfo': JSON.stringify({
                 'appBuild': '1',
-                'appVersion': '6.0.1',
+                'appVersion': '6.0.0',
                 'deviceId': '882163256345',
                 'deviceName': 'redmi note5',
                 'osType': 'android',
@@ -153,6 +220,24 @@ class Apis {
                 'latitude': '39.888'
             })
         };
+    }
+
+    static request(url, data, headers) {
+        return new Promise((resolve, reject) => {
+            Request.send(url, data, headers).then(responseBody => {
+                Dev.log('url', url);
+                Dev.log('request headers', headers);
+                Dev.log('request body', data);
+                Dev.log('responseBody', responseBody);
+                if (responseBody.success) {
+                    resolve(responseBody.content);
+                } else {
+                    reject(responseBody.message);
+                }
+            }).catch(error => {
+                throw `request error ${error}`;
+            });
+        });
     }
 }
 

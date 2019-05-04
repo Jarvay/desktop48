@@ -24,6 +24,7 @@ div[id^="vjs_video_"] {
 }
 
 .layout {
+  min-height: 800px;
   padding: 4px 0;
   border: 1px solid #d7dde4;
   background: #f5f7f9;
@@ -88,6 +89,7 @@ div[id^="vjs_video_"] {
 }
 
 .team-badge {
+  height: 18px;
   margin-left: 8px;
   display: inline-flex;
   justify-content: center;
@@ -146,4 +148,13 @@ div[id^="vjs_video_"] {
   }
 }
 
+.username, .message-time {
+  color: #cccccc;
+}
 
+
+.message-item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
