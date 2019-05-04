@@ -75,14 +75,6 @@ let rendererConfig = {
         }
       },
       {
-        test: /\.ts$/,
-        loader: 'ts-loader',
-        exclude: /node_modules|vue\/src/,
-        options: {
-          appendTsSuffixTo: [/\.vue$/]
-        }
-      },
-      {
         test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
         use: {
           loader: 'url-loader',
@@ -128,8 +120,8 @@ let rendererConfig = {
         removeComments: true
       },
       nodeModules: process.env.NODE_ENV !== 'production'
-        ? path.resolve(__dirname, '../node_modules')
-        : false
+          ? path.resolve(__dirname, '../node_modules')
+          : false
     }),
     new webpack.HotModuleReplacementPlugin(),
     new webpack.NoEmitOnErrorsPlugin()
@@ -154,9 +146,9 @@ let rendererConfig = {
  */
 if (process.env.NODE_ENV !== 'production') {
   rendererConfig.plugins.push(
-    new webpack.DefinePlugin({
-      '__static': `"${path.join(__dirname, '../static').replace(/\\/g, '\\\\')}"`
-    })
+      new webpack.DefinePlugin({
+        '__static': `"${path.join(__dirname, '../static').replace(/\\/g, '\\\\')}"`
+      })
   )
 }
 
@@ -167,20 +159,20 @@ if (process.env.NODE_ENV === 'production') {
   rendererConfig.devtool = ''
 
   rendererConfig.plugins.push(
-    new BabiliWebpackPlugin(),
-    new CopyWebpackPlugin([
-      {
-        from: path.join(__dirname, '../static'),
-        to: path.join(__dirname, '../dist/electron/static'),
-        ignore: ['.*']
-      }
-    ]),
-    new webpack.DefinePlugin({
-      'process.env.NODE_ENV': '"production"'
-    }),
-    new webpack.LoaderOptionsPlugin({
-      minimize: true
-    })
+      new BabiliWebpackPlugin(),
+      new CopyWebpackPlugin([
+        {
+          from: path.join(__dirname, '../static'),
+          to: path.join(__dirname, '../dist/electron/static'),
+          ignore: ['.*']
+        }
+      ]),
+      new webpack.DefinePlugin({
+        'process.env.NODE_ENV': '"production"'
+      }),
+      new webpack.LoaderOptionsPlugin({
+        minimize: true
+      })
   )
 }
 
