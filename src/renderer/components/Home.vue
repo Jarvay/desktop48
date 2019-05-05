@@ -4,9 +4,12 @@
             <TabPane label="Home" :closable="homeClosable">
                 <Layout>
                     <Sider hide-trigger width="120">
-                        <Menu :active-name="Constants.MENU.LIVE" theme="dark" width="auto" @on-select="onMenuSelect">
-                            <MenuItem :name="Constants.MENU.LIVE">直播</MenuItem>
-                            <MenuItem :name="Constants.MENU.REVIEW">回放</MenuItem>
+                        <Menu :active-name="Constants.MENU.LIVES" theme="dark" width="auto" @on-select="onMenuSelect">
+                            <MenuItem :name="Constants.MENU.LIVES">直播</MenuItem>
+                            <MenuItem :name="Constants.MENU.REVIEWS">回放</MenuItem>
+                            <MenuItem :name="Constants.MENU.JUJU">聚聚</MenuItem>
+                            <MenuItem :name="Constants.MENU.MESSAGES">消息</MenuItem>
+                            <MenuItem :name="Constants.MENU.SETTINGS">设置</MenuItem>
                         </Menu>
                     </Sider>
 
@@ -14,16 +17,23 @@
                         <Content style="padding: 8px 16px;min-height: 600px;">
                             <Card>
                                 <div>
-                                    <Lives ref="lives" v-show="liveShow" :col="colNum"
+                                    <Lives ref="lives" v-show="menus[Constants.MENU.LIVES]" :col="colNum"
                                            @on-item-click="openLive"></Lives>
 
-                                    <Reviews ref="reviews" v-show="reviewShow" :col="colNum"
+                                    <Reviews ref="reviews" v-show="menus[Constants.MENU.REVIEWS]" :col="colNum"
                                              @on-item-click="openLive"
-                                             :members="members"></Reviews>
+                                             :members="members"
+                                             :teams="teams"
+                                             :groups="groups"></Reviews>
+
+                                    <MessageBox v-show="menus[Constants.MENU.MESSAGES]"></MessageBox>
+
+                                    <JuJu v-show="menus[Constants.MENU.JUJU]"></JuJu>
+
+                                    <Settings v-show="menus[Constants.MENU.SETTINGS]"></Settings>
                                 </div>
                             </Card>
                         </Content>
-
                     </Layout>
                 </Layout>
             </TabPane>
@@ -43,10 +53,21 @@
     import Constants from "../assets/js/constants";
     import Reviews from "./Reviews";
     import Lives from "./Lives";
+    import Database from "../assets/js/database";
+    import MessageBox from "./MessageBox";
+    import Settings from "./Settings";
+    import JuJu from "./JuJu";
+    import Dev from "../assets/js/dev";
+    import Tools from "../assets/js/tools";
+
+    const menus = {};
+    Object.keys(Constants.MENU).forEach(key => {
+        menus[key] = Constants.MENU[key] == Constants.MENU.LIVES;
+    });
 
     export default {
         name: 'Home',
-        components: {Lives, Reviews, Live},
+        components: {JuJu, Settings, MessageBox, Lives, Reviews, Live},
         data() {
             return {
                 homeClosable: false,
@@ -54,17 +75,29 @@
                 activeTab: 0,
                 syncing: false,
                 colNum: 8,
-                liveShow: true,
-                reviewShow: false,
-                activeMenu: this.Constants.MENU.LIVE,
-                members: []
+                menuShow: {
+                    lives: true,
+                    reviews: false,
+                    settings: false,
+                    messages: false
+                },
+                menus: menus,
+                activeMenu: this.Constants.MENU.LIVES,
+                members: [],
+                teams: [],
+                groups: []
             }
         },
-        created: async function () {
+        async created() {
             await this.initMembers();
-
             this.$refs.reviews.getReviewList();
             this.$refs.lives.getLiveList();
+
+            this.checkForUpdate();
+
+            if (Database.isLogin()){
+                this.imUserInfo();
+            }
         },
         methods: {
             handleTabRemove: function (name) {
@@ -79,7 +112,8 @@
                     return tab.liveId == item.liveId && tab.show == true;
                 });
                 if (exists) return;
-                const typeText = item.liveType == 1 ? '直播视频' : '直播电台';
+                let typeText = item.liveType == 1 ? '视频' : '电台';
+                typeText = this.isReview ? `${typeText}回放` : `${typeText}直播`;
                 const liveTab = {
                     label: `${item.userInfo.nickname}的${typeText}`,
                     title: item.title,
@@ -96,48 +130,33 @@
                 Apis.syncInfo().then(() => {
                     this.syncing = false;
                 }).catch(error => {
-                    console.error(error);
                     this.syncing = false;
-                })
-            },
-            onLiveReachBottom: function () {
-                return new Promise(resolve => {
-                    this.getLiveList(this.liveNext);
-                    resolve();
-                });
-            },
-            onReviewReachBottom: function () {
-                return new Promise(resolve => {
-                    this.getReviewList(this.reviewNext);
-                    resolve();
-                });
-            },
-            showListEndTips: function () {
-                this.$Notice.info({
-                    title: '没有更多了'
                 })
             },
             onMenuSelect: function (name) {
                 switch (name) {
-                    case Constants.MENU.LIVE:
-                        this.liveShow = true;
-                        this.reviewShow = false;
-                        break;
-                    case Constants.MENU.REVIEW:
-                        this.reviewShow = true;
-                        this.liveShow = false;
-                        break;
-                    default:
+                    case this.Constants.MENU.JUJU:
+                    case this.Constants.MENU.MESSAGES:
+                        if (!Database.isLogin()) {
+                            this.$Message.warning({
+                                content: '登录后才能使用'
+                            });
+                            return;
+                        }
                         break;
                 }
+
+                Object.keys(this.menus).forEach(key => {
+                    this.menus[key] = key == name;
+                });
                 this.activeMenu = name;
             },
             initMembers: async function () {
-                if (!Apis.db().has('members').value()) {
+                if (!Database.db().has('members').value()) {
                     await Apis.syncInfo();
                 }
 
-                this.members = Apis.groups().map(group => {
+                this.members = Database.groups().map(group => {
                     return {
                         value: group.groupId + "",
                         label: group.groupName,
@@ -154,6 +173,44 @@
                             }
                         })
                     }
+                });
+
+                this.teams = Database.groups().map(group => {
+                    return {
+                        value: group.groupId + "",
+                        label: group.groupName,
+                        children: group.teams.map(team => {
+                            return {
+                                value: team.teamId + "",
+                                label: team.teamName
+                            }
+                        })
+                    }
+                });
+
+                this.groups = Database.groups().map(group => {
+                    return {
+                        value: group.groupId + "",
+                        label: group.groupName
+                    }
+                });
+            },
+            imUserInfo: function () {
+                if (typeof Database.getToken() !== "undefined" && typeof Database.getAccid() === "undefined") {
+                    Apis.IMUserInfo().then(content => {
+                        Database.setAccid(content.accid);
+                        Database.setIMPwd(content.pwd);
+                    }).catch(error => {
+                        Dev.error(error);
+                    });
+                }
+            },
+            checkForUpdate: function () {
+                Tools.checkForUpdate().then(() => {
+                   this.$Notice.info({
+                       title: '检测到新版本',
+                      desc:'可在【设置】菜单中打开下载页面'
+                   });
                 });
             }
         }

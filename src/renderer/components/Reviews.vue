@@ -2,10 +2,26 @@
     <Layout>
         <Header class="header">
             <div>
-                <Cascader transfer
+                <Select v-model="reviewScreen" style="width: 60px;">
+                    <Option :value="Constants.REVIEW_SCREEN.USER">成员</Option>
+                    <Option :value="Constants.REVIEW_SCREEN.TEAM">队伍</Option>
+                    <Option :value="Constants.REVIEW_SCREEN.GROUP">分团</Option>
+                </Select>
+
+                <Cascader transfer v-if="reviewScreen == Constants.REVIEW_SCREEN.USER"
                           filterable="" class="cascader" placeholder="请选择成员"
                           :data="members"
                           v-model="selectedUser"></Cascader>
+
+                <Cascader transfer v-if="reviewScreen == Constants.REVIEW_SCREEN.TEAM"
+                          filterable="" class="cascader" placeholder="请选择成员"
+                          :data="teams"
+                          v-model="selectedTeam"></Cascader>
+
+                <Cascader transfer v-if="reviewScreen == Constants.REVIEW_SCREEN.GROUP"
+                          filterable="" class="cascader" placeholder="请选择成员"
+                          :data="groups"
+                          v-model="selectedGroup"></Cascader>
 
                 <Button type="primary" @click="refresh">刷新</Button>
             </div>
@@ -58,6 +74,7 @@
 <script>
     import Apis from '../assets/js/apis';
     import Tools from '../assets/js/tools';
+    import Database from "../assets/js/database";
 
     export default {
         name: "Reviews",
@@ -69,7 +86,15 @@
             members: {
                 type: Array,
                 required: true
-            }
+            },
+            teams: {
+                type: Array,
+                required: true
+            },
+            groups: {
+                type: Array,
+                required: true
+            },
         },
         data() {
             return {
@@ -78,6 +103,9 @@
                 reviewNext: '0',
                 distance: -10,
                 selectedUser: [],
+                selectedTeam: [],
+                selectedGroup: [],
+                reviewScreen: this.Constants.REVIEW_SCREEN.USER
             }
         },
         created() {
@@ -86,26 +114,61 @@
         methods: {
             getReviewList: function () {
                 this.reviewSpinShow = true;
+                let options;
+                switch (this.reviewScreen) {
+                    case this.Constants.REVIEW_SCREEN.USER:
+                        options = {
+                            userId: this.selectedUser[2],
+                            teamId: '0',
+                            groupId: '0'
+                        }
+                        break;
+                    case this.Constants.REVIEW_SCREEN.TEAM:
+                        options = {
+                            userId: '0',
+                            teamId: this.selectedTeam[1],
+                            groupId: '0'
+                        }
+                        break;
+                    case this.Constants.REVIEW_SCREEN.GROUP:
+                        options = {
+                            userId: '0',
+                            teamId: '0',
+                            groupId: this.selectedGroup[0]
+                        }
+                        break;
+                    default:
+                        options = {
+                            userId: '0',
+                            teamId: '0',
+                            groupId: '0'
+                        };
+                        break;
+                }
+                options.next = this.reviewNext;
 
-                Apis.reviews(this.selectedUser[2], this.reviewNext).then(responseBody => {
+                Apis.reviews(options).then(content => {
                     this.reviewSpinShow = false;
-                    if (this.reviewNext == responseBody.content.next) {
+                    if (this.reviewNext == content.next) {
                         this.showListEndTips();
                         return;
                     }
 
-                    this.reviewNext = responseBody.content.next;
-                    const newList = responseBody.content.liveList.map(item => {
+                    this.reviewNext = content.next;
+                    const newList = content.liveList.map(item => {
                         item.cover = Tools.pictureUrls(item.coverPath);
                         item.date = new Date(parseInt(item.ctime)).format('yyyy-MM-dd hh:mm');
                         item.userInfo.teamLogo = Tools.pictureUrls(item.userInfo.teamLogo);
                         item.isReview = false;
-                        item.member = Apis.member(item.userInfo.userId);
+                        item.member = Database.member(item.userInfo.userId);
                         return item;
                     });
                     this.reviewList = this.reviewList.concat(newList);
                 }).catch(error => {
                     this.reviewSpinShow = false;
+                    this.$Message.error({
+                        content: error
+                    });
                     console.error(error);
                 });
             },

@@ -20,7 +20,7 @@ let template = [{
         {
             label: 'Github',
             click: function () {
-                shell.openExternal('https://github.com/Jarvay/48live-electron')
+                shell.openExternal('https://github.com/Jarvay/desktop48')
             }
         },
         {
@@ -73,3 +73,5 @@ app.on('activate', () => {
         createWindow()
     }
 })
+
+app.setAppUserModelId('cn.jarvay.desktop48')
