@@ -196,13 +196,6 @@
 
                 this.player.volume(Tools.getVolume());
 
-                if (this.isReview) {
-                    Tools.videoInfo(this.playStreamPath).then(result => {
-                        this.duration = result.duration;
-                    }).catch(error => {
-                        console.error(error);
-                    });
-                }
 
                 //时长
                 this.player.onGotDuration(duration => {
@@ -213,6 +206,7 @@
                         this.connectChatroom();
                         this.play();
                     } else {
+                        this.duration = duration;
                         this.getBarrages();
                     }
                 });

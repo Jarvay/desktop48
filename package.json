@@ -19,6 +19,7 @@
   "build": {
     "productName": "Desktop48",
     "appId": "cn.jarvay.desktop48",
+    "asar": false,
     "directories": {
       "output": "build"
     },
@@ -52,12 +53,12 @@
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
-      "perMachine": true
+      "perMachine": true,
+      "createDesktopShortcut": false
     }
   },
   "dependencies": {
     "@ffmpeg-installer/ffmpeg": "^1.0.17",
-    "@ffprobe-installer/ffprobe": "^1.0.10",
     "aes-decrypter": "^3.0.0",
     "axios": "^0.18.0",
     "fluent-ffmpeg": "^2.1.2",

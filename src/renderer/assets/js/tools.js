@@ -1,9 +1,7 @@
 import ffmpeg from 'fluent-ffmpeg';
 
 const ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;
-const ffprobePath = require('@ffprobe-installer/ffprobe').path;
 ffmpeg.setFfmpegPath(ffmpegPath);
-ffmpeg.setFfprobePath(ffprobePath);
 
 Date.prototype.format = function (fmt) {
     const o = {
@@ -70,14 +68,6 @@ class Tools {
         return localStorage.getItem('senderName');
     }
 
-    static setSenderId(senderId) {
-        localStorage.setItem('senderId', parseInt(senderId));
-    }
-
-    static getSenderId() {
-        return localStorage.getItem('senderId');
-    }
-
     static setVolume(volume) {
         localStorage.setItem('volume', volume);
     }
@@ -115,37 +105,6 @@ class Tools {
 
             return `${protocol}://${host}/${liveDate}`;
         })
-    }
-
-    static videoInfo(playStreamPath) {
-        return new Promise((resolve, reject) => {
-            ffmpeg.ffprobe(playStreamPath, (err, data) => {
-                if (err) {
-                    reject(err);
-                    return;
-                }
-                var streams = data.streams;
-                var checkResult = {
-                    videoCodecSupport: false,
-                    audioCodecSupport: false,
-                    duration: data.format.duration
-                }
-                if (streams) {
-                    streams.map((value) => {
-                        // mp4, webm, ogg
-                        if (value.codec_type == 'video' && (value.codec_name == 'h264' ||
-                            value.codec_name == 'vp8' || value.codec_name == 'theora')) {
-                            checkResult.videoCodecSupport = true;
-                        }
-                        if (value.codec_type == 'audio' && (value.codec_name == 'aac' ||
-                            value.codec_name == 'vorbis')) {
-                            checkResult.audioCodecSupport = true;
-                        }
-                    })
-                }
-                resolve(checkResult)
-            });
-        });
     }
 
     static createVideoServer(playerStreamPath, port) {

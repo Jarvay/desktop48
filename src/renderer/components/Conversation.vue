@@ -2,9 +2,7 @@
     <div class="base-container">
         <Card style="width: 560px;">
             <p slot="title">{{title}}</p>
-            <div slot="extra">
-                <Button type="primary" @click="refresh">刷新</Button>
-            </div>
+
             <Scroll :on-reach-bottom="onReachBottom" :distance-to-edge="distance" height="700">
                 <Card v-for="item in messages" class="message-card">
                     <div class="message-item">
@@ -76,11 +74,6 @@
                 });
             },
             onReachBottom: function () {
-                this.getMessages();
-            },
-            refresh: function () {
-                this.isEnd = false;
-                this.lastTime = 0;
                 this.getMessages();
             },
             setTargetUserId: function (targetUserId) {

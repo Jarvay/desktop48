@@ -5,6 +5,7 @@
             <div slot="extra">
                 <Button type="primary" @click="refresh">刷新</Button>
             </div>
+
             <Scroll :on-reach-bottom="onReachBottom" :distance-to-edge="distance" height="700">
                 <CellGroup @on-click="onItemClick">
                     <Cell v-for="(item, index) in messages" :name="index">
@@ -89,6 +90,7 @@
             refresh: function () {
                 this.isEnd = false;
                 this.lastTime = 0;
+                this.messages = [];
                 this.getMessages();
             },
             onItemClick: function (index) {

@@ -98,6 +98,7 @@
                     });
                     Database.setLoginUserInfo(content);
                     this.$eventBus.$emit(this.Constants.EVENT.USER_INFO);
+                    this.$eventBus.$emit(this.Constants.EVENT.LOGIN);
                 }).catch(error => {
                     Dev.error(error);
                 });
