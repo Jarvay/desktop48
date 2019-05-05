@@ -62,9 +62,7 @@
 
             const date = new Date().format('MM-dd');
             const lastCheckInTime = Database.getLastCheckInTime();
-            if (typeof lastCheckInTime === "undefined") {
-                this.checkInDisabled = true;
-            } else {
+            if (typeof lastCheckInTime !== "undefined") {
                 const lastCheckInDate = lastCheckInTime.format('MM-dd');
                 if (date == lastCheckInDate) {
                     this.checkInDisabled = true;
