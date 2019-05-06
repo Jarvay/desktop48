@@ -47,7 +47,8 @@
                                 :send-disabled="sendDisabled"
                                 :send-text="sendText"
                                 :show-input="!isReview"
-                                :send-barrage="sendBarrage"></BarrageBox>
+                                :send-barrage="sendBarrage"
+                                :is-live="!isReview"></BarrageBox>
                 </div>
             </Content>
         </Layout>
@@ -271,7 +272,6 @@
                     },
                     onDisconnect: (message) => {
                         this.chatRoomStatus = 0;
-                        console.log(message);
                     },
                     onWillConnect: () => {
 
@@ -476,6 +476,7 @@
                         title: '弹幕已加载',
                         desc: ''
                     });
+                    this.chatRoomStatus = 1;
                 }).catch(error => {
                     console.log(error);
                     this.$Notice.error({

@@ -1,9 +1,9 @@
 <template>
     <Card style="flex: 1 0 auto;margin-left: 16px;">
         <p slot="title">
-            <span>弹幕</span>
-            <span style="color: #ccc;" v-if="chatRoomStatus == 0">未连接</span>
-            <span style="color: #19be6b;" v-else>已连接</span>
+            <span>{{titleText}}</span>
+            <span style="color: #ccc;" v-if="chatRoomStatus == 0">{{statusText}}</span>
+            <span style="color: #19be6b;" v-else>{{statusText}}</span>
         </p>
         <p slot="extra">
             <span>观看人数：{{number}} </span>
@@ -77,6 +77,10 @@
             startTime: {
                 type: Number,
                 required: true
+            },
+            isLive: {
+                type: Boolean,
+                required: true
             }
         },
         components: {Barrage},
@@ -89,6 +93,22 @@
         computed: {
             startDate() {
                 return new Date(this.startTime).format('yyyy-MM-dd hh:mm');
+            },
+            titleText() {
+                return this.isLive ? '聊天室' : '弹幕';
+            },
+            statusText() {
+                if (this.isLive) {
+                    if (this.chatRoomStatus == 0){
+                        return '未连接'
+                    }
+                    return '已连接';
+                } else {
+                    if (this.chatRoomStatus == 0){
+                        return '未加载'
+                    }
+                    return '已加载';
+                }
             }
         },
         methods: {

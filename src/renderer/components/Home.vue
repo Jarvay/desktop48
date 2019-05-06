@@ -113,7 +113,7 @@
                 });
                 if (exists) return;
                 let typeText = item.liveType == 1 ? '视频' : '电台';
-                typeText = this.isReview ? `${typeText}回放` : `${typeText}直播`;
+                typeText = item.isReview ? `${typeText}回放` : `${typeText}直播`;
                 const liveTab = {
                     label: `${item.userInfo.nickname}的${typeText}`,
                     title: item.title,

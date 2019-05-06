@@ -54,7 +54,7 @@
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
       "perMachine": true,
-      "createDesktopShortcut": false
+      "createDesktopShortcut": true
     }
   },
   "dependencies": {

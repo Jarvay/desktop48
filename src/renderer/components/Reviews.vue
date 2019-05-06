@@ -159,7 +159,7 @@
                         item.cover = Tools.pictureUrls(item.coverPath);
                         item.date = new Date(parseInt(item.ctime)).format('yyyy-MM-dd hh:mm');
                         item.userInfo.teamLogo = Tools.pictureUrls(item.userInfo.teamLogo);
-                        item.isReview = false;
+                        item.isReview = true;
                         item.member = Database.member(item.userInfo.userId);
                         return item;
                     });
