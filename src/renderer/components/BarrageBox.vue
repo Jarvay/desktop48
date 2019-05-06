@@ -14,7 +14,7 @@
             <Barrage class="barrage-box" ref="barrage"></Barrage>
 
             <div class="barrage-input-box" v-if="showInput">
-                <Poptip trigger="hover" title="发送者名称" style="margin-left:8px;">
+                <Poptip trigger="hover" title="发送者名称">
                     <div slot="content">
                         <p>请勿滥用</p>
                         <p>请勿Diss小偶像</p>

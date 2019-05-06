@@ -1,6 +1,6 @@
 <template>
     <Card style="min-width: 480px;height: inherit;">
-        <CellGroup id="cellGroup" style="overflow-y: auto;height: 640px;">
+        <CellGroup id="cellGroup" style="overflow-y: auto;height: 620px;">
             <Cell v-for="(barrage, index) in barrageList">
                 <div class="barrage-item">
                     <span class="barrage-username">{{barrage.username}}：</span>
