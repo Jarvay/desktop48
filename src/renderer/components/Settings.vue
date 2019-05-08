@@ -5,11 +5,18 @@
         </Card>
 
         <Card style="margin-top: 16px;">
-            <div style="display: flex;flex-direction: row;margin-top: 16px;">
+            <div style="display: flex;flex-direction: row;">
                 <Input style="width: 480px;" type="text" v-model="token" placeholder="手动设置Token"></Input>
 
                 <Button style="margin-left: 8px;" type="primary" @click="setToken">设置</Button>
             </div>
+        </Card>
+
+        <Card style="margin-top: 16px;">
+            <p>
+                <span>直播通知</span>
+                <i-switch style="margin-left: 8px;" v-model="noticeSwitch" @on-change="onNoticeSwitchChange"></i-switch>
+            </p>
         </Card>
 
         <Card style="margin-top: 16px;">
@@ -38,6 +45,7 @@
     import Apis from "../assets/js/apis";
     import Account from "./Account";
     import Database from "../assets/js/database";
+    import Dev from "../assets/js/dev";
 
     export default {
         name: "Settings",
@@ -50,6 +58,7 @@
                 version: '',
                 latestVersion: '',
                 checkInDisabled: false,
+                noticeSwitch: false
             };
         },
         created() {
@@ -60,10 +69,12 @@
             this.remoteVersion();
             this.registerEvent();
 
+            this.noticeSwitch = Database.getConfig('liveNotice', true);
+
             const date = new Date().format('MM-dd');
             const lastCheckInTime = Database.getLastCheckInTime();
-            if (typeof lastCheckInTime !== "undefined") {
-                const lastCheckInDate = lastCheckInTime.format('MM-dd');
+            if (lastCheckInTime != null) {
+                const lastCheckInDate = new Date(lastCheckInTime).format('MM-dd');
                 if (date == lastCheckInDate) {
                     this.checkInDisabled = true;
                 }
@@ -79,7 +90,6 @@
                     });
                 }).catch(error => {
                     this.isUpdating = false;
-                    console.error(error);
                 });
             },
             setToken: function () {
@@ -131,8 +141,13 @@
                     this.$Message.error({
                         content: error
                     });
+                    Database.setLastCheckInTime(new Date().getTime());
+                    this.checkInDisabled = true;
                 });
             },
+            onNoticeSwitchChange: function (enable) {
+                Database.setConfig('liveNotice', enable);
+            }
         }
     }
 </script>

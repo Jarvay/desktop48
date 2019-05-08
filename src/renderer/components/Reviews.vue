@@ -14,12 +14,12 @@
                           v-model="selectedUser"></Cascader>
 
                 <Cascader transfer v-if="reviewScreen == Constants.REVIEW_SCREEN.TEAM"
-                          filterable="" class="cascader" placeholder="请选择成员"
+                          filterable="" class="cascader" placeholder="请选择队伍"
                           :data="teams"
                           v-model="selectedTeam"></Cascader>
 
                 <Cascader transfer v-if="reviewScreen == Constants.REVIEW_SCREEN.GROUP"
-                          filterable="" class="cascader" placeholder="请选择成员"
+                          filterable="" class="cascader" placeholder="请选择分团"
                           :data="groups"
                           v-model="selectedGroup"></Cascader>
 

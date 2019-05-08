@@ -145,6 +145,9 @@
                     },
                     onDisconnect: (message) => {
                         Dev.log('Home chatroom disconnect', message);
+                        setTimeout(() => {
+                            this.connectHomeChatRoom();
+                        }, 10000);
                     },
                     onWillConnect: () => {
 
@@ -160,7 +163,7 @@
                                     const matchedItem = this.list[index];
                                     matchedItem.msgTime = custom.msgTime;
                                     matchedItem.msg = custom.msg;
-                                    matchedItem.newTime = new Date(custom.msgTime).format('hh:ss');
+                                    matchedItem.newTime = new Date(custom.msgTime).format('hh:mm');
                                     matchedItem.badgeCount++;
                                     Database.incrementBadgeCount(matchedItem.ownerId);
                                     this.list.splice(index, 1);
@@ -187,9 +190,11 @@
                 });
             },
             notification: function (userId) {
+                if (!Database.getConfig('liveNotice', true)) return;
                 const user = Database.member(userId);
                 const notification = new Notification('直播提示', {
-                    body: `${user.realName}的直播开始啦`
+                    body: `${user.realName}的直播开始啦`,
+                    requireInteraction: true
                 });
             }
         }

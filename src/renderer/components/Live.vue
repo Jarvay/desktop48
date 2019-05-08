@@ -69,6 +69,7 @@
     import FlvJs from 'flv.js';
 
     import {FlvJsPlayer, VideoJsPlayer} from '../assets/js/players';
+    import Database from "../assets/js/database";
 
     export default {
         name: "Live",
@@ -195,7 +196,7 @@
                     this.initVideoJs();
                 }
 
-                this.player.volume(Tools.getVolume());
+                this.player.volume(Database.getConfig('volume', 80));
 
 
                 //时长

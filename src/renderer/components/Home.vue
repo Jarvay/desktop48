@@ -95,9 +95,11 @@
 
             this.checkForUpdate();
 
-            if (Database.isLogin()){
+            if (Database.isLogin()) {
                 this.imUserInfo();
             }
+
+            this.registerEvent();
         },
         methods: {
             handleTabRemove: function (name) {
@@ -112,10 +114,8 @@
                     return tab.liveId == item.liveId && tab.show == true;
                 });
                 if (exists) return;
-                let typeText = item.liveType == 1 ? '视频' : '电台';
-                typeText = item.isReview ? `${typeText}回放` : `${typeText}直播`;
                 const liveTab = {
-                    label: `${item.userInfo.nickname}的${typeText}`,
+                    label: `${item.userInfo.nickname}的直播间`,
                     title: item.title,
                     liveId: item.liveId,
                     show: true,
@@ -152,7 +152,7 @@
                 this.activeMenu = name;
             },
             initMembers: async function () {
-                if (!Database.db().has('members').value()) {
+                if (!Database.db.has('members').value()) {
                     await Apis.syncInfo();
                 }
 
@@ -196,7 +196,7 @@
                 });
             },
             imUserInfo: function () {
-                if (typeof Database.getToken() !== "undefined" && typeof Database.getAccid() === "undefined") {
+                if (Database.getToken() != '' && Database.getAccid() == null) {
                     Apis.IMUserInfo().then(content => {
                         Database.setAccid(content.accid);
                         Database.setIMPwd(content.pwd);
@@ -207,10 +207,17 @@
             },
             checkForUpdate: function () {
                 Tools.checkForUpdate().then(() => {
-                   this.$Notice.info({
-                       title: '检测到新版本',
-                      desc:'可在【设置】菜单中打开下载页面'
-                   });
+                    this.$Notice.info({
+                        title: '检测到新版本',
+                        desc: '可在【设置】菜单中打开下载页面'
+                    });
+                }).catch(error => {
+
+                });
+            },
+            registerEvent: function () {
+                this.$eventBus.$on(this.Constants.EVENT.LIVE_OPEN, item => {
+                    this.openLive(item);
                 });
             }
         }

@@ -39,7 +39,7 @@
             };
         },
         created() {
-            this.teams = Database.teamsDB().value();
+            this.teams = Database.teamsDB.value();
 
             if (Database.isLogin()) {
                 this.followMemberList();
@@ -50,7 +50,7 @@
                 Apis.followMemberList().then(content => {
                     this.followMembers = content.list;
                     this.teams = this.teams.filter(team => {
-                        team.members = Database.membersDB().filter({teamId: team.teamId, status: 1}).value();
+                        team.members = Database.membersDB.filter({teamId: team.teamId, status: 1}).value();
                         team.members = team.members.map(member => {
                             member.isFollowed = this.followMembers.some(follow => {
                                 return follow.userInfo.userId == member.userId;

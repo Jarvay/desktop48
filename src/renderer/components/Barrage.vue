@@ -1,6 +1,6 @@
 <template>
     <Card style="min-width: 480px;height: inherit;">
-        <CellGroup id="cellGroup" style="overflow-y: auto;height: 620px;">
+        <CellGroup id="cell-group" style="overflow-y: auto;height: 620px;">
             <Cell v-for="(barrage, index) in barrageList">
                 <div class="barrage-item">
                     <span class="barrage-username">{{barrage.username}}：</span>
@@ -24,10 +24,10 @@
 
         },
         updated() {
-            this.$nextTick(function(){
-                const cellGroup = document.getElementById('cellGroup');
+            this.$nextTick(() => {
+                const cellGroup = document.getElementById('cell-group');
                 cellGroup.scrollTop = cellGroup.scrollHeight;
-            })
+            });
         },
         methods: {
             shoot: function (barrage) {
