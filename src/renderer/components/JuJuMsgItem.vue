@@ -26,9 +26,11 @@
         </div>
 
         <!--直播-->
-        <div class="msg-content" v-else-if="extInfo.messageType == Constants.JUJU_MSG_TYPE.LIVE_PUSH">
-            <span>[直播消息]</span>
-        </div>
+        <Card class="msg-content" v-else-if="extInfo.messageType == Constants.JUJU_MSG_TYPE.LIVE_PUSH">
+            <p slot="title">直播消息</p>
+            <img style="cursor: pointer;" :src="getUrl(extInfo.liveCover)" @click="openLive(extInfo)"
+                 class="live-cover">
+        </Card>
 
         <!--翻牌-->
         <div class="msg-content" v-else-if="extInfo.messageType == Constants.JUJU_MSG_TYPE.FLIP_CARD">
@@ -60,6 +62,18 @@
         <!--视频-->
         <div class="msg-content" v-else-if="extInfo.messageType == Constants.JUJU_MSG_TYPE.VIDEO">
             <video style="max-width: 300px;" :src="bodys.url" controls></video>
+        </div>
+
+        <!--礼物-->
+        <div class="msg-content" v-else-if="extInfo.messageType == Constants.JUJU_MSG_TYPE.PRESENT_TEXT">
+            <p>
+                <span>{{extInfo.user.nickName}}</span>
+                <span class="message-time">{{msgTime}}</span>
+            </p>
+            <p>
+                <span>送出了{{extInfo.giftInfo.giftNum}}个{{extInfo.giftInfo.giftName}}</span>
+                <img :src="getUrl(extInfo.giftInfo.picPath)" class="gift-img">
+            </p>
         </div>
     </div>
 </template>
@@ -95,7 +109,21 @@
         data() {
             return {};
         },
-        methods: {}
+        methods: {
+            getUrl: function (path) {
+                return Tools.sourceUrl(path);
+            },
+            openLive: function (extInfo) {
+                const userInfo = extInfo.user;
+                userInfo.nickname = userInfo.nickName;
+                this.$eventBus.$emit(this.Constants.EVENT.LIVE_OPEN, {
+                    userInfo: userInfo,
+                    liveId: extInfo.liveId,
+                    title: extInfo.liveTitle,
+                    ctime: parseInt(this.message.msgTime)
+                });
+            }
+        }
     }
 </script>
 
@@ -115,6 +143,12 @@
             border-radius: 20px;
         }
 
+        .live-cover {
+            width: 120px;
+            height: 120px;
+            border-radius: 8px;
+        }
+
         .msg-content {
             display: flex;
             margin-left: 16px;
@@ -130,6 +164,10 @@
 
             .icon-question {
                 color: #19be6b;
+            }
+
+            .gift-img {
+                height: 16px;
             }
         }
 

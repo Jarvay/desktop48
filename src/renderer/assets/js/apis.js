@@ -11,9 +11,9 @@ class Apis {
     static syncInfo() {
         return new Promise((resolve, reject) => {
             Apis.request(ApiUrls.UPDATE_INFO_URL).then(content => {
-                Database.db().set('members', content.starInfo).write();
-                Database.db().set('teams', content.teamInfo).write();
-                Database.db().set('groups', content.groupInfo).write();
+                Database.db.set('members', content.starInfo).write();
+                Database.db.set('teams', content.teamInfo).write();
+                Database.db.set('groups', content.groupInfo).write();
                 resolve();
             }).catch(error => {
                 reject(error);

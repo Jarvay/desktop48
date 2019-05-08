@@ -1,42 +1,9 @@
 import Constants from "./constants";
-import Dev from "./dev";
 
 class Database {
-    static db() {
-        if (Database._db == null) {
-            const low = require('lowdb');
-            const LocalStorage = require('lowdb/adapters/LocalStorage')
-            const adapter = new LocalStorage();
-
-            Database._db = low(adapter);
-        }
-        return Database._db;
-    }
-
-    static membersDB() {
-        if (Database._membersDB == null) {
-            Database._membersDB = Database.db().get('members').cloneDeep();
-        }
-        return Database._membersDB;
-    }
-
-    static teamsDB() {
-        if (Database._teamsDB == null) {
-            Database._teamsDB = Database.db().get('teams').cloneDeep();
-        }
-        return Database._teamsDB;
-    }
-
-    static groupsDB() {
-        if (Database._groupsDB == null) {
-            Database._groupsDB = Database.db().get('groups').cloneDeep();
-        }
-        return Database._groupsDB;
-    }
-
     static member(memberId) {
         memberId = parseInt(memberId);
-        let member = Database.membersDB().find({userId: memberId}).value();
+        let member = Database.membersDB.find({userId: memberId}).value();
         if (typeof member === "undefined") {
             member = Constants.UNKNOWN_USER;
             member.team = {
@@ -44,14 +11,14 @@ class Database {
                 teamColor: 'ccc'
             };
         } else {
-            member.team = Database.teamsDB().find({teamId: member.teamId}).value();
+            member.team = Database.teamsDB.find({teamId: member.teamId}).value();
         }
         return member;
     }
 
     static team(teamId) {
-        const team = Database.teamsDB().find({teamId: teamId}).value();
-        const members = Database.membersDB().filter({teamId: teamId}).value();
+        const team = Database.teamsDB.find({teamId: teamId}).value();
+        const members = Database.membersDB.filter({teamId: teamId}).value();
 
         const tmpMembers = [];
         for (let i = 0; i < members.length; i++) {
@@ -63,9 +30,9 @@ class Database {
     }
 
     static group(groupId) {
-        const group = Database.groupsDB().find({groupId: groupId}).value();
+        const group = Database.groupsDB.find({groupId: groupId}).value();
 
-        const teams = Database.teamsDB().filter({groupId: groupId}).value();
+        const teams = Database.teamsDB.filter({groupId: groupId}).value();
 
         const tmpTeams = [];
         for (let i = 0; i < teams.length; i++) {
@@ -80,7 +47,7 @@ class Database {
      * @returns {Array}
      */
     static groups() {
-        const groups = Database.groupsDB().value();
+        const groups = Database.groupsDB.value();
         const result = [];
         for (let i = 0; i < groups.length; i++) {
             result.push(Database.group(groups[i].groupId));
@@ -89,73 +56,66 @@ class Database {
     }
 
     static setLoginUserInfo(userInfo) {
-        Database._db.set('loginUserInfo', userInfo).write();
+        Database.db.set('loginUserInfo', userInfo).write();
     }
 
     static getLoginUserInfo() {
-        return Database._db.get('loginUserInfo').cloneDeep().value();
+        return Database.get('loginUserInfo', null);
     }
 
     static removeLoginUserInfo() {
-        Database._db.unset('loginUserInfo').write();
+        Database.db.unset('loginUserInfo').write();
     }
 
     static getToken() {
-        const token = Database._db.get('token').value();
-        if (typeof token === "undefined" || token == null){
-            return '';
-        }
-        return token;
+        return  Database.get('token', '');
     }
 
     static setToken(token) {
-        Database._db.set('token', token).write();
+        Database.db.set('token', token).write();
     }
 
     static removeToken() {
-        Database._db.unset('token').write();
+        Database.db.unset('token').write();
     }
 
     static isLogin() {
-        return Database._db.has('token').value();
+        return Database.db.has('token').value();
     }
 
     static setAccid(accid) {
-        Database._db.set('accid', accid).write();
+        Database.db.set('accid', accid).write();
     }
 
     static getAccid() {
-        return Database._db.get('accid').cloneDeep().value();
+        return Database.get('accid', null);
     }
 
     static setIMPwd(accid) {
-        Database._db.set('imPwd', accid).write();
+        Database.db.set('imPwd', accid).write();
     }
 
     static getIMPwd() {
-        return Database._db.get('imPwd').cloneDeep().value();
+        return Database.get('imPwd', '');
     }
 
     static incrementBadgeCount(ownerId) {
-        if (!Database._db.has('badgeCount').value()) {
-            Database._db.set('badgeCount', []).write();
-        }
-        if (typeof Database._db.get('badgeCount').find({ownerId: ownerId}).value() === "undefined") {
-            Database._db.get('badgeCount').push({
+        if (typeof Database.db.get('badgeCount').find({ownerId: ownerId}).value() === "undefined") {
+            Database.db.get('badgeCount').push({
                 ownerId: ownerId,
                 count: 1
             }).write();
         } else {
-            Database._db.get('badgeCount').find({ownerId: ownerId}).update('count', n => n + 1).write();
+            Database.db.get('badgeCount').find({ownerId: ownerId}).update('count', n => n + 1).write();
         }
     }
 
     static clearBadgeCount(ownerId) {
-        Database._db.get('badgeCount').remove({ownerId: ownerId}).write();
+        Database.db.get('badgeCount').remove({ownerId: ownerId}).write();
     }
 
     static getBadgeCount(ownerId) {
-        const item = Database._db.get('badgeCount').find({ownerId: ownerId}).value();
+        const item = Database.db.get('badgeCount').find({ownerId: ownerId}).value();
         if (typeof item === "undefined") {
             return 0;
         }
@@ -163,17 +123,50 @@ class Database {
     }
 
     static setLastCheckInTime(lastCheckInTime) {
-        Database._db.set('lastCheckInTime', lastCheckInTime).write();
+        Database.db.set('lastCheckInTime', lastCheckInTime).write();
     }
 
     static getLastCheckInTime() {
-        Database._db.get('lastCheckInTime').cloneDeep().value();
+        return Database.get('lastCheckInTime', null);
+    }
+
+    static setConfig(key, value) {
+        Database.db.set(`config.${key}`, value).write();
+    }
+
+    static getConfig(key, defaultValue) {
+        return Database.get(`config.${key}`, defaultValue);
+    }
+
+    static init() {
+        const low = require('lowdb');
+        const LocalStorage = require('lowdb/adapters/LocalStorage')
+        const adapter = new LocalStorage();
+
+        Database.db = low(adapter);
+
+        Database.membersDB = Database.db.get('members').cloneDeep();
+        Database.teamsDB = Database.db.get('teams').cloneDeep();
+        Database.groupsDB = Database.db.get('groups').cloneDeep();
+
+        if (!Database.db.has('config')) {
+            Database.db.set('config', {}).write();
+        }
+
+        if (!Database.db.has('badgeCount').value()) {
+            Database.db.set('badgeCount', []).write();
+        }
+    }
+
+    static get(key, defaultValue) {
+        const result = Database.db.get(`${key}`).cloneDeep().value();
+        if (typeof result === "undefined" || result == null) {
+            return defaultValue;
+        }
+        return result;
     }
 }
 
-Database._membersDB = null;
-Database._groupsDB = null;
-Database._teamsDB = null;
-Database._db = null;
+Database.init();
 
 export default Database;

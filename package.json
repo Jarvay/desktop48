@@ -1,6 +1,6 @@
 {
   "name": "desktop48",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "author": "jarvay <157140483@qq.com>",
   "description": "",
   "license": null,
@@ -19,12 +19,13 @@
   "build": {
     "productName": "Desktop48",
     "appId": "cn.jarvay.desktop48",
-    "asar": false,
+    "asar": true,
     "directories": {
       "output": "build"
     },
     "files": [
-      "dist/electron/**/*"
+      "dist/electron/**/*",
+      "!**/@ffmpeg-installer/*"
     ],
     "dmg": {
       "contents": [
@@ -54,7 +55,7 @@
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
       "perMachine": true,
-      "createDesktopShortcut": false
+      "createDesktopShortcut": true
     }
   },
   "dependencies": {

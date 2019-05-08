@@ -14,7 +14,7 @@ class ChatRoomTools {
      * @returns {Promise<any>}
      */
     static chatroom(options) {
-        if (typeof Database.getAccid() !== "undefined") {
+        if (Database.getAccid() != null) {
             Dev.info('user account login im');
             return new Promise((resolve, reject) => {
                 const chatroom = new Chatroom({

@@ -1,6 +1,6 @@
 import ffmpeg from 'fluent-ffmpeg';
 
-const ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;
+const ffmpegPath = require('@ffmpeg-installer/ffmpeg').path.replace('app.asar', 'app.asar.unpacked');
 ffmpeg.setFfmpegPath(ffmpegPath);
 
 Date.prototype.format = function (fmt) {
@@ -68,14 +68,6 @@ class Tools {
         return localStorage.getItem('senderName');
     }
 
-    static setVolume(volume) {
-        localStorage.setItem('volume', volume);
-    }
-
-    static getVolume() {
-        return localStorage.getItem('volume') || 0.8;
-    }
-
     static lyricsParse(lyrics) {
         const barrages = [];
         const lines = lyrics.split('\n');
@@ -123,8 +115,22 @@ class Tools {
     static checkForUpdate() {
         return new Promise((resolve, reject) => {
             axios.get('https://raw.githubusercontent.com/Jarvay/desktop48/master/package.json').then(response => {
-                const latestVersion = response.data.version;
-                const hasUpdate = require('../../../../package').version != latestVersion;
+                const remoteVersion = response.data.version;
+                const localVersion = require('../../../../package').version;
+                const localVerArray = localVersion.split('.');
+                const remoteVerArray = remoteVersion.split('.');
+                let hasUpdate = false;
+                if (remoteVerArray[0] > localVerArray[0]){
+                    hasUpdate = true;
+                } else if (remoteVerArray[0] == localVerArray[0]){
+                    if (remoteVerArray[1] > localVerArray[1]) {
+                        hasUpdate = true;
+                    }else if (remoteVerArray[1] == localVerArray[1]){
+                        if (remoteVerArray[2] > localVerArray[2]){
+                            hasUpdate = true;
+                        }
+                    }
+                }
                 if (hasUpdate) {
                     resolve();
                 } else {

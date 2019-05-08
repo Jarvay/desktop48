@@ -27,6 +27,8 @@
 </template>
 
 <script>
+    import Database from "../assets/js/database";
+
     export default {
         name: 'PlayerControls',
         data() {
@@ -74,8 +76,8 @@
             }
         },
         created: function () {
-            if (localStorage.getItem('volume') != null) {
-                this.volume = parseInt(localStorage.getItem('volume'));
+            if (Database.getConfig('volume') != null) {
+                this.volume = parseInt(Database.getConfig('volume'));
             }
         },
         methods: {
@@ -106,7 +108,7 @@
                 this.$emit('progress', newTime);
             },
             volumeChange: function (volume) {
-                localStorage.setItem('volume', volume);
+                Database.setConfig('volume', volume);
                 this.$emit('volume', volume);
             },
         }

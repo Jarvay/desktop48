@@ -47,7 +47,8 @@
                                 :send-disabled="sendDisabled"
                                 :send-text="sendText"
                                 :show-input="!isReview"
-                                :send-barrage="sendBarrage"></BarrageBox>
+                                :send-barrage="sendBarrage"
+                                :is-live="!isReview"></BarrageBox>
                 </div>
             </Content>
         </Layout>
@@ -68,6 +69,7 @@
     import FlvJs from 'flv.js';
 
     import {FlvJsPlayer, VideoJsPlayer} from '../assets/js/players';
+    import Database from "../assets/js/database";
 
     export default {
         name: "Live",
@@ -194,7 +196,7 @@
                     this.initVideoJs();
                 }
 
-                this.player.volume(Tools.getVolume());
+                this.player.volume(Database.getConfig('volume', 80));
 
 
                 //时长
@@ -271,7 +273,6 @@
                     },
                     onDisconnect: (message) => {
                         this.chatRoomStatus = 0;
-                        console.log(message);
                     },
                     onWillConnect: () => {
 
@@ -476,6 +477,7 @@
                         title: '弹幕已加载',
                         desc: ''
                     });
+                    this.chatRoomStatus = 1;
                 }).catch(error => {
                     console.log(error);
                     this.$Notice.error({
