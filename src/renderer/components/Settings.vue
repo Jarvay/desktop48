@@ -46,6 +46,7 @@
     import Account from "./Account";
     import Database from "../assets/js/database";
     import Dev from "../assets/js/dev";
+    import Tools from "../assets/js/tools";
 
     export default {
         name: "Settings",
@@ -71,11 +72,9 @@
 
             this.noticeSwitch = Database.getConfig('liveNotice', true);
 
-            const date = new Date().format('MM-dd');
             const lastCheckInTime = Database.getLastCheckInTime();
             if (lastCheckInTime != null) {
-                const lastCheckInDate = new Date(lastCheckInTime).format('MM-dd');
-                if (date == lastCheckInDate) {
+                if (Tools.isToday(lastCheckInTime)) {
                     this.checkInDisabled = true;
                 }
             }
@@ -128,6 +127,10 @@
 
                 this.$eventBus.$on(this.Constants.EVENT.LOGOUT, () => {
                     this.token = '';
+                });
+
+                this.$eventBus.$on(this.Constants.EVENT.TO_CHECK_IN, () => {
+                    this.checkIn();
                 });
             },
             checkIn: function () {

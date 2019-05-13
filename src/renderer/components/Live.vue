@@ -308,6 +308,9 @@
                                             content: '当前直播已结束'
                                         });
                                         break;
+                                    case this.Constants.MESSAGE_TYPE.LIVE_TRANSFORM: //直播结束
+
+                                        break;
                                     default:
                                         break;
                                 }

@@ -64,6 +64,11 @@
             <video style="max-width: 300px;" :src="bodys.url" controls></video>
         </div>
 
+        <!--视频-->
+        <div class="msg-content" v-else-if="extInfo.messageType == Constants.JUJU_MSG_TYPE.EXPRESS">
+            <span>[表情消息]</span>
+        </div>
+
         <!--礼物-->
         <div class="msg-content" v-else-if="extInfo.messageType == Constants.JUJU_MSG_TYPE.PRESENT_TEXT">
             <p>
