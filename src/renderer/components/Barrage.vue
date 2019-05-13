@@ -32,7 +32,7 @@
         methods: {
             shoot: function (barrage) {
                 if (this.barrageList.length >= 30) {
-                    this.barrageList.unshift();
+                    this.barrageList.shift();
                 }
                 this.barrageList.push({
                     content: barrage.content,

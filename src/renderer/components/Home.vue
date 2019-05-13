@@ -97,6 +97,11 @@
 
             if (Database.isLogin()) {
                 this.imUserInfo();
+
+                const lastCheckInTime = Database.getLastCheckInTime();
+                if (!Tools.isToday(lastCheckInTime)) {
+                    this.$eventBus.$emit(this.Constants.EVENT.TO_CHECK_IN);
+                }
             }
 
             this.registerEvent();

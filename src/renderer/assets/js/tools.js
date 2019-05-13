@@ -112,6 +112,17 @@ class Tools {
         }).listen(port);
     }
 
+    static isToday(timestamp) {
+        if (timestamp == null) return false;
+        const date = new Date().format('MM-dd');
+        const lastCheckInDate = new Date(timestamp).format('MM-dd');
+        if (date == lastCheckInDate) {
+            return true;
+        }
+
+        return false;
+    }
+
     static checkForUpdate() {
         return new Promise((resolve, reject) => {
             axios.get('https://raw.githubusercontent.com/Jarvay/desktop48/master/package.json').then(response => {
@@ -120,13 +131,13 @@ class Tools {
                 const localVerArray = localVersion.split('.');
                 const remoteVerArray = remoteVersion.split('.');
                 let hasUpdate = false;
-                if (remoteVerArray[0] > localVerArray[0]){
+                if (remoteVerArray[0] > localVerArray[0]) {
                     hasUpdate = true;
-                } else if (remoteVerArray[0] == localVerArray[0]){
+                } else if (remoteVerArray[0] == localVerArray[0]) {
                     if (remoteVerArray[1] > localVerArray[1]) {
                         hasUpdate = true;
-                    }else if (remoteVerArray[1] == localVerArray[1]){
-                        if (remoteVerArray[2] > localVerArray[2]){
+                    } else if (remoteVerArray[1] == localVerArray[1]) {
+                        if (remoteVerArray[2] > localVerArray[2]) {
                             hasUpdate = true;
                         }
                     }

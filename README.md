@@ -1,7 +1,7 @@
 # 网页版可以使用[pocket48-grab](https://github.com/xsaiting/pocket48-grab/)
 ## 感谢[小赛艇](https://github.com/xsaiting/)提供的帮助
 
-# [点此下载构建好的压缩包](https://github.com/Jarvay/48live-electron/releases)
+# [点此下载构建好的安装包](https://github.com/Jarvay/desktop48/releases)
 
 
 # 安装步骤
