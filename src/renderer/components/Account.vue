@@ -103,12 +103,12 @@
                 sendText: '获取验证码',
                 verifyLoginDisabled: false,
                 loginDisabled: false,
-                userInfo: {}
+                userInfo: null
             };
         },
         computed: {
             isLogin() {
-                return typeof this.userInfo !== "undefined";
+                return this.userInfo != null;
             }
         },
         created() {
@@ -181,7 +181,7 @@
                 this.verifyLoginDisabled = false;
                 Database.removeLoginUserInfo();
                 Database.removeToken();
-                this.userInfo = undefined;
+                this.userInfo = null;
 
                 this.$eventBus.$emit(this.Constants.EVENT.LOGOUT);
             },

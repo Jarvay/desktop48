@@ -13,18 +13,26 @@
         </Card>
 
         <Card style="margin-top: 16px;">
-            <p>
-                <span>直播通知</span>
-                <i-switch style="margin-left: 8px;" v-model="noticeSwitch" @on-change="onNoticeSwitchChange"></i-switch>
-            </p>
-        </Card>
-
-        <Card style="margin-top: 16px;">
             <Button type="primary" @click="accountShow = true">个人信息</Button>
 
             <Button style="margin-left: 8px;" @click="checkIn" type="primary" :disabled="checkInDisabled">
                 每日打卡{{checkInDisabled ? '（已打卡）' : ''}}
             </Button>
+        </Card>
+
+        <Card style="margin-top: 16px;">
+            <HiddenMembers></HiddenMembers>
+        </Card>
+
+        <Card style="margin-top: 16px;">
+            <NoticeMembers></NoticeMembers>
+        </Card>
+
+        <Card style="margin-top: 16px;">
+            <p>
+                <span>直播通知</span>
+                <i-switch style="margin-left: 8px;" v-model="noticeSwitch" @on-change="onNoticeSwitchChange"></i-switch>
+            </p>
         </Card>
 
         <Card style="margin-top: 16px;">
@@ -47,10 +55,12 @@
     import Database from "../assets/js/database";
     import Dev from "../assets/js/dev";
     import Tools from "../assets/js/tools";
+    import HiddenMembers from "./HiddenMembers";
+    import NoticeMembers from "./NoticeMembers";
 
     export default {
         name: "Settings",
-        components: {Account},
+        components: {NoticeMembers, HiddenMembers, Account},
         data() {
             return {
                 isUpdating: false,

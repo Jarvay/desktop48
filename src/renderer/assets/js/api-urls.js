@@ -26,4 +26,6 @@ ApiUrls.FOLLOW_MEMBERS_URL = 'https://pocketapi.48.cn/user/api/v1/friendships/fr
 
 ApiUrls.CHECK_IN_URL = 'https://pocketapi.48.cn/user/api/v1/checkin';
 
+ApiUrls.TRIP_LIST_URL = 'https://pocketapi.48.cn/trip/api/trip/v1/list';
+
 export default ApiUrls;

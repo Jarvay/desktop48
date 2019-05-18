@@ -94,12 +94,12 @@
             if (Database.isLogin()) {
                 this.init();
             }
+            this.connectHomeChatRoom();
             this.registerEvent();
         },
         methods: {
             init: function () {
                 this.juJuList();
-                this.connectHomeChatRoom();
             },
             juJuList: function () {
                 Apis.juJuList().then(content => {
@@ -156,20 +156,31 @@
                         messages.forEach(message => {
                             if (message.type == 'text') {
                                 const custom = JSON.parse(message.custom);
-                                const index = this.list.findIndex(item => {
-                                    return item.ownerId == custom.ownerId;
-                                });
-                                if (index != -1) {
-                                    const matchedItem = this.list[index];
-                                    matchedItem.msgTime = custom.msgTime;
-                                    matchedItem.msg = custom.msg;
-                                    matchedItem.newTime = new Date(custom.msgTime).format('hh:mm');
-                                    matchedItem.badgeCount++;
-                                    Database.incrementBadgeCount(matchedItem.ownerId);
-                                    this.list.splice(index, 1);
-                                    this.list.unshift(matchedItem);
 
-                                    if (custom.msg == '[直播消息]') {
+                                if (Database.isLogin()) {
+                                    const index = this.list.findIndex(item => {
+                                        return item.ownerId == custom.ownerId;
+                                    });
+                                    if (index != -1) {
+                                        const matchedItem = this.list[index];
+                                        matchedItem.msgTime = custom.msgTime;
+                                        matchedItem.msg = custom.msg;
+                                        matchedItem.newTime = new Date(custom.msgTime).format('hh:mm');
+                                        matchedItem.badgeCount++;
+                                        Database.incrementBadgeCount(matchedItem.ownerId);
+                                        this.list.splice(index, 1);
+                                        this.list.unshift(matchedItem);
+
+                                        if (custom.msg == '[直播消息]') {
+                                            this.notification(matchedItem.ownerId);
+                                        }
+                                    }
+                                } else {
+                                    Dev.log('not login on message', custom);
+                                    const toNotice = Database.getNoticeMembers().some(memberId => {
+                                        return memberId == custom.ownerId;
+                                    });
+                                    if (toNotice && custom.msg == '[直播消息]') {
                                         this.notification(matchedItem.ownerId);
                                     }
                                 }

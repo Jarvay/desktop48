@@ -68,7 +68,7 @@ class Database {
     }
 
     static getToken() {
-        return  Database.get('token', '');
+        return Database.get('token', '');
     }
 
     static setToken(token) {
@@ -130,6 +130,32 @@ class Database {
         return Database.get('lastCheckInTime', null);
     }
 
+    static addHiddenMember(memberId) {
+        Database.removeHiddenMember(memberId);
+        Database.db.get('hiddenMembers').push(memberId).write();
+    }
+
+    static removeHiddenMember(memberId) {
+        Database.db.get('hiddenMembers').pull(memberId).write();
+    }
+
+    static getHiddenMembers() {
+        return Database.get('hiddenMembers', []);
+    }
+
+    static addNoticeMember(memberId) {
+        Database.removeNoticeMember(memberId);
+        Database.db.get('noticeMembers').push(memberId).write();
+    }
+
+    static removeNoticeMember(memberId) {
+        Database.db.get('noticeMembers').pull(memberId).write();
+    }
+
+    static getNoticeMembers() {
+        return Database.get('noticeMembers', []);
+    }
+
     static setConfig(key, value) {
         Database.db.set(`config.${key}`, value).write();
     }
@@ -155,6 +181,14 @@ class Database {
 
         if (!Database.db.has('badgeCount').value()) {
             Database.db.set('badgeCount', []).write();
+        }
+
+        if (!Database.db.has('onlyShowMembers').value()) {
+            Database.db.set('onlyShowMembers', []).write();
+        }
+
+        if (!Database.db.has('hiddenMembers').value()) {
+            Database.db.set('hiddenMembers', []).write();
         }
     }
 

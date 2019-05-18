@@ -105,7 +105,7 @@
                 selectedUser: [],
                 selectedTeam: [],
                 selectedGroup: [],
-                reviewScreen: this.Constants.REVIEW_SCREEN.USER
+                reviewScreen: this.Constants.REVIEW_SCREEN.USER,
             }
         },
         created() {
@@ -155,13 +155,20 @@
                     }
 
                     this.reviewNext = content.next;
-                    const newList = content.liveList.map(item => {
+                    const newList = [];
+                    content.liveList.forEach(item => {
                         item.cover = Tools.pictureUrls(item.coverPath);
                         item.date = new Date(parseInt(item.ctime)).format('yyyy-MM-dd hh:mm');
                         item.userInfo.teamLogo = Tools.pictureUrls(item.userInfo.teamLogo);
                         item.isReview = true;
                         item.member = Database.member(item.userInfo.userId);
-                        return item;
+
+                        const hidden = Database.getHiddenMembers().some(memberId => {
+                            return memberId == item.userInfo.userId;
+                        });
+                        if (!hidden) {
+                            newList.push(item);
+                        }
                     });
                     this.reviewList = this.reviewList.concat(newList);
                 }).catch(error => {

@@ -85,6 +85,21 @@ class Apis {
         });
     }
 
+    /**
+     *
+     * @param lastTime
+     * @param userId
+     * @returns {*|Promise<any>}
+     */
+    static trips(lastTime, userId = '0') {
+        return Apis.request(ApiUrls.TRIP_LIST_URL, {
+            isMore: 'true',
+            lastTime: lastTime,
+            limit: 20,
+            userId: userId
+        });
+    }
+
     static async chatRoomToken() {
         const cookieVal = '48web' + Math.random().toString(36).substr(2);
 
