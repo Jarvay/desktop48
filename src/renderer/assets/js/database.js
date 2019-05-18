@@ -143,6 +143,19 @@ class Database {
         return Database.get('hiddenMembers', []);
     }
 
+    static addNoticeMember(memberId) {
+        Database.removeNoticeMember(memberId);
+        Database.db.get('noticeMembers').push(memberId).write();
+    }
+
+    static removeNoticeMember(memberId) {
+        Database.db.get('noticeMembers').pull(memberId).write();
+    }
+
+    static getNoticeMembers() {
+        return Database.get('noticeMembers', []);
+    }
+
     static setConfig(key, value) {
         Database.db.set(`config.${key}`, value).write();
     }

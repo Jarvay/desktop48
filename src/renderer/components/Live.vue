@@ -283,7 +283,6 @@
                     onMessage: messages => {
                         messages.forEach(message => {
                             if (message.type == 'text') {
-                                console.log(message.custom);
                                 const custom = JSON.parse(message.custom);
                                 switch (custom.messageType) {
                                     case this.Constants.MESSAGE_TYPE.BARRAGE_NORMAL: //弹幕消息
@@ -315,12 +314,12 @@
                                         break;
                                 }
                             } else {
-                                console.log(message);
+                                Dev.log(message);
                             }
                         });
                     },
                     onError: error => {
-                        console.log(error);
+                        Dev.error(error);
                     }
                 };
                 ChatRoomTools.chatroom(options).then(chatroom => {

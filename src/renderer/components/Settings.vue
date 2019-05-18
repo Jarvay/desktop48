@@ -25,6 +25,10 @@
         </Card>
 
         <Card style="margin-top: 16px;">
+            <NoticeMembers></NoticeMembers>
+        </Card>
+
+        <Card style="margin-top: 16px;">
             <p>
                 <span>直播通知</span>
                 <i-switch style="margin-left: 8px;" v-model="noticeSwitch" @on-change="onNoticeSwitchChange"></i-switch>
@@ -52,10 +56,11 @@
     import Dev from "../assets/js/dev";
     import Tools from "../assets/js/tools";
     import HiddenMembers from "./HiddenMembers";
+    import NoticeMembers from "./NoticeMembers";
 
     export default {
         name: "Settings",
-        components: {HiddenMembers, Account},
+        components: {NoticeMembers, HiddenMembers, Account},
         data() {
             return {
                 isUpdating: false,
