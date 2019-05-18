@@ -7,6 +7,7 @@
                         <Menu :active-name="Constants.MENU.LIVES" theme="dark" width="auto" @on-select="onMenuSelect">
                             <MenuItem :name="Constants.MENU.LIVES">直播</MenuItem>
                             <MenuItem :name="Constants.MENU.REVIEWS">回放</MenuItem>
+                            <MenuItem :name="Constants.MENU.TRIPS">行程</MenuItem>
                             <MenuItem :name="Constants.MENU.JUJU">聚聚</MenuItem>
                             <MenuItem :name="Constants.MENU.MESSAGES">消息</MenuItem>
                             <MenuItem :name="Constants.MENU.SETTINGS">设置</MenuItem>
@@ -25,6 +26,8 @@
                                              :members="members"
                                              :teams="teams"
                                              :groups="groups"></Reviews>
+
+                                    <Trips v-show="menus[Constants.MENU.TRIPS]"></Trips>
 
                                     <MessageBox v-show="menus[Constants.MENU.MESSAGES]"></MessageBox>
 
@@ -59,6 +62,7 @@
     import JuJu from "./JuJu";
     import Dev from "../assets/js/dev";
     import Tools from "../assets/js/tools";
+    import Trips from "./Trips";
 
     const menus = {};
     Object.keys(Constants.MENU).forEach(key => {
@@ -67,7 +71,7 @@
 
     export default {
         name: 'Home',
-        components: {JuJu, Settings, MessageBox, Lives, Reviews, Live},
+        components: {Trips, JuJu, Settings, MessageBox, Lives, Reviews, Live},
         data() {
             return {
                 homeClosable: false,
