@@ -183,8 +183,8 @@ class Database {
             Database.db.set('badgeCount', []).write();
         }
 
-        if (!Database.db.has('onlyShowMembers').value()) {
-            Database.db.set('onlyShowMembers', []).write();
+        if (!Database.db.has('noticeMembers').value()) {
+            Database.db.set('noticeMembers', []).write();
         }
 
         if (!Database.db.has('hiddenMembers').value()) {
