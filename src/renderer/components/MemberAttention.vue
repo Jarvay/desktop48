@@ -99,6 +99,11 @@
                 this.teams[teamIndex].members[memberIndex].followText = isFollowed ? '已关注' : '关注';
                 const newTeam = this.teams[teamIndex];
                 this.$set(this.teams, teamIndex, newTeam);
+            },
+            registerEvent: function () {
+                this.$eventBus.$on(this.Constants.EVENT.LOGIN, () => {
+                   this.followMemberList();
+                });
             }
         }
     }

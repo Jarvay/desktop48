@@ -4,7 +4,8 @@
             <TabPane label="Home" :closable="homeClosable">
                 <Layout>
                     <Sider hide-trigger width="120">
-                        <Menu :active-name="Constants.MENU.LIVES" theme="dark" width="auto" @on-select="onMenuSelect">
+                        <Menu :active-name="Constants.MENU.LIVES" theme="dark" width="auto"
+                              @on-select="onMenuSelect">
                             <MenuItem :name="Constants.MENU.LIVES">直播</MenuItem>
                             <MenuItem :name="Constants.MENU.REVIEWS">回放</MenuItem>
                             <MenuItem :name="Constants.MENU.TRIPS">行程</MenuItem>
@@ -18,10 +19,12 @@
                         <Content style="padding: 8px 16px;min-height: 600px;">
                             <Card>
                                 <div>
-                                    <Lives ref="lives" v-show="menus[Constants.MENU.LIVES]" :col="colNum"
+                                    <Lives ref="lives" v-show="menus[Constants.MENU.LIVES]"
+                                           :col="colNum"
                                            @on-item-click="openLive"></Lives>
 
-                                    <Reviews ref="reviews" v-show="menus[Constants.MENU.REVIEWS]" :col="colNum"
+                                    <Reviews ref="reviews" v-show="menus[Constants.MENU.REVIEWS]"
+                                             :col="colNum"
                                              @on-item-click="openLive"
                                              :members="members"
                                              :teams="teams"
@@ -29,7 +32,8 @@
 
                                     <Trips v-show="menus[Constants.MENU.TRIPS]"></Trips>
 
-                                    <MessageBox v-show="menus[Constants.MENU.MESSAGES]"></MessageBox>
+                                    <MessageBox
+                                            v-show="menus[Constants.MENU.MESSAGES]"></MessageBox>
 
                                     <JuJu v-show="menus[Constants.MENU.JUJU]"></JuJu>
 
@@ -92,10 +96,8 @@
                 groups: []
             }
         },
-        async created() {
-            await this.initMembers();
-            this.$refs.reviews.getReviewList();
-            this.$refs.lives.getLiveList();
+        created() {
+            this.initMembers();
 
             this.checkForUpdate();
 
@@ -109,6 +111,10 @@
             }
 
             this.registerEvent();
+        },
+        mounted() {
+            this.$refs.reviews.getReviewList();
+            this.$refs.lives.getLiveList();
         },
         methods: {
             handleTabRemove: function (name) {
@@ -161,10 +167,6 @@
                 this.activeMenu = name;
             },
             initMembers: async function () {
-                if (!Database.db.has('members').value()) {
-                    await Apis.syncInfo();
-                }
-
                 this.members = Database.groups().map(group => {
                     return {
                         value: group.groupId + "",

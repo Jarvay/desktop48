@@ -9,6 +9,7 @@ import iView from 'iview'
 import 'iview/dist/styles/iview.css'
 import Constant from '../renderer/assets/js/constants'
 import Gallery from 'img-vuer'
+import Apis from "./assets/js/apis";
 
 Vue.use(iView)
 
@@ -25,8 +26,10 @@ window.axios = axios
 Vue.prototype.$eventBus = new Vue();
 
 /* eslint-disable no-new */
-new Vue({
-  components: { App },
-  router,
-  template: '<App/>'
-}).$mount('#app')
+Apis.syncInfo().then(() => {
+    new Vue({
+        components: {App},
+        router,
+        template: '<App/>'
+    }).$mount('#app')
+})
