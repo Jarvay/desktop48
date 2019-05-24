@@ -1,6 +1,6 @@
 class Request {
     static send(url, body = {}, headers = {'Content-Type': 'application/json'}) {
-        headers['User-Agent'] = 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Safari/537.36';
+        headers['User-Agent'] = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Safari/537.36';
         return new Promise((resolve, reject) => {
             const request = Request.net.request({
                 url: url,
