@@ -40,6 +40,9 @@
                     level: barrage.level,
                 });
             },
+            clear: function () {
+                this.barrageList = [];
+            }
         }
     }
 </script>

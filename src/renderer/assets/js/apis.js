@@ -14,7 +14,7 @@ class Apis {
                 Database.db.set('members', content.starInfo).write();
                 Database.db.set('teams', content.teamInfo).write();
                 Database.db.set('groups', content.groupInfo).write();
-                resolve();
+                resolve(content);
             }).catch(error => {
                 reject(error);
             })

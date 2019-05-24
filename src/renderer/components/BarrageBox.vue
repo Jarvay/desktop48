@@ -114,6 +114,9 @@
         methods: {
             shoot: function (barrage) {
                 this.$refs.barrage.shoot(barrage);
+            },
+            clear: function () {
+                this.$refs.barrage.clear();
             }
         }
     }

@@ -166,7 +166,7 @@
                 });
                 this.activeMenu = name;
             },
-            initMembers: async function () {
+            initMembers: function () {
                 this.members = Database.groups().map(group => {
                     return {
                         value: group.groupId + "",

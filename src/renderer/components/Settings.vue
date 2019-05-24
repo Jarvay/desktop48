@@ -25,10 +25,6 @@
         </Card>
 
         <Card style="margin-top: 16px;">
-            <NoticeMembers></NoticeMembers>
-        </Card>
-
-        <Card style="margin-top: 16px;">
             <p>
                 <span>直播通知</span>
                 <i-switch style="margin-left: 8px;" v-model="noticeSwitch" @on-change="onNoticeSwitchChange"></i-switch>
@@ -76,6 +72,7 @@
             if (typeof Database.getToken() === "string") {
                 this.token = Database.getToken();
             }
+
             this.version = require('../../../package').version;
             this.remoteVersion();
             this.registerEvent();

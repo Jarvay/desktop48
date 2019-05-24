@@ -1,4 +1,5 @@
 import Constants from "./constants";
+import data from './data';
 
 class Database {
     static member(memberId) {
@@ -170,6 +171,10 @@ class Database {
         const adapter = new LocalStorage();
 
         Database.db = low(adapter);
+
+        Database.db.set('members', data.starInfo).write();
+        Database.db.set('teams', data.teamInfo).write();
+        Database.db.set('groups', data.groupInfo).write();
 
         Database.membersDB = Database.db.get('members').cloneDeep();
         Database.teamsDB = Database.db.get('teams').cloneDeep();

@@ -1,16 +1,12 @@
-import Database from './database';
-
 class Request {
     static send(url, body = {}, headers = {'Content-Type': 'application/json'}) {
+        headers['User-Agent'] = 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Safari/537.36';
         return new Promise((resolve, reject) => {
             const request = Request.net.request({
                 url: url,
-                method: 'POST'
+                method: 'POST',
+                headers: headers
             });
-
-            for (let key in headers) {
-                request.setHeader(key, headers[key]);
-            }
 
             let data = '';
             request.on('response', response => {
@@ -38,6 +34,6 @@ class Request {
     }
 }
 
-Request.net = require('electron').remote.net
+Request.net = require('electron').remote.net;
 
 export default Request;
