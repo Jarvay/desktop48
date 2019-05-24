@@ -24,9 +24,13 @@ window.axios = axios
 
 Vue.prototype.$eventBus = new Vue();
 
+Vue.prototype.$Notice.config({
+    top: 50
+});
+
 /* eslint-disable no-new */
 new Vue({
-  components: { App },
-  router,
-  template: '<App/>'
+    components: {App},
+    router,
+    template: '<App/>'
 }).$mount('#app')

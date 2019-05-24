@@ -22,6 +22,9 @@
 </template>
 
 <script>
+    /**
+     * @deprecated
+     */
     import Database from "../assets/js/database";
     import Dev from "../assets/js/dev";
 

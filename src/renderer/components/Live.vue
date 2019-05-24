@@ -44,7 +44,7 @@
                     <BarrageBox :ref="'barrage-box-' + liveId" :number="number"
                                 :start-time="startTime"
                                 :chat-room-status="chatRoomStatus"
-                                :send-disabled="sendDisabled"
+                                :send-disabled="sendDisabled || !isLogin"
                                 :send-text="sendText"
                                 :show-input="!isReview"
                                 :send-barrage="sendBarrage"
@@ -103,7 +103,8 @@
                 seconds: this.Constants.BARRAGE_SEND_INTERVAL,
                 videoServer: null,
                 port: 8800,
-                isFixing: false
+                isFixing: false,
+                isLogin: false
             };
         },
         props: {
@@ -139,6 +140,8 @@
         },
         created: function () {
             this.port = this.port + this.index;
+
+            this.isLogin = Database.isLogin();
 
             this.getOne();
         },
@@ -266,6 +269,12 @@
             },
             //连接聊天室
             connectChatroom: function () {
+                if (!Database.isLogin()) {
+                    this.$Message.info({
+                        content: '需要登录后才能进入聊天室'
+                    });
+                    return;
+                }
                 const options = {
                     roomId: this.roomId,
                     onConnect: () => {
@@ -360,6 +369,7 @@
                 this.player.currentTime(newTime);
 
                 //重新加载弹幕
+                this.barrageBox.clear();
                 this.barrageList = [];
                 this.finalBarrageList.forEach(item => {
                     if (Tools.timeToSecond(item.time) - 2 > newTime) {
@@ -506,6 +516,16 @@
                 this.playStreamPath = `http://127.0.0.1:${this.port}?.mp4&from=ffmpeg`;
                 this.initPlayer();
             },
+            registerEvent: function () {
+                this.$eventBus.$on(this.Constants.EVENT.LOGIN, () => {
+                    this.login = true;
+                    this.connectChatroom();
+                });
+
+                this.$eventBus.$on(this.Constants.EVENT.LOGOUT, () => {
+                    this.isLogin = false;
+                });
+            }
         }
     }
 </script>

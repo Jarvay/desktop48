@@ -3,7 +3,6 @@ import './48sdk/nim-v2.8.0';
 import Chatroom from './48sdk/chatroom-v2.8.0';
 import Apis from "./apis";
 import Database from "./database";
-import Dev from "./dev";
 
 const APP_KEY = '632feff1f4c838541ab75195d1ceb3fa';
 
@@ -15,7 +14,6 @@ class ChatRoomTools {
      */
     static chatroom(options) {
         if (Database.getAccid() != null) {
-            Dev.info('user account login im');
             return new Promise((resolve, reject) => {
                 const chatroom = new Chatroom({
                     appKey: APP_KEY,      //从官网公演直播网页代码获取
@@ -37,12 +35,11 @@ class ChatRoomTools {
             });
         } else {
             return new Promise((resolve, reject) => {
-                Dev.info('public account login im');
-                Apis.chatRoomToken().then(responseBody => {
+                Apis.IMUserInfo().then(content => {
                     const chatroom = new Chatroom({
                         appKey: APP_KEY,      //从官网公演直播网页代码获取
-                        account: responseBody.account,
-                        token: responseBody.token,
+                        account: content.accid,
+                        token: content.pwd,
                         chatroomId: options.roomId,
                         chatroomAddresses: [
                             // '127.0.0.1:7272',
@@ -53,7 +50,6 @@ class ChatRoomTools {
                         onerror: options.onError,
                         onwillreconnect: options.onWillConnnect,
                         ondisconnect: options.onDisconnect,
-                        // // 消息
                         onmsgs: options.onMessage
                     });
                     resolve(chatroom);
@@ -62,7 +58,6 @@ class ChatRoomTools {
                 });
             });
         }
-
     }
 
     static juJuMsgCustomCreate(userInfo, roomId, content) {
