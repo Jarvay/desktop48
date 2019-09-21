@@ -1,6 +1,6 @@
 <template>
     <div id="app">
-        <Initialize @on-initialized="onInitialized" v-if="isInitialized"></Initialize>
+        <Initialize @on-initialized="onInitialized" v-if="!isInitialized"></Initialize>
         <Index v-else></Index>
     </div>
 </template>

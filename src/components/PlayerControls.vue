@@ -40,7 +40,7 @@
     export default class PlayerControls extends Vue {
         private dragging: boolean = false;
         private progress: number = 0;
-        private volume: number = 80;
+        private volume: number = Database.instance().getConfig('volume', 80);
 
         @Prop({type: Boolean, required: true}) private isPlaying!: boolean;
         @Prop({type: Boolean, required: true}) private isMuted!: boolean;

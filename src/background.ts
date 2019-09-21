@@ -1,6 +1,6 @@
 'use strict';
 
-import {app, protocol, BrowserWindow} from 'electron';
+import {app, protocol, BrowserWindow, shell, Menu} from 'electron';
 import {
     createProtocol,
     installVueDevtools,
@@ -14,6 +14,25 @@ let win: BrowserWindow | null;
 
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([{scheme: 'app', privileges: {secure: true, standard: true}}]);
+
+const template: any = [{
+    label: '帮助',
+    role: 'help',
+    submenu: [
+        {
+            label: 'Github',
+            click: function () {
+                shell.openExternal('https://github.com/Jarvay/desktop48')
+            }
+        },
+        {
+            label: '调试',
+            click: function () {
+                if (win !== null) win.webContents.openDevTools()
+            }
+        }
+    ]
+}];
 
 function createWindow() {
     // Create the browser window.
@@ -43,6 +62,8 @@ function createWindow() {
         win = null;
     });
 }
+
+app.setAppUserModelId('cn.jarvay.desktop48');
 
 // Quit when all windows are closed.
 app.on('window-all-closed', () => {
@@ -77,6 +98,9 @@ app.on('ready', async () => {
         // }
 
     }
+
+    const menu = Menu.buildFromTemplate(template);
+    Menu.setApplicationMenu(menu);
     createWindow();
 });
 

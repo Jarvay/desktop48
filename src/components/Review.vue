@@ -1,7 +1,10 @@
 <template>
     <el-container>
         <el-header class="header-box">
-            <el-button type="primary">视频地址</el-button>
+            <el-tooltip :content="playStreamPath">
+                <el-button type="primary">视频地址</el-button>
+            </el-tooltip>
+
         </el-header>
 
         <el-main>
@@ -30,7 +33,7 @@
                                      :is-playing="status === Constants.STATUS_PLAYING" :volume-disabled="isMuted"
                                      @play="play" @pause="pause" @mute="mute" @unmute="unmute"
                                      @progress-change="progressChange"
-                                     @volume="volumeChange"
+                                     @volume-change="volumeChange"
                                      @full-screen="fullScreen"
                                      :current-time="currentTime"
                                      :duration="duration"></player-controls>
@@ -216,7 +219,6 @@
 
         private getBarrages() {
             if (this.barrageUrl.length == 0) {
-
                 return;
             }
             Apis.instance().barrage(this.barrageUrl).then((response: any) => {

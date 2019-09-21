@@ -58,7 +58,6 @@ export default class Request {
             let data = '';
             request.on('response', (response: any) => {
                 response.on('end', () => {
-                    Debug.log('get response', data);
                     resolve(data);
                 });
 

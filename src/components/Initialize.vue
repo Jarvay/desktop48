@@ -18,7 +18,7 @@
     @Component
     export default class Initialize extends Vue {
         //初始化
-        private initText: string = "";
+        private initText: string = '正在初始化';
         private isIniting: boolean = false;
         private percent: number = 0;
 

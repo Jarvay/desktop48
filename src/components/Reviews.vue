@@ -39,30 +39,7 @@
                         v-if="i <  index * Constants.LIST_COL && i >= (index - 1) * Constants.LIST_COL"
                         :key="item.liveId">
                     <div @click="onReviewClick(item)">
-                        <el-card class="live-card" shadow="hover">
-                            <div slot="header">
-                                <div class="live-header">
-                                    <span class="live-title">{{item.title}}</span>
-
-                                    <div>
-                                        <el-tag v-if="item.liveType === 1">直播</el-tag>
-                                        <el-tag v-else type="warning">电台</el-tag>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="cover-container">
-                                <el-image ref="cover" class="cover" :src="item.cover[0]" fit="cover"/>
-                            </div>
-                            <p class="live-date">{{item.date}}</p>
-                            <div style="display: flex;justify-content: space-between;">
-                                <div class="member-info">
-                                    <span style="color: #000;">{{item.userInfo.nickname}}</span>
-                                    <span class="team-badge"
-                                          :style="{'background-color':`#${item.member.team.teamColor}`}">{{item.member.team.teamName.replace('TEAM ', '')}}</span>
-                                </div>
-                            </div>
-                        </el-card>
+                        <live-item :item="item"></live-item>
                     </div>
                 </el-col>
             </el-row>
@@ -78,8 +55,10 @@
     import Debug from '@/assets/js/debug';
     import Constants from '@/assets/js/constants';
     import ListInterface from '@/assets/js/list-interface';
-
-    @Component
+    import LiveItem from '@/components/LiveItem.vue';
+    @Component({
+        components: {LiveItem}
+    })
     export default class Reviews extends Vue implements ListInterface {
         public setVisibility(flag: boolean): void {
             this.visible = flag;

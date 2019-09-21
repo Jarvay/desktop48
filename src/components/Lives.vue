@@ -19,29 +19,30 @@
                         v-if="i <  index * Constants.LIST_COL && i >= (index - 1) * Constants.LIST_COL"
                         :key="item.liveId">
                     <div @click="onItemClick(item)">
-                        <el-card class="live-card" shadow="hover">
-                            <div slot="header" class="live-title">
-                                <span>{{item.title}}</span>
-                            </div>
+                        <live-item :item="item"></live-item>
+<!--                        <el-card class="live-card" shadow="hover">-->
+<!--                            <div slot="header" class="live-title">-->
+<!--                                <span>{{item.title}}</span>-->
+<!--                            </div>-->
 
-                            <p slot="extra">
-                                <Tag v-if="item.liveType === 1" color="purple">直播</Tag>
-                                <Tag v-else color="orange">电台</Tag>
-                            </p>
+<!--                            <p slot="extra">-->
+<!--                                <Tag v-if="item.liveType === 1" color="purple">直播</Tag>-->
+<!--                                <Tag v-else color="orange">电台</Tag>-->
+<!--                            </p>-->
 
-                            <div class="cover-container">
-                                <el-image ref="cover" class="cover" :src="item.cover[0]" fit="cover"
-                                          lazy/>
-                            </div>
-                            <p class="live-date">{{item.date}}</p>
-                            <div style="display: flex;justify-content: space-between;">
-                                <div class="member-info">
-                                    <span style="color: #000;">{{item.userInfo.nickname}}</span>
-                                    <span class="team-badge"
-                                          :style="{'background-color':`#${item.member.team.teamColor}`}">{{item.member.team.teamName.replace('TEAM ', '')}}</span>
-                                </div>
-                            </div>
-                        </el-card>
+<!--                            <div class="cover-container">-->
+<!--                                <el-image ref="cover" class="cover" :src="item.cover[0]" fit="cover"-->
+<!--                                          lazy/>-->
+<!--                            </div>-->
+<!--                            <p class="live-date">{{item.date}}</p>-->
+<!--                            <div style="display: flex;justify-content: space-between;">-->
+<!--                                <div class="member-info">-->
+<!--                                    <span style="color: #000;">{{item.userInfo.nickname}}</span>-->
+<!--                                    <span class="team-badge"-->
+<!--                                          :style="{'background-color':`#${item.member.team.teamColor}`}">{{item.member.team.teamName.replace('TEAM ', '')}}</span>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                        </el-card>-->
                     </div>
                 </el-col>
             </el-row>
@@ -56,8 +57,10 @@
     import Tools from "@/assets/js/tools";
     import Debug from "@/assets/js/debug";
     import ListInterface from "@/assets/js/list-interface";
-
-    @Component
+    import LiveItem from '@/components/LiveItem.vue';
+    @Component({
+        components: {LiveItem}
+    })
     export default class Lives extends Vue implements ListInterface {
         visible: boolean = true;
 
