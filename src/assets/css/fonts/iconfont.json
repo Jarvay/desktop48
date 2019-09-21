@@ -1,0 +1,51 @@
+{
+  "id": "1427906",
+  "name": "desktop48",
+  "font_family": "iconfont",
+  "css_prefix_text": "icon-",
+  "description": "",
+  "glyphs": [
+    {
+      "icon_id": "490185",
+      "name": "fullscreen",
+      "font_class": "fullscreen",
+      "unicode": "eb9d",
+      "unicode_decimal": 60317
+    },
+    {
+      "icon_id": "490421",
+      "name": "pause",
+      "font_class": "pause",
+      "unicode": "ec79",
+      "unicode_decimal": 60537
+    },
+    {
+      "icon_id": "490491",
+      "name": "play_arrow",
+      "font_class": "playarrow",
+      "unicode": "ecaa",
+      "unicode_decimal": 60586
+    },
+    {
+      "icon_id": "490793",
+      "name": "volume_mute",
+      "font_class": "volumemute",
+      "unicode": "ed9b",
+      "unicode_decimal": 60827
+    },
+    {
+      "icon_id": "490794",
+      "name": "volume_off",
+      "font_class": "volumeoff",
+      "unicode": "ed9c",
+      "unicode_decimal": 60828
+    },
+    {
+      "icon_id": "490795",
+      "name": "volume_up",
+      "font_class": "volumeup",
+      "unicode": "ed9d",
+      "unicode_decimal": 60829
+    }
+  ]
+}

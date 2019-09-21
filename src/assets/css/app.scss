@@ -1,0 +1,101 @@
+.team-badge {
+  height: 18px;
+  margin-left: 8px;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  min-width: 32px;
+  padding: 0 4px;
+  border-radius: 24px;
+  color: white;
+  font-size: 12px;
+}
+
+.cover-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 0;
+  padding-bottom: 100%;
+  position: relative;
+
+  .cover {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+  }
+}
+
+.live-card {
+  cursor: pointer;
+  margin-top: 8px;
+
+  .live-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .live-title {
+    max-width: 90px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .live-info {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .member-info {
+    display: flex;
+    align-items: center;
+    font-size: 13px;
+  }
+
+  .live-date {
+    margin: 3px 0;
+    color: #919191;
+    text-align: left;
+    font-size: 13px;
+  }
+}
+
+.header-box {
+  margin: auto 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.player-container {
+  display: flex;
+}
+
+$height: 600px;
+
+.video {
+  display: flex;
+  justify-content: center;
+  width: 400px;
+  height: $height;
+}
+
+.barrage-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  .barrage-box {
+    flex: 1 0 auto;
+    height: 680px !important;
+  }
+}
+
+.picture {
+  max-width: 400px;
+  max-height: $height;
+}

@@ -1,0 +1,41 @@
+@font-face {font-family: "iconfont";
+  src: url('iconfont.eot?t=1569026151050'); /* IE9 */
+  src: url('iconfont.eot?t=1569026151050#iefix') format('embedded-opentype'), /* IE6-IE8 */
+  url('data:application/x-font-woff2;charset=utf-8;base64,d09GMgABAAAAAAOsAAsAAAAACDQAAANfAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHEIGVgCDTgqDCIJyATYCJAMcCxAABCAFhG0HbBtGByMRVoMVsn8sVDxZ0DfNLX622iwcxTPB86VL399dQVYBpAqQdfJdgFFOuKLKWGcsO0B1SmIFqGh8N6k8KdUAAWZpfb85B2wnTIQqydqRR1/46eDo5XKDg2OpHy2U923v0tEDHA9oYNGhE9pAhr5h7CbKg7geAlh6Gk5mzVkU4mMAuwkge3Zu34ifCmMwWs5HcEuONchNHHx1Xb0BbvDfl0ZG5IPC0YB9l22bvYVpjbWlWh1nsTUUgWQ8J6CdBBoYDgzIsVL3AXSYHk5jnZsbZgEWH4VqrC2eLCal2iyDi6qWAq9g4YEgKDQGBxcE/+/E6uYA5FMq9/QkMg8CxZM8KCgmPGgoVfNgoFTDgwOlWg2nivZ2bgm0ArYCFQJ21IYGhSAYtAsMxrDDdOvmbnPHPR5gxRZEUG1TXEBccDwwtrlDPjJ099Yt24MyE9ndRNHRZdGXUJ5PjVRkdRAdLP8aSZoSh9HjKG4vBo+n6YVa47dvpWWFONTpvn4b5eq+fAnj+Hx9HAbm88NSpIZYQXkiCZMoJMLQ8HkILGFI1vA5RfciS58UCv8uvnyZKyubP355u3yPz0+f9k7ThFf5x9bN33a0em23fHm3Ox+vbRi2fOr03M7xbTtt375u50hyTaaitSRgJfm13Y5Wv2lWsLPHiZ0j8xLLVC9J04ZIwjkaYAc9TNUDaLg0fSOVqG+QZTrWAOhy9f+v/g1zet4+tb7VpCY/MAD8qL+1XWrLMoMGfo2G1pJ/KGm5YFwZsHjGHo87EMBjQCKKgl828Pf8bf0dT9uhdRIEPyXRQOHRAzQ+/ZEGOxwcAkaBi89UsAwz9+SAdg6hEdMMGOqyAEJr90HRkmegae0t0mD/gENHJXBpnQbLzajtOQMD+2YnaBQ9tX96dt4xsukmqD1jSKaRpIyT75D4jFGZFdncCQ4yxgHxM1SqTCze0lG4GYzxFMS/0Gn2UA11nnPZF2Wdt6ONmQQ0FPRI6488dTyH6epqk/v5MxgkRkNqRjr8dyCi5/pJKVO0QJ7UrtXItbwk+hhUlGKECc8iR2ErMAyPhPKtXqCjMo8eyaCWw5W4rTqbX2uf8xrAAt/lpUSLEUdc8cTHLhkTOwHcPDQpYh1M829E/Hfz8SZZ2KRYRxHPvFJCKYxGAA==') format('woff2'),
+  url('iconfont.woff?t=1569026151050') format('woff'),
+  url('iconfont.ttf?t=1569026151050') format('truetype'), /* chrome, firefox, opera, Safari, Android, iOS 4.2+ */
+  url('iconfont.svg?t=1569026151050#iconfont') format('svg'); /* iOS 4.1- */
+}
+
+.iconfont {
+  font-family: "iconfont" !important;
+  font-size: 16px;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-fullscreen:before {
+  content: "\eb9d";
+}
+
+.icon-pause:before {
+  content: "\ec79";
+}
+
+.icon-playarrow:before {
+  content: "\ecaa";
+}
+
+.icon-volumemute:before {
+  content: "\ed9b";
+}
+
+.icon-volumeoff:before {
+  content: "\ed9c";
+}
+
+.icon-volumeup:before {
+  content: "\ed9d";
+}
+
