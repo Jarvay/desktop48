@@ -1,21 +1,35 @@
 <template>
     <div>
-        <el-card style="text-align: left;">
+        <el-divider content-position="left">更新成员信息</el-divider>
+
+        <el-card style="text-align: left;" shadow="hover">
             <el-button type="primary" @click="updateInfo" :loading="isUpdating">更新成员信息</el-button>
         </el-card>
 
-        <el-card style="margin-top: 16px;">
-            <div style="display: flex;flex-direction: row;">
-                <el-input style="width: 640px;" type="text" v-model="userAgent" placeholder="设置User-Agent"></el-input>
+        <el-divider content-position="left">User-Agent设置</el-divider>
+
+        <el-card style="margin-top: 16px;" shadow="hover">
+            <div style="display: flex;flex-direction: row;width: 720px;">
+                <el-input style="" type="text" v-model="userAgent" placeholder="设置User-Agent"></el-input>
 
                 <el-button style="margin-left: 8px;" type="primary" @click="setUserAgent">设置</el-button>
             </div>
         </el-card>
 
-        <el-card style="margin-top: 16px;">
-            <div slot="header">
-                <span>屏蔽直播|回放的成员</span>
+        <el-divider content-position="left">默认下载目录</el-divider>
+
+        <el-card style="margin-top: 16px;" shadow="hover">
+            <div style="display: flex;flex-direction: row; width: 640px;">
+                <el-input type="text" v-model="downloadDirectory" placeholder="下载目录"
+                          @click="setDownloadDirectory"></el-input>
+
+                <el-button style="margin-left: 8px;" type="primary" @click="setDownloadDirectory">选择</el-button>
             </div>
+        </el-card>
+
+        <el-divider content-position="left">屏蔽成员直播|回放</el-divider>
+
+        <el-card style="margin-top: 16px;" shadow="hover">
             <hidden-members></hidden-members>
         </el-card>
     </div>
@@ -28,12 +42,15 @@
     import Apis from '@/assets/js/apis';
     import Debug from '@/assets/js/debug';
     import HiddenMembers from '@/components/HiddenMembers.vue';
+    import {remote} from 'electron';
+
     @Component({
         components: {HiddenMembers}
     })
-    export default class Setting extends Vue{
+    export default class Setting extends Vue {
         private userAgent: string = Database.instance().getConfig('userAgent', Constants.DEFAULT_USER_AGENT);
         private isUpdating: boolean = false;
+        private downloadDirectory: string = Database.instance().getDownloadDir();
 
         private updateInfo() {
             this.isUpdating = true;
@@ -55,6 +72,16 @@
                 message: '设置成功',
                 type: 'success'
             });
+        }
+
+        private setDownloadDirectory() {
+            const dir = remote.dialog.showOpenDialogSync({
+                properties: ['openDirectory']
+            });
+            if (typeof dir !== 'undefined') {
+                this.downloadDirectory = dir[0];
+                Database.instance().setDownloadDir(this.downloadDirectory);
+            }
         }
     }
 </script>

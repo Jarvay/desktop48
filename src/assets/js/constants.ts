@@ -27,13 +27,14 @@ export default class Constants {
         LIVES: 'LIVES',
         REVIEWS: 'REVIEWS',
         SETTING: 'SETTING',
+        DOWNLOADS: 'DOWNLOADS'
     };
 
     /**
      * ffmpeg下载地址
      */
-    public static readonly FFMPEG_URL_WIN32 = 'https://ffmpeg.zeranoe.com/builds/win64/static/ffmpeg-20190826-0821bc4-win64-static.zip';
-    public static readonly FFMPEG_URL_MAC = 'https://ffmpeg.zeranoe.com/builds/macos64/static/ffmpeg-20190909-976617c-macos64-static.zip';
+    public static readonly FFMPEG_URL_WIN32 = 'https://ffmpeg.zeranoe.com/builds/win64/static/ffmpeg-latest-win64-static.zip';
+    public static readonly FFMPEG_URL_MAC = 'https://ffmpeg.zeranoe.com/builds/macos64/static/ffmpeg-latest-macos64-static.zip';
 
     /**
      * 播放状态
@@ -46,6 +47,29 @@ export default class Constants {
      */
     public static readonly LIST_COL = 8;
     public static readonly LIST_SPAN_TOTAL = 24;
+
+    /**
+     * event
+     */
+    public static readonly EVENT = {
+        'DOWNLOAD_TASK': 'DOWNLOAD_TASK',
+    };
+
+    /**
+     * 下载状态
+     */
+    public static readonly DownloadStatus = {
+        Prepared: 0,
+        Downloading: 1,
+        Finish: 2,
+    };
+
+    /**
+     * 默认下载目录
+     */
+    public static readonly DEFAULT_DOWNLOAD_DIR = require('electron').remote.app.getPath('desktop');
+
+    public static readonly MAX_DOWNLOAD_TASK = 3;
 
     /**
      * 未知成员

@@ -9,9 +9,13 @@ export default class Debug {
         }
     }
 
-    public static error(error: any) {
+    public static error(message: any, error: any = 'undefined') {
         if (process.env.NODE_ENV === 'development') {
-            console.error(error);
+            if (error === 'undefined') {
+                console.error(message);
+            } else {
+                console.error(message, error);
+            }
         }
     }
 

@@ -13,6 +13,8 @@
                         </el-menu-item>
                         <el-menu-item :index="Constants.MENUS.REVIEWS">回放
                         </el-menu-item>
+                        <el-menu-item :index="Constants.MENUS.DOWNLOADS">下载
+                        </el-menu-item>
                         <el-menu-item :index="Constants.MENUS.SETTING">设置
                         </el-menu-item>
                     </el-menu>
@@ -24,6 +26,8 @@
 
                     <reviews ref="reviews" v-show="menus[Constants.MENUS.REVIEWS]"
                              @on-review-click="onReviewClick"></reviews>
+
+                    <downloads v-show="menus[Constants.MENUS.DOWNLOADS]"></downloads>
 
                     <setting ref="setting" v-show="menus[Constants.MENUS.SETTING]"></setting>
                 </el-main>
@@ -38,15 +42,18 @@
 </template>
 
 <script lang="ts">
-    import {Component, Vue} from "vue-property-decorator";
-    import Lives from "@/components/Lives.vue";
-    import Reviews from "@/components/Reviews.vue";
-    import Constants from "@/assets/js/constants";
-    import Debug from "@/assets/js/debug";
-    import Tools from "@/assets/js/tools";
-    import Apis from "@/assets/js/apis";
+    import {Component, Vue} from 'vue-property-decorator';
+    import Lives from '@/components/Lives.vue';
+    import Reviews from '@/components/Reviews.vue';
+    import Constants from '@/assets/js/constants';
+    import Debug from '@/assets/js/debug';
+    import Tools from '@/assets/js/tools';
+    import Apis from '@/assets/js/apis';
     import Review from '@/components/Review.vue';
     import Setting from '@/components/Setting.vue';
+    import Downloads from '@/components/Downloads.vue';
+    import Database from '@/assets/js/database';
+    import EventBus from '@/assets/js/event-bus';
 
     const menus: any = {};
     Object.keys(Constants.MENUS).forEach(key => {
@@ -55,6 +62,7 @@
 
     @Component({
         components: {
+            Downloads,
             Setting,
             Review,
             Lives,
@@ -105,7 +113,7 @@
          */
         private onReviewClick(item: any) {
             const exists = this.liveTabs.some((tab: any) => {
-                return tab.liveId == item.liveId && tab.show == true;
+                return tab.liveId === item.liveId;
             });
             if (exists) {
                 return;
@@ -114,7 +122,7 @@
                 label: `${item.userInfo.nickname}的直播间`,
                 title: item.title,
                 liveId: item.liveId,
-                name: item.liveId + "_" + Math.random().toString(36).substr(2),
+                name: item.liveId + '_' + Math.random().toString(36).substr(2),
                 startTime: parseInt(item.ctime)
             };
             Debug.log(liveTab);

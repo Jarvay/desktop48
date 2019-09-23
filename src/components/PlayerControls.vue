@@ -23,7 +23,7 @@
                    v-if="isMuted"></i>
 
                 <el-slider class="volume-slider" :disabled="volumeDisabled" v-model="volume"
-                           @on-change="volumeChange"></el-slider>
+                           @change="volumeChange"></el-slider>
             </div>
 
             <i style="margin-left: 8px;" class="button icon-fullscreen iconfont" @click="fullScreen"></i>

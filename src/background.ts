@@ -49,14 +49,14 @@ function createWindow() {
         if (!process.env.IS_TEST) {
             win.webContents.openDevTools();
         }
-
-        win.maximize();
-        win.show();
     } else {
         createProtocol('app');
         // Load the index.html when not in development
         win.loadURL('app://./index.html');
     }
+
+    win.maximize();
+    win.show();
 
     win.on('closed', () => {
         win = null;

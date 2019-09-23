@@ -10,6 +10,7 @@
             <div style="margin-left: 8px;">
                 <el-cascader transfer v-if="reviewScreen === Constants.REVIEW_SCREEN.USER"
                              style="width: 320px;"
+                             clearable
                              placeholder="请选择成员"
                              filterable
                              :options="members"
@@ -17,12 +18,14 @@
 
                 <el-cascader transfer v-if="reviewScreen === Constants.REVIEW_SCREEN.TEAM"
                              placeholder="请选择队伍"
+                             clearable
                              filterable
                              :options="teams"
                              v-model="selectedTeam"></el-cascader>
 
                 <el-cascader transfer v-if="reviewScreen === Constants.REVIEW_SCREEN.GROUP"
                              placeholder="请选择分团"
+                             clearable
                              filterable
                              :options="groups"
                              v-model="selectedGroup"></el-cascader>
@@ -48,7 +51,7 @@
 </template>
 
 <script lang="ts">
-    import {Component, Emit, Prop, Vue} from 'vue-property-decorator';
+    import {Component, Emit, Vue} from 'vue-property-decorator';
     import Apis from '@/assets/js/apis';
     import Tools from '@/assets/js/tools';
     import Database from '@/assets/js/database';
@@ -56,6 +59,7 @@
     import Constants from '@/assets/js/constants';
     import ListInterface from '@/assets/js/list-interface';
     import LiveItem from '@/components/LiveItem.vue';
+
     @Component({
         components: {LiveItem}
     })

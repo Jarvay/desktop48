@@ -5,6 +5,7 @@
                 <el-button type="primary">视频地址</el-button>
             </el-tooltip>
 
+            <el-button @click="download" type="success">下载</el-button>
         </el-header>
 
         <el-main>
@@ -14,7 +15,7 @@
                         <el-tooltip :content="liveTitle"><span>{{liveTitle}}</span></el-tooltip>
                     </div>
                     <p slot="extra">
-                        <span>{{user.userName}}</span>
+                        <span>{{member.userName}}</span>
                     </p>
 
                     <el-carousel class="video" v-if="isRadio" autoplay loop :autoplay-speed="carouselTime">
@@ -60,6 +61,8 @@
     import BarrageBox from '@/components/BarrageBox.vue';
     import VideoJs from 'video.js';
     import 'video.js/dist/video-js.css';
+    import DownloadTask from '@/assets/js/download-task';
+    import EventBus from '@/assets/js/event-bus';
 
     @Component({
         components: {BarrageBox, PlayerControls}
@@ -73,7 +76,7 @@
         private isReview: boolean = false;
         private isRadio: boolean = false;
         private number: number = 0;
-        private user: any = {};
+        private member: any = {};
         private player!: VideoJsPlayer;
         private currentTime: number = 0;
         private status: any = Constants.STATUS_PREPARED;
@@ -119,7 +122,7 @@
                     });
                     this.carouselTime = parseInt(data.carousels.carouselTime);
                 }
-                this.user = data.user;
+                this.member = Database.instance().member(data.user.userId);
 
                 this.initPlayer();
             }).catch((error: any) => {
@@ -210,6 +213,7 @@
         private volumeChange(volume: number) {
             this.volume = volume;
             Debug.log('volumeChange');
+            Database.instance().setConfig('volume', volume);
         }
 
         private fullScreen() {
@@ -252,6 +256,14 @@
                 this.currentBarrage = this.barrageList.shift();
                 this.loadBarrages();
             }
+        }
+
+        private download() {
+            const date = Tools.dateFormat(parseInt(this.startTime), 'yyyyMMddhhmm');
+            const random: number = parseInt((parseFloat(Math.random().toFixed(5)) * 100000).toString());
+            const filename = `${this.member.realName} ${date}.mp4`;
+            const downloadTask: DownloadTask = new DownloadTask(this.playStreamPath, filename, this.liveId);
+            EventBus.post<DownloadTask>(Constants.EVENT.DOWNLOAD_TASK, downloadTask);
         }
     }
 </script>

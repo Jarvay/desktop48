@@ -73,109 +73,50 @@ export default class Database {
         return result;
     }
 
-    public setLoginUserInfo(userInfo: any) {
-        this.db.set('loginUserInfo', userInfo).write();
-    }
-
-    public getLoginUserInfo() {
-        return this.get('loginUserInfo', null);
-    }
-
-    public removeLoginUserInfo() {
-        this.db.unset('loginUserInfo').write();
-    }
-
-    public getToken() {
-        return this.get('token', '');
-    }
-
-    public setToken(token: string) {
-        this.db.set('token', token).write();
-    }
-
-    public removeToken() {
-        this.db.unset('token').write();
-    }
-
-    public isLogin() {
-        return this.db.has('token').value();
-    }
-
-    public setAccid(accid: string) {
-        this.db.set('accid', accid).write();
-    }
-
-    public getAccid() {
-        return this.get('accid', null);
-    }
-
-    public setIMPwd(accid: string) {
-        this.db.set('imPwd', accid).write();
-    }
-
-    public getIMPwd() {
-        return this.get('imPwd', '');
-    }
-
-    public incrementBadgeCount(ownerId: any) {
-        if (typeof this.db.get('badgeCount').find({ownerId}).value() === 'undefined') {
-            this.db.get('badgeCount').push({
-                ownerId,
-                count: 1,
-            }).write();
-        } else {
-            this.db.get('badgeCount').find({ownerId}).update('count', (n: number) => n + 1).write();
-        }
-    }
-
-    public clearBadgeCount(ownerId: any) {
-        this.db.get('badgeCount').remove({ownerId}).write();
-    }
-
-    public getBadgeCount(ownerId: any) {
-        const item = this.db.get('badgeCount').find({ownerId}).value();
-        if (typeof item === 'undefined') {
-            return 0;
-        }
-        return item.count;
-    }
-
-    public setLastCheckInTime(lastCheckInTime: number) {
-        this.db.set('lastCheckInTime', lastCheckInTime).write();
-    }
-
-    public getLastCheckInTime() {
-        return this.get('lastCheckInTime', null);
-    }
-
+    /**
+     * 添加屏蔽成员
+     * @param memberId
+     */
     public addHiddenMember(memberId: any) {
         this.removeHiddenMember(memberId);
         this.db.get('hiddenMembers').push(memberId).write();
     }
 
+    /**
+     * 取消屏蔽成员
+     * @param memberId
+     */
     public removeHiddenMember(memberId: any) {
         this.db.get('hiddenMembers').pull(memberId).write();
     }
 
+    /**
+     * 获取屏蔽成员
+     */
     public getHiddenMembers(): any[] {
         return this.get('hiddenMembers', []);
     }
 
+    /**
+     * 清空屏蔽成员
+     */
     public clearHiddenMembers() {
         this.db.get('hiddenMembers').remove().write();
     }
 
-    public addNoticeMember(memberId: number) {
-        this.removeNoticeMember(memberId);
-        this.db.get('noticeMembers').push(memberId).write();
+    /**
+     * 获取下载目录
+     */
+    public getDownloadDir() {
+        return this.getConfig('downloadDir', Constants.DEFAULT_DOWNLOAD_DIR);
     }
 
-    public removeNoticeMember(memberId: number) {
-        this.db.get('noticeMembers').pull(memberId).write();
-    }
-
-    public getNoticeMembers() {
-        return this.get('noticeMembers', []);
+    /**
+     * 设置下载目录
+     * @param downloadDir
+     */
+    public setDownloadDir(downloadDir: string) {
+        this.setConfig('downloadDir', downloadDir);
     }
 
     public setConfig(key: string, value: any) {

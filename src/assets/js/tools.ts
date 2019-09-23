@@ -144,8 +144,26 @@ class Tools {
                 ffplayPath = path.join(ffmpegDir, 'ffplay');
                 break;
         }
-
         return ffplayPath;
+    }
+
+    /**
+     * ffmpeg路径
+     */
+    public static ffmpegPath(): string {
+        const ffmpegDir = path.join(this.APP_DATA_PATH, 'ffmpeg', 'bin');
+        let ffmpegPath;
+
+        switch (process.platform) {
+            default:
+            case 'win32':
+                ffmpegPath = path.join(ffmpegDir, 'ffmpeg.exe');
+                break;
+            case 'darwin':
+                ffmpegPath = path.join(ffmpegDir, 'ffmpeg');
+                break;
+        }
+        return ffmpegPath;
     }
 }
 
