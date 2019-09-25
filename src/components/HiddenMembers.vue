@@ -10,7 +10,7 @@
         <el-button style="margin-left: 8px;" type="danger" @click="clear">清空</el-button>
 
         <div style="margin-top: 8px;">
-            <el-tag style="margin-left: 8px;color: white;" :name="member.userId" closable
+            <el-tag :style="{color: 'white',borderColor:member.team.teamColor}" :name="member.userId" closable
                     @close="removeHiddenMember(member.userId)"
                     :color="member.team.teamColor"
                     v-for="member in hiddenMembers">
@@ -111,7 +111,5 @@
 </script>
 
 <style scoped lang="scss">
-    .el-transfer-panel {
-        width: 320px !important;
-    }
+
 </style>

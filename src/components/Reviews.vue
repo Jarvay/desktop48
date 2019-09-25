@@ -51,7 +51,7 @@
 </template>
 
 <script lang="ts">
-    import {Component, Emit, Vue} from 'vue-property-decorator';
+    import {Component, Emit, Vue, Watch} from 'vue-property-decorator';
     import Apis from '@/assets/js/apis';
     import Tools from '@/assets/js/tools';
     import Database from '@/assets/js/database';
@@ -72,6 +72,10 @@
             this.onReviewClick(item);
         }
 
+        public created() {
+            this.initMembers();
+        }
+
         public visible: boolean = false;
         private reviewList: any[] = [];
         private reviewNext: string = '0';
@@ -85,12 +89,14 @@
         private selectedTeam: any[] = [];
         private selectedGroup: any[] = [];
 
-        get disabled() {
-            return this.loading || this.noMore || !this.visible;
+        @Watch('reviewList')
+        private onReviewListChange(newValue: any[]) {
+            if (newValue.length < Constants.MIN_SHOWN_LIVE_COUNT)
+                this.getReviewList();
         }
 
-        public created() {
-            this.initMembers();
+        get disabled() {
+            return this.loading || this.noMore || !this.visible;
         }
 
         public getReviewList() {

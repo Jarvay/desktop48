@@ -69,7 +69,12 @@ export default class Constants {
      */
     public static readonly DEFAULT_DOWNLOAD_DIR = require('electron').remote.app.getPath('desktop');
 
+    /**
+     * 最大下载任务数
+     */
     public static readonly MAX_DOWNLOAD_TASK = 3;
+
+    public static readonly MIN_SHOWN_LIVE_COUNT = 20;
 
     /**
      * 未知成员
