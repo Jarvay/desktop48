@@ -100,8 +100,9 @@
         private onLiveClick(item: any) {
             const ChildProcess = require('child_process');
             Apis.instance().live(item.liveId).then(content => {
-                Debug.log(Tools.ffplayPath() + ` ${content.playStreamPath}`);
-                ChildProcess.exec(Tools.ffplayPath() + ` ${content.playStreamPath}`);
+                const command = `"${Tools.ffplayPath()}" ${content.playStreamPath}`;
+                Debug.log(command);
+                ChildProcess.exec(command);
             }).catch(error => {
                 Debug.error(error);
             });

@@ -87,8 +87,14 @@
             this.onInitialized();
         }
 
+        private ffmpegInit() {
+            fs.chmodSync(Tools.ffmpegPath(), '777');
+            fs.chmodSync(Tools.ffplayPath(), '777');
+        }
+
         @Emit()
         private onInitialized() {
+            this.ffmpegInit();
         }
     };
 </script>
