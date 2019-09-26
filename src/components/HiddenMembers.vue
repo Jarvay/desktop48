@@ -10,7 +10,7 @@
         <el-button style="margin-left: 8px;" type="danger" @click="clear">清空</el-button>
 
         <div style="margin-top: 8px;">
-            <el-tag :style="{color: 'white',borderColor:member.team.teamColor}" :name="member.userId" closable
+            <el-tag :style="{color: 'white',borderColor:member.team.teamColor, marginRight: '8px'}" :name="member.userId" closable
                     @close="removeHiddenMember(member.userId)"
                     :color="member.team.teamColor"
                     v-for="member in hiddenMembers">

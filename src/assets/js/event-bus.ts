@@ -6,11 +6,11 @@ export default class EventBus {
 
     public static post<T>(event: string, param: T) {
         this.eventBus.$emit(event, param);
-        Debug.info('post event');
+        Debug.info('post event', event);
     }
 
     public static bind<T>(event: string, listener: (param: T) => any) {
         this.eventBus.$on(event, listener);
-        Debug.info('bind event');
+        Debug.info('bind event', event);
     }
 }

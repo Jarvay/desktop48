@@ -5,7 +5,7 @@
                 <el-button type="primary">视频地址</el-button>
             </el-tooltip>
 
-            <el-button @click="download" type="success">下载</el-button>
+            <el-button icon="el-icon-download" @click="download" type="success">下载</el-button>
         </el-header>
 
         <el-main>
@@ -18,11 +18,13 @@
                         <span>{{member.userName}}</span>
                     </p>
 
-                    <el-carousel class="video" v-if="isRadio" autoplay loop :autoplay-speed="carouselTime">
-                        <el-carousel-item v-for="carousel in carousels" :key="carousel">
-                            <el-image class="picture" :src="carousel"/>
-                        </el-carousel-item>
-                    </el-carousel>
+                    <div class="carousel-box" v-if="isRadio">
+                        <el-carousel style="top: 25%;" autoplay loop :interval="carouselTime">
+                            <el-carousel-item v-for="carousel in carousels" :key="carousel">
+                                <el-image class="picture" :src="carousel"/>
+                            </el-carousel-item>
+                        </el-carousel>
+                    </div>
 
                     <div v-else>
                         <video :id="'video-js-' + liveId" class="video video-js" preload="auto">
@@ -263,7 +265,7 @@
             const random: number = parseInt((parseFloat(Math.random().toFixed(5)) * 100000).toString());
             const filename = `${this.member.realName} ${date}.mp4`;
             const downloadTask: DownloadTask = new DownloadTask(this.playStreamPath, filename, this.liveId);
-            EventBus.post<DownloadTask>(Constants.EVENT.DOWNLOAD_TASK, downloadTask);
+            EventBus.post<DownloadTask>(Constants.Event.DOWNLOAD_TASK, downloadTask);
         }
     }
 </script>

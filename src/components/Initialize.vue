@@ -1,7 +1,10 @@
 <template>
     <el-container>
         <el-main style="display: flex;flex-direction: column;align-items:center;justify-content:center;height: 600px;">
-            <span>{{initText}}</span>
+            <div>
+                <i class="el-icon-loading"></i>
+                <span style="margin-left: 8px;">{{initText}}</span>
+            </div>
             <el-progress v-if="downloading" style="margin-top: 16px;" type="circle" :percentage="percent"></el-progress>
         </el-main>
     </el-container>
@@ -23,7 +26,7 @@
         private percent: number = 0;
         private downloading = false;
 
-        private mounted() {
+        private created() {
             this.init();
         }
 

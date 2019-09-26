@@ -19,7 +19,18 @@
                         v-if="i <  index * Constants.LIST_COL && i >= (index - 1) * Constants.LIST_COL"
                         :key="item.liveId">
                     <div @click="onItemClick(item)">
-                        <live-item :item="item"></live-item>
+                        <el-popover placement="top" trigger="hover" :ref="`popover-${item.liveId}`">
+                            <p>{{item.title}}</p>
+                            <div>
+                                <el-button type="danger" icon="el-icon-video-camera" size="small"
+                                           @click="onRecordClick(item)">录制
+                                </el-button>
+                                <el-button type="success" icon="el-icon-video-play" size="small"
+                                           @click="onPlayClick(item)">观看
+                                </el-button>
+                            </div>
+                            <live-item :item="item" slot="reference"></live-item>
+                        </el-popover>
                     </div>
                 </el-col>
             </el-row>
@@ -28,24 +39,19 @@
 </template>
 
 <script lang="ts">
-    import {Component, Emit, Vue} from 'vue-property-decorator';
+    import {Component, Emit, Prop, Vue} from 'vue-property-decorator';
     import Apis from '@/assets/js/apis';
     import Database from '@/assets/js/database';
     import Tools from '@/assets/js/tools';
     import Debug from '@/assets/js/debug';
-    import ListInterface from '@/assets/js/list-interface';
+    import IList from '@/assets/js/i-list';
     import LiveItem from '@/components/LiveItem.vue';
 
     @Component({
         components: {LiveItem}
     })
-    export default class Lives extends Vue implements ListInterface {
-        visible: boolean = true;
-
-        setVisibility(flag: boolean): void {
-            this.visible = flag;
-        }
-
+    export default class Lives extends Vue implements IList {
+        @Prop({type: Boolean, required: true}) private visible!: boolean;
         private liveList: any[] = [];
         private liveNext: string = '0';
         private loading: boolean = false;
@@ -98,11 +104,18 @@
         }
 
         onItemClick(item: any): void | any {
-            this.onLiveClick(item);
         }
 
         @Emit()
         onLiveClick(item: any) {
+        }
+
+        @Emit()
+        onRecordClick(item: any) {
+        }
+
+        @Emit()
+        onPlayClick(item: any) {
         }
     }
 </script>

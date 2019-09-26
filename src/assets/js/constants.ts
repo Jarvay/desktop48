@@ -23,7 +23,7 @@ export default class Constants {
     /**
      * 菜单
      */
-    public static readonly MENUS: any = {
+    public static readonly Menu: any = {
         LIVES: 'LIVES',
         REVIEWS: 'REVIEWS',
         SETTING: 'SETTING',
@@ -51,8 +51,9 @@ export default class Constants {
     /**
      * event
      */
-    public static readonly EVENT = {
+    public static readonly Event = {
         'DOWNLOAD_TASK': 'DOWNLOAD_TASK',
+        'RECORD_TASK': 'RECORD_TASK',
     };
 
     /**
@@ -61,6 +62,15 @@ export default class Constants {
     public static readonly DownloadStatus = {
         Prepared: 0,
         Downloading: 1,
+        Finish: 2,
+    };
+
+    /**
+     * 录制状态
+     */
+    public static readonly RecordStatus = {
+        Prepared: 0,
+        Recording: 1,
         Finish: 2,
     };
 
