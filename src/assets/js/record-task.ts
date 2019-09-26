@@ -1,13 +1,13 @@
-import Debug from '@/assets/js/debug';
-import Tools from '@/assets/js/tools';
-import path from 'path';
-import Constants from '@/assets/js/constants';
 import Database from '@/assets/js/database';
+import Constants from '@/assets/js/constants';
+import path from 'path';
+import Tools from '@/assets/js/tools';
+import Debug from '@/assets/js/debug';
 
 /**
- * 回放下载任务
+ * 直播录制任务
  */
-export default class DownloadTask {
+export default class RecordTask {
     private _url!: string;
     private _saveDirectory: string = Database.instance().getDownloadDir();
     private _filename!: string;
@@ -16,8 +16,9 @@ export default class DownloadTask {
     private _onEnd: () => void = () => {
     };
     private _ffmpegCommand: any = null;
-    private _status: number = Constants.DownloadStatus.Prepared;
+    private _status: number = Constants.RecordStatus.Prepared;
     private _liveId!: string;
+    private _duration: number = 0;
 
     public constructor(url: string, filename: string, liveId: string) {
         this._url = url;
@@ -70,39 +71,58 @@ export default class DownloadTask {
         ffmpeg.setFfmpegPath(Tools.ffmpegPath());
         this._ffmpegCommand = ffmpeg(this._url)
             .on('start', () => {
-                this._status = Constants.DownloadStatus.Downloading;
+                this._status = Constants.RecordStatus.Recording;
                 startListener();
-                Debug.info('download task start');
+                Debug.info('record task start');
             })
             .on('progress', (progress: any) => {
-                let percent: number = parseFloat(progress.percent.toFixed(2));
-                if (percent > 100) percent = 100;
-                this._onProgress(percent);
-                Debug.info('ffmpeg progress event', progress);
+                Debug.info('ffmpeg progress event');
+                Debug.log(progress);
+                this.setDuration(progress.timemark);
             })
             .on('end', () => {
-                this._status = Constants.DownloadStatus.Finish;
-                this._onEnd();
+                ffmpeg(this.getFilePath())
+                    .audioCodec('aac')
+                    .videoCodec('libx264')
+                    .duration(this._duration)
+                    .on('end', () => {
+                        Debug.info('end');
+                        this._status = Constants.RecordStatus.Finish;
+                        this._onEnd();
+                    })
+                    .save(this.getFilePath().replace('.flv', '.mp4'));
             })
-            .save(path.join(this._saveDirectory, this._filename));
+            .audioCodec('copy')
+            .videoCodec('copy')
+            .save(this.getFilePath());
     }
 
-    public isDownloading() {
-        return this._status === Constants.DownloadStatus.Downloading;
+    public isRecording() {
+        return this._status === Constants.RecordStatus.Recording;
     }
 
     public isFinish() {
-        return this._status === Constants.DownloadStatus.Finish;
+        return this._status === Constants.RecordStatus.Finish;
     }
 
     public stop() {
-        if (this._ffmpegCommand === null || this._status !== Constants.DownloadStatus.Downloading) return;
+        if (this._ffmpegCommand === null || this._status !== Constants.RecordStatus.Recording) return;
         this._ffmpegCommand.ffmpegProc.stdin.write('q');
-        this._status = Constants.DownloadStatus.Finish;
-        Debug.info('download task stop');
+        this._status = Constants.RecordStatus.Finish;
+        Debug.info('record task stop');
     }
 
     public openSaveDirectory() {
         require('electron').remote.shell.showItemInFolder(this.getFilePath());
+    }
+
+    private setDuration(timeMark: string) {
+        const timeArray = timeMark.split(':');
+        if (timeArray.length === 0) this._duration = 0;
+        const hours: number = parseFloat(timeArray[0]);
+        const minutes: number = parseFloat(timeArray[1]);
+        const seconds: number = parseFloat(timeArray[2]);
+        this._duration = hours * 60 * 60 + minutes * 60 + seconds;
+        Debug.log('duration', this._duration);
     }
 }

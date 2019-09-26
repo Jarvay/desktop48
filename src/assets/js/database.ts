@@ -112,6 +112,18 @@ export default class Database {
     }
 
     /**
+     * 是否初始化过
+     * @param initialized
+     */
+    public setInitialized(initialized: boolean) {
+        this.setConfig('initialized', initialized);
+    }
+
+    public getInitialized() {
+        return this.getConfig('initialized', false);
+    }
+
+    /**
      * 设置下载目录
      * @param downloadDir
      */

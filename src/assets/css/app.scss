@@ -76,11 +76,18 @@
 }
 
 $height: 600px;
+$width: 400px;
 
 .video {
   display: flex;
   justify-content: center;
-  width: 400px;
+  width: $width;
+  height: $height;
+}
+
+.carousel-box {
+  position: relative;
+  width: $width;
   height: $height;
 }
 

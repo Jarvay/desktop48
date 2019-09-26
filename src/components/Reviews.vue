@@ -42,7 +42,7 @@
                         v-if="i <  index * Constants.LIST_COL && i >= (index - 1) * Constants.LIST_COL"
                         :key="item.liveId">
                     <div @click="onReviewClick(item)">
-                        <live-item :item="item"></live-item>
+                        <live-item :item="item" slot="reference"></live-item>
                     </div>
                 </el-col>
             </el-row>
@@ -51,23 +51,19 @@
 </template>
 
 <script lang="ts">
-    import {Component, Emit, Vue, Watch} from 'vue-property-decorator';
+    import {Component, Emit, Prop, Vue, Watch} from 'vue-property-decorator';
     import Apis from '@/assets/js/apis';
     import Tools from '@/assets/js/tools';
     import Database from '@/assets/js/database';
     import Debug from '@/assets/js/debug';
     import Constants from '@/assets/js/constants';
-    import ListInterface from '@/assets/js/list-interface';
+    import IList from '@/assets/js/i-list';
     import LiveItem from '@/components/LiveItem.vue';
 
     @Component({
         components: {LiveItem}
     })
-    export default class Reviews extends Vue implements ListInterface {
-        public setVisibility(flag: boolean): void {
-            this.visible = flag;
-        }
-
+    export default class Reviews extends Vue implements IList {
         public onItemClick(item: any) {
             this.onReviewClick(item);
         }
@@ -76,7 +72,7 @@
             this.initMembers();
         }
 
-        public visible: boolean = false;
+        @Prop({type: Boolean, required: true}) private visible!: boolean;
         private reviewList: any[] = [];
         private reviewNext: string = '0';
         private loading: boolean = false;
@@ -219,7 +215,7 @@
 
         @Emit()
         private onReviewClick(item: any) {
-            return;
+
         }
     }
 </script>
