@@ -87,7 +87,7 @@
 
         @Watch('reviewList')
         private onReviewListChange(newValue: any[]) {
-            if (newValue.length < Constants.MIN_SHOWN_LIVE_COUNT)
+            if (newValue.length < Constants.MIN_SHOWN_LIVE_COUNT && newValue.length !== 0)
                 this.getReviewList();
         }
 
