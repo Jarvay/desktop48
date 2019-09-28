@@ -1,6 +1,6 @@
 <template>
     <div>
-        <el-divider content-position="left">下载任务(下载进度显示可能有问题)</el-divider>
+        <el-divider content-position="left">下载任务</el-divider>
 
         <el-card v-if="downloadTasks.length === 0" shadow="hover">
             <span>未有下载任务</span>
@@ -86,6 +86,9 @@
                 this.downloadTasks.push(downloadTask);
                 downloadTask.setOnProgress((percent: number) => {
                     this.$set(downloadTask, 'progress', percent);
+                });
+                downloadTask.setOnEnd(() => {
+                    this.$set(downloadTask, 'progress', 100);
                 });
                 downloadTask.start(() => {
                     this.$message({
