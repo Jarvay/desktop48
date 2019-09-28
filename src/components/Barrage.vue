@@ -1,12 +1,10 @@
 <template>
-    <el-card style="min-width: 480px;height: inherit;">
-        <ul id="barrage-ul" style="overflow-y: auto;height: 620px;">
-            <li v-for="(barrage, index) in barrageList" class="barrage-item">
-                <span class="barrage-username">{{barrage.username}}：</span>
-                <span>{{barrage.content}}</span>
-            </li>
-        </ul>
-    </el-card>
+    <ul id="barrage-ul" style="overflow-y: auto;height: 620px;">
+        <li v-for="(barrage, index) in barrageList" class="barrage-item">
+            <span class="barrage-username">{{barrage.username}}：</span>
+            <span>{{barrage.content}}</span>
+        </li>
+    </ul>
 </template>
 
 <script lang="ts">

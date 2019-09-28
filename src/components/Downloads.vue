@@ -87,6 +87,9 @@
                 downloadTask.setOnProgress((percent: number) => {
                     this.$set(downloadTask, 'progress', percent);
                 });
+                downloadTask.setOnEnd(() => {
+                    this.$set(downloadTask, 'progress', 100);
+                });
                 downloadTask.start(() => {
                     this.$message({
                         message: '下载开始',
