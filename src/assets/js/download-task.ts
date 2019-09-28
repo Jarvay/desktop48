@@ -69,6 +69,13 @@ export default class DownloadTask {
         const ffmpeg = require('fluent-ffmpeg');
         ffmpeg.setFfmpegPath(Tools.ffmpegPath());
         this._ffmpegCommand = ffmpeg(this._url)
+            .inputOptions([
+                '-protocol_whitelist',
+                'file,http,https,tcp,tls',
+            ])
+            .audioCodec('copy')
+            .videoCodec('copy')
+            .format('mp4')
             .on('start', () => {
                 this._status = Constants.DownloadStatus.Downloading;
                 startListener();
