@@ -74,6 +74,75 @@ export default class Database {
     }
 
     /**
+     * 成员筛选
+     */
+    public getMemberOptions(): any[] {
+        return this.db.get('memberOptions').value();
+    }
+
+    public refreshMemberOptions() {
+        const options: any[] = this.groups().map((group: any) => {
+            return {
+                value: group.groupId + '',
+                label: group.groupName,
+                children: group.teams.map((team: any) => {
+                    return {
+                        value: team.teamId + '',
+                        label: team.teamName,
+                        children: team.members.map((member: any) => {
+                            return {
+                                value: member.userId + '',
+                                label: `${member.realName}(${member.abbr})`,
+                            };
+                        }),
+                    };
+                }),
+            };
+        });
+        this.db.set('memberOptions', options).write();
+    }
+
+    /**
+     * 队伍筛选
+     */
+    public getTeamOptions(): any[] {
+        return this.db.get('teamOptions').value();
+    }
+
+    public refreshTeamOptions() {
+        const options: any[] = this.groups().map((group: any) => {
+            return {
+                value: group.groupId + '',
+                label: group.groupName,
+                children: group.teams.map((team: any) => {
+                    return {
+                        value: team.teamId + '',
+                        label: team.teamName,
+                    };
+                }),
+            };
+        });
+        this.db.set('teamOptions', options).write();
+    }
+
+    /**
+     * 分团筛选
+     */
+    public getGroupOptions(): any[] {
+        return this.db.get('groupOptions').value();
+    }
+
+    public refreshGroupOptions() {
+        const options: any[] = this.groups().map((group: any) => {
+            return {
+                value: group.groupId + '',
+                label: group.groupName,
+            };
+        });
+        this.db.set('groupOptions', options).write();
+    }
+
+    /**
      * 添加屏蔽成员
      * @param memberId
      */
@@ -151,7 +220,6 @@ export default class Database {
         }
 
         if (!this.db.has('members').value()) {
-            Debug.log(1);
             this.db.set('members', data.starInfo).write();
             this.db.set('teams', data.teamInfo).write();
             this.db.set('groups', data.groupInfo).write();
@@ -160,6 +228,17 @@ export default class Database {
         this.membersDB = this.db.get('members').cloneDeep();
         this.teamsDB = this.db.get('teams').cloneDeep();
         this.groupsDB = this.db.get('groups').cloneDeep();
+
+        //回放筛选
+        if (!this.db.has('memberOptions').value()) {
+            this.refreshMemberOptions();
+        }
+        if (!this.db.has('teamOptions').value()) {
+            this.refreshMemberOptions();
+        }
+        if (!this.db.has('groupOptions').value()) {
+            this.refreshMemberOptions();
+        }
 
         if (!this.db.has('config')) {
             this.db.set('config', {}).write();

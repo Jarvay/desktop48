@@ -1,57 +1,68 @@
 <template>
-    <el-container v-loading="loading">
-        <el-header class="header-box">
-            <el-select style="width: 100px;" v-model="reviewScreen">
-                <el-option :value="Constants.REVIEW_SCREEN.USER" label="成员"></el-option>
-                <el-option :value="Constants.REVIEW_SCREEN.TEAM" label="队伍"></el-option>
-                <el-option :value="Constants.REVIEW_SCREEN.GROUP" label="分团"></el-option>
-            </el-select>
+    <div>
+        <el-tabs v-model="activeName" closable type="card" @tab-remove="onTabRemove">
+            <el-tab-pane :closable="false" label="列表" name="Home">
+                <el-container v-loading="loading">
+                    <el-header class="header-box">
+                        <el-select style="width: 100px;" v-model="reviewScreen">
+                            <el-option :value="Constants.REVIEW_SCREEN.USER" label="成员"></el-option>
+                            <el-option :value="Constants.REVIEW_SCREEN.TEAM" label="队伍"></el-option>
+                            <el-option :value="Constants.REVIEW_SCREEN.GROUP" label="分团"></el-option>
+                        </el-select>
 
-            <div style="margin-left: 8px;">
-                <el-cascader transfer v-if="reviewScreen === Constants.REVIEW_SCREEN.USER"
-                             style="width: 320px;"
-                             clearable
-                             placeholder="请选择成员"
-                             filterable
-                             :options="members"
-                             v-model="selectedUser"></el-cascader>
+                        <div style="margin-left: 8px;">
+                            <el-cascader transfer v-if="reviewScreen === Constants.REVIEW_SCREEN.USER"
+                                         style="width: 320px;"
+                                         clearable
+                                         placeholder="请选择成员"
+                                         filterable
+                                         :options="members"
+                                         v-model="selectedUser"></el-cascader>
 
-                <el-cascader transfer v-if="reviewScreen === Constants.REVIEW_SCREEN.TEAM"
-                             placeholder="请选择队伍"
-                             clearable
-                             filterable
-                             :options="teams"
-                             v-model="selectedTeam"></el-cascader>
+                            <el-cascader transfer v-if="reviewScreen === Constants.REVIEW_SCREEN.TEAM"
+                                         placeholder="请选择队伍"
+                                         clearable
+                                         filterable
+                                         :options="teams"
+                                         v-model="selectedTeam"></el-cascader>
 
-                <el-cascader transfer v-if="reviewScreen === Constants.REVIEW_SCREEN.GROUP"
-                             placeholder="请选择分团"
-                             clearable
-                             filterable
-                             :options="groups"
-                             v-model="selectedGroup"></el-cascader>
-            </div>
-            <el-button style="margin-left: 8px;" type="primary" @click="refresh">刷新</el-button>
-        </el-header>
+                            <el-cascader transfer v-if="reviewScreen === Constants.REVIEW_SCREEN.GROUP"
+                                         placeholder="请选择分团"
+                                         clearable
+                                         filterable
+                                         :options="groups"
+                                         v-model="selectedGroup"></el-cascader>
+                        </div>
+                        <el-button style="margin-left: 8px;" type="primary" @click="refresh">刷新</el-button>
+                    </el-header>
 
-        <el-main style="overflow: auto;height: 800px;" v-infinite-scroll="getReviewList"
-                 :infinite-scroll-disabled="disabled">
-            <el-row v-for="index in Math.ceil(reviewList.length / Constants.LIST_COL)"
-                    :key="index" :gutter="10">
-                <el-col :span="Constants.LIST_SPAN_TOTAL / Constants.LIST_COL"
-                        v-for="(item, i) in reviewList"
-                        v-if="i <  index * Constants.LIST_COL && i >= (index - 1) * Constants.LIST_COL"
-                        :key="item.liveId">
-                    <div @click="onReviewClick(item)">
-                        <live-item :item="item" slot="reference"></live-item>
-                    </div>
-                </el-col>
-            </el-row>
-        </el-main>
-    </el-container>
+                    <el-main style="overflow: auto;height: 780px;" v-infinite-scroll="getReviewList"
+                             :infinite-scroll-disabled="disabled">
+                        <el-row v-for="index in Math.ceil(reviewList.length / Constants.LIST_COL)"
+                                :key="index" :gutter="10">
+                            <el-col :span="Constants.LIST_SPAN_TOTAL / Constants.LIST_COL"
+                                    v-for="(item, i) in reviewList"
+                                    v-if="i <  index * Constants.LIST_COL && i >= (index - 1) * Constants.LIST_COL"
+                                    :key="item.liveId">
+                                <div @click="onReviewClick(item)">
+                                    <live-item :item="item" slot="reference"></live-item>
+                                </div>
+                            </el-col>
+                        </el-row>
+                    </el-main>
+                </el-container>
+            </el-tab-pane>
+
+            <el-tab-pane v-for="(liveTab, index) in liveTabs" :label="liveTab.label" :name="liveTab.name">
+                <review :index="index" :live-id="liveTab.liveId" :start-time="liveTab.startTime"
+                        :live-title="liveTab.title"></review>
+            </el-tab-pane>
+        </el-tabs>
+    </div>
 </template>
 
 <script lang="ts">
-    import {Component, Emit, Prop, Vue, Watch} from 'vue-property-decorator';
+    import {Component, Vue, Watch} from 'vue-property-decorator';
     import Apis from '@/assets/js/apis';
     import Tools from '@/assets/js/tools';
     import Database from '@/assets/js/database';
@@ -59,40 +70,41 @@
     import Constants from '@/assets/js/constants';
     import IList from '@/assets/js/i-list';
     import LiveItem from '@/components/LiveItem.vue';
+    import Review from '@/components/Review.vue';
 
     @Component({
-        components: {LiveItem}
+        components: {Review, LiveItem}
     })
     export default class Reviews extends Vue implements IList {
         public onItemClick(item: any) {
             this.onReviewClick(item);
         }
 
-        public created() {
-            this.initMembers();
-        }
+        //顶部tabs
+        private activeName: string = 'Home';
+        private liveTabs: any[] = [];
 
-        @Prop({type: Boolean, required: true}) private visible!: boolean;
         private reviewList: any[] = [];
         private reviewNext: string = '0';
         private loading: boolean = false;
         private noMore: boolean = false;
         private reviewScreen: string = Constants.REVIEW_SCREEN.USER;
-        private members: any = [];
-        private teams: any = [];
-        private groups: any = [];
+        private members: any = Database.instance().getMemberOptions();
+        private teams: any = Database.instance().getTeamOptions();
+        private groups: any = Database.instance().getGroupOptions();
         private selectedUser: any[] = [];
         private selectedTeam: any[] = [];
         private selectedGroup: any[] = [];
 
         @Watch('reviewList')
         private onReviewListChange(newValue: any[]) {
-            if (newValue.length < Constants.MIN_SHOWN_LIVE_COUNT && newValue.length !== 0)
+            if (newValue.length < Constants.MIN_SHOWN_LIVE_COUNT && newValue.length !== 0) {
                 this.getReviewList();
+            }
         }
 
         get disabled() {
-            return this.loading || this.noMore || !this.visible;
+            return this.loading || this.noMore;
         }
 
         public getReviewList() {
@@ -170,52 +182,38 @@
             this.getReviewList();
         }
 
-        private initMembers() {
-            this.members = Database.instance().groups().map((group: any) => {
-                return {
-                    value: group.groupId + '',
-                    label: group.groupName,
-                    children: group.teams.map((team: any) => {
-                        return {
-                            value: team.teamId + '',
-                            label: team.teamName,
-                            children: team.members.map((member: any) => {
-                                return {
-                                    value: member.userId + '',
-                                    label: `${member.realName}(${member.abbr})`,
-                                };
-                            }),
-                        };
-                    }),
-                };
+        /**
+         * 打开回放
+         * @param item
+         */
+        private onReviewClick(item: any) {
+            const exists = this.liveTabs.some((tab: any) => {
+                return tab.liveId === item.liveId;
             });
-
-            Debug.log('init members', this.members);
-
-            this.teams = Database.instance().groups().map((group: any) => {
-                return {
-                    value: group.groupId + '',
-                    label: group.groupName,
-                    children: group.teams.map((team: any) => {
-                        return {
-                            value: team.teamId + '',
-                            label: team.teamName,
-                        };
-                    }),
-                };
-            });
-
-            this.groups = Database.instance().groups().map((group: any) => {
-                return {
-                    value: group.groupId + '',
-                    label: group.groupName,
-                };
-            });
+            if (exists) {
+                return;
+            }
+            const liveTab = {
+                label: `${item.userInfo.nickname}的直播间`,
+                title: item.title,
+                liveId: item.liveId,
+                name: item.liveId + '_' + Math.random().toString(36).substr(2),
+                startTime: parseInt(item.ctime)
+            };
+            Debug.log(liveTab);
+            this.liveTabs.push(liveTab);
+            this.activeName = liveTab.name;
         }
 
-        @Emit()
-        private onReviewClick(item: any) {
-
+        /**
+         * 移除tab
+         * @param targetName
+         */
+        private onTabRemove(targetName: string) {
+            this.activeName = 'Home';
+            this.liveTabs = this.liveTabs.filter((tab: any) => {
+                return tab.name != targetName;
+            });
         }
     }
 </script>
