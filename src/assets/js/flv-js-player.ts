@@ -1,6 +1,6 @@
 import IPlayer from '@/assets/js/i-player';
 
-export default class VideoJsPlayer implements IPlayer {
+export default class FlvJsPlayer implements IPlayer {
     private player: any;
 
     constructor(player: any) {
@@ -8,7 +8,7 @@ export default class VideoJsPlayer implements IPlayer {
     }
 
     public mute(): void {
-        this.player.volume(0);
+        this.player.volume = 0;
     }
 
     public pause(): void {
@@ -19,39 +19,39 @@ export default class VideoJsPlayer implements IPlayer {
         this.player.play();
     }
 
-    public volume(volume: number): void {
-        this.player.volume(volume * 0.01);
+    public load(): void {
+        this.player.load();
     }
 
-    public load(): void {
+    public volume(volume: number): void {
+        this.player.volume = volume * 0.01;
     }
 
     public currentTime(currentTime: number): void {
-        this.player.currentTime(currentTime);
+        this.player.currentTime = currentTime;
     }
 
     public destroy(): void {
-        this.player.dispose();
+        this.player.destroy();
     }
 
     public onGotDuration(callback: (duration: number) => void): void {
-        this.player.on('loadeddata', (event: any) => {
-            callback(event.target.player.duration());
+        this.player._mediaElement.addEventListener('loadeddata', (event: any) => {
+            callback(event.target.duration);
         });
     }
 
     public onTimeUpdate(callback: (currentTime: number) => void): void {
-        this.player.on('timeupdate', (event: any) => {
-            callback(event.target.player.currentTime());
+        this.player._mediaElement.addEventListener('timeupdate', (event: any) => {
+            callback(event.target.currentTime);
         });
     }
 
     public requestPictureInPicture(): void {
-        this.player.requestPictureInPicture();
+        //
     }
 
     public fullScreen(): void {
-        this.player.requestFullscreen();
+
     }
 }
-

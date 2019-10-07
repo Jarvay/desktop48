@@ -19,6 +19,8 @@ export default class Apis {
                 Database.instance().db.set('members', content.starInfo).write();
                 Database.instance().db.set('teams', content.teamInfo).write();
                 Database.instance().db.set('groups', content.groupInfo).write();
+
+                Database.instance().refreshOptions();
                 resolve(content);
             }).catch((error) => {
                 reject(error);

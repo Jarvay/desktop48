@@ -13,7 +13,7 @@
         </div>
 
         <div class="cover-container">
-            <el-image ref="cover" class="cover" :src="item.cover[0]" fit="cover"/>
+            <el-image ref="cover" class="cover" :src="item.cover[0]" fit="cover" lazy/>
         </div>
         <p class="live-date">{{item.date}}</p>
         <div style="display: flex;justify-content: space-between;">

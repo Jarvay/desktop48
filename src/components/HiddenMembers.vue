@@ -30,24 +30,7 @@
         //屏蔽成员
         private hiddenMembers: any[] = [];
         //所有成员
-        private members: any[] = Database.instance().groups().map((group: any) => {
-            return {
-                value: group.groupId + '',
-                label: group.groupName,
-                children: group.teams.map((team: any) => {
-                    return {
-                        value: team.teamId + '',
-                        label: team.teamName,
-                        children: team.members.map((member: any) => {
-                            return {
-                                value: member.userId + '',
-                                label: `${member.realName}(${member.abbr})`,
-                            };
-                        }),
-                    };
-                }),
-            };
-        });
+        private members: any[] = Database.instance().getMemberOptions();
 
         private selectedMember: any[] = [];
 

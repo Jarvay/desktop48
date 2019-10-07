@@ -20,7 +20,7 @@ export default class Database {
         this.init();
     }
 
-    public member(memberId: any) {
+    public member(memberId: any): any {
         memberId = parseInt(memberId);
         let member = this.membersDB.find({userId: memberId}).value();
         if (typeof member === 'undefined') {
@@ -35,7 +35,7 @@ export default class Database {
         return member;
     }
 
-    public team(teamId: any) {
+    public team(teamId: any): any {
         const team = this.teamsDB.find({teamId}).value();
         const members = this.membersDB.filter({teamId}).value();
 
@@ -47,7 +47,7 @@ export default class Database {
         return team;
     }
 
-    public group(groupId: any) {
+    public group(groupId: any): any {
         const group = this.groupsDB.find({groupId}).value();
 
         const teams = this.teamsDB.filter({groupId}).value();
@@ -64,13 +64,80 @@ export default class Database {
      * 分团列表
      * @returns {Array}
      */
-    public groups() {
+    public groups(): any[] {
         const groups = this.groupsDB.value();
         const result = [];
         for (const group of groups) {
             result.push(this.group(group.groupId));
         }
         return result;
+    }
+
+    /**
+     * 成员筛选
+     */
+    public refreshOptions(): void {
+        const memberOptions: any[] = [];
+        const teamOptions: any[] = [];
+        const groupOptions: any[] = [];
+        this.groups().forEach((group: any) => {
+            //成员
+            memberOptions.push({
+                value: String(group.groupId),
+                label: group.groupName,
+                children: group.teams.map((team: any) => {
+                    return {
+                        value: String(team.teamId),
+                        label: team.teamName,
+                        children: team.members.map((member: any) => {
+                            return {
+                                value: String(member.userId),
+                                label: `${member.realName}(${member.abbr})`,
+                            };
+                        }),
+                    };
+                }),
+            });
+            //队伍
+            teamOptions.push({
+                value: String(group.groupId),
+                label: group.groupName,
+                children: group.teams.map((team: any) => {
+                    return {
+                        value: String(team.teamId),
+                        label: team.teamName,
+                    };
+                }),
+            });
+            //分团
+            groupOptions.push({
+                value: String(group.groupId),
+                label: group.groupName
+            });
+        });
+
+        this.db.set('memberOptions', memberOptions).write();
+        this.db.set('teamOptions', teamOptions).write();
+        this.db.set('groupOptions', groupOptions).write();
+    }
+
+
+    public getMemberOptions(): any[] {
+        return this.db.get('memberOptions').value();
+    }
+
+    /**
+     * 队伍筛选
+     */
+    public getTeamOptions(): any[] {
+        return this.db.get('teamOptions').value();
+    }
+
+    /**
+     * 分团筛选
+     */
+    public getGroupOptions(): any[] {
+        return this.db.get('groupOptions').value();
     }
 
     /**
@@ -151,7 +218,6 @@ export default class Database {
         }
 
         if (!this.db.has('members').value()) {
-            Debug.log(1);
             this.db.set('members', data.starInfo).write();
             this.db.set('teams', data.teamInfo).write();
             this.db.set('groups', data.groupInfo).write();
@@ -160,6 +226,13 @@ export default class Database {
         this.membersDB = this.db.get('members').cloneDeep();
         this.teamsDB = this.db.get('teams').cloneDeep();
         this.groupsDB = this.db.get('groups').cloneDeep();
+
+        //回放筛选
+        if (!this.db.has('memberOptions').value()
+            || !this.db.has('teamOptions').value()
+            || !this.db.has('groupOptions').value()) {
+            this.refreshOptions();
+        }
 
         if (!this.db.has('config')) {
             this.db.set('config', {}).write();

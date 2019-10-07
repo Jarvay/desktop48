@@ -24,10 +24,10 @@ export default class Constants {
      * 菜单
      */
     public static readonly Menu: any = {
-        LIVES: 'LIVES',
-        REVIEWS: 'REVIEWS',
-        SETTING: 'SETTING',
-        DOWNLOADS: 'DOWNLOADS'
+        LIVES: 'lives',
+        REVIEWS: 'reviews',
+        SETTING: 'setting',
+        DOWNLOADS: 'downloads'
     };
 
     /**
