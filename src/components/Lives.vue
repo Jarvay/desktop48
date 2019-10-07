@@ -18,15 +18,15 @@
                         v-for="(item, i) in liveList"
                         v-if="i <  index * Constants.LIST_COL && i >= (index - 1) * Constants.LIST_COL"
                         :key="item.liveId">
-                    <div @click="onItemClick(item)">
+                    <div style="padding: 6px 0;">
                         <el-popover placement="top" trigger="hover" :ref="`popover-${item.liveId}`">
                             <p>{{item.title}}</p>
                             <div>
                                 <el-button type="danger" icon="el-icon-video-camera" size="small"
-                                           @click="onRecordClick(item)">录制
+                                           @click="record(item)">录制
                                 </el-button>
                                 <el-button type="success" icon="el-icon-video-play" size="small"
-                                           @click="onPlayClick(item)">观看
+                                           @click="play(item)">观看
                                 </el-button>
                             </div>
                             <live-item :item="item" slot="reference"></live-item>
@@ -39,26 +39,28 @@
 </template>
 
 <script lang="ts">
-    import {Component, Emit, Prop, Vue} from 'vue-property-decorator';
+    import {Component, Vue} from 'vue-property-decorator';
     import Apis from '@/assets/js/apis';
     import Database from '@/assets/js/database';
     import Tools from '@/assets/js/tools';
     import Debug from '@/assets/js/debug';
     import IList from '@/assets/js/i-list';
     import LiveItem from '@/components/LiveItem.vue';
+    import RecordTask from '@/assets/js/record-task';
+    import EventBus from '@/assets/js/event-bus';
+    import Constants from '@/assets/js/constants';
 
     @Component({
         components: {LiveItem}
     })
     export default class Lives extends Vue implements IList {
-        @Prop({type: Boolean, required: true}) private visible!: boolean;
         private liveList: any[] = [];
         private liveNext: string = '0';
         private loading: boolean = false;
         private noMore: boolean = false;
 
         get disabled() {
-            return this.loading || this.noMore || !this.visible;
+            return this.loading || this.noMore;
         }
 
         public getLiveList() {
@@ -96,6 +98,10 @@
             });
         }
 
+        private created() {
+            this.getLiveList();
+        }
+
         private refresh() {
             this.liveList = [];
             this.liveNext = '0';
@@ -106,16 +112,35 @@
         onItemClick(item: any): void | any {
         }
 
-        @Emit()
-        onLiveClick(item: any) {
+        /**
+         * 直播录制
+         */
+        private record(item: any) {
+            Apis.instance().live(item.liveId).then(content => {
+                const member = Database.instance().member(content.user.userId);
+                const date = Tools.dateFormat(parseInt(item.ctime), 'yyyyMMddhhmm');
+                const randomNumber = parseInt((Math.random() * 100000000).toFixed());
+                const filename = `${member.realName} ${date}-${randomNumber}.flv`;
+                const recordTask: RecordTask = new RecordTask(content.playStreamPath, filename, content.liveId);
+                EventBus.post<RecordTask>(Constants.Event.RECORD_TASK, recordTask);
+            }).catch(error => {
+                Debug.error(error);
+            });
         }
 
-        @Emit()
-        onRecordClick(item: any) {
-        }
-
-        @Emit()
-        onPlayClick(item: any) {
+        /**
+         * 打开直播
+         */
+        private play(item: any) {
+            const ChildProcess = require('child_process');
+            Apis.instance().live(item.liveId).then(content => {
+                const command = `"${Tools.ffplayPath()}" -window_title "${item.userInfo.nickname} ${item.title}" ${content.playStreamPath}`;
+                Debug.log(command);
+                ChildProcess.exec(command);
+            }).catch((error: any) => {
+                this.$message.error(error);
+                Debug.error(error);
+            });
         }
     }
 </script>

@@ -21,9 +21,11 @@
         <el-card style="margin-top: 16px;" shadow="hover">
             <div style="display: flex;flex-direction: row; width: 640px;">
                 <el-input type="text" v-model="downloadDirectory" placeholder="下载目录"
-                          @click="setDownloadDirectory"></el-input>
+                          @click="setDownloadDirectory" readonly></el-input>
 
                 <el-button style="margin-left: 8px;" type="primary" @click="setDownloadDirectory">选择</el-button>
+
+                <el-button style="margin-left: 8px;" type="success" @click="openDownloadDirectory">打开目录</el-button>
             </div>
         </el-card>
 
@@ -43,6 +45,7 @@
     import Debug from '@/assets/js/debug';
     import HiddenMembers from '@/components/HiddenMembers.vue';
     import {remote} from 'electron';
+    import path from 'path';
 
     @Component({
         components: {HiddenMembers}
@@ -82,6 +85,10 @@
                 this.downloadDirectory = dir[0];
                 Database.instance().setDownloadDir(this.downloadDirectory);
             }
+        }
+
+        private openDownloadDirectory() {
+            remote.shell.showItemInFolder(path.join(Database.instance().getDownloadDir(), '48'));
         }
     }
 </script>
