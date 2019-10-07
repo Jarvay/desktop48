@@ -20,9 +20,7 @@ export default class Apis {
                 Database.instance().db.set('teams', content.teamInfo).write();
                 Database.instance().db.set('groups', content.groupInfo).write();
 
-                Database.instance().refreshMemberOptions();
-                Database.instance().refreshTeamOptions();
-                Database.instance().refreshGroupOptions();
+                Database.instance().refreshOptions();
                 resolve(content);
             }).catch((error) => {
                 reject(error);

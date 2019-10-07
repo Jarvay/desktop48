@@ -27,9 +27,11 @@
                     </div>
 
                     <div v-else>
-                        <video :id="'video-js-' + liveId" class="video video-js" preload="auto">
+                        <video v-show="videoJsShow" :id="'video-js-' + liveId" class="video video-js" preload="auto">
                             <source :src="playStreamPath">
                         </video>
+
+                        <video class="video" :id="'flv-js-' + liveId" ref="video" v-show="flvJsShow"></video>
                     </div>
 
                     <player-controls ref="controls" :is-muted="isMuted"
@@ -65,6 +67,9 @@
     import 'video.js/dist/video-js.css';
     import DownloadTask from '@/assets/js/download-task';
     import EventBus from '@/assets/js/event-bus';
+    import IPlayer from '@/assets/js/i-player';
+    import FlvJs from 'flv.js';
+    import FlvJsPlayer from '@/assets/js/flv-js-player';
 
     @Component({
         components: {BarrageBox, PlayerControls}
@@ -79,7 +84,7 @@
         private isRadio: boolean = false;
         private number: number = 0;
         private member: any = {};
-        private player!: VideoJsPlayer;
+        private player!: IPlayer;
         private currentTime: number = 0;
         private status: any = Constants.STATUS_PREPARED;
         private duration: number = 0;
@@ -94,6 +99,8 @@
         private finalBarrageList: any[] = [];
         private barrageList: any[] = [];
         private currentBarrage: any = {};
+        private videoJsShow: boolean = true;
+        private flvJsShow: boolean = false;
         public $refs!: any;
 
         get barrageBox(): any {
@@ -107,7 +114,7 @@
         private destroyed() {
             if (this.player != null) {
                 this.player.destroy();
-                Debug.info('player destroyed')
+                Debug.info('player destroyed');
             }
         }
 
@@ -137,7 +144,11 @@
                 this.player.destroy();
             }
 
-            this.initVideoJs();
+            if (this.playStreamPath.includes('.m3u8')) {
+                this.initVideoJs();
+            } else {
+                this.initFlvJs();
+            }
             this.player.volume(Database.instance().getConfig('volume', 80));
 
             if (!this.isReview) {
@@ -158,6 +169,33 @@
             });
         }
 
+        /**
+         * 初始化FlvJs
+         */
+        private initFlvJs() {
+            if (FlvJs.isSupported()) {
+                const videoElement: any = document.getElementById('flv-js-' + this.liveId);
+                const flvPlayer = FlvJs.createPlayer({
+                    type: 'video/mp4',
+                    url: this.playStreamPath,
+                    isLive: !this.isReview,
+                    withCredentials: false,
+                    hasVideo: !this.isRadio,
+                    hasAudio: true,
+                });
+                flvPlayer.attachMediaElement(videoElement);
+                flvPlayer.volume = this.$refs.controls.volume * 0.01;
+                flvPlayer.load();
+                this.player = new FlvJsPlayer(flvPlayer);
+
+                this.flvJsShow = true;
+                this.videoJsShow = false;
+            }
+        }
+
+        /**
+         * 初始化VideoJS
+         */
         private initVideoJs() {
             const videoJsPlayer = VideoJs('video-js-' + this.liveId, {
                 autoplay: false, // 自动播放
@@ -170,6 +208,9 @@
             });
             videoJsPlayer.volume(this.$refs.controls.volume * 0.01);
             this.player = new VideoJsPlayer(videoJsPlayer);
+
+            this.flvJsShow = false;
+            this.videoJsShow = true;
         }
 
         private play() {

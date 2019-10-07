@@ -20,7 +20,7 @@ export default class Database {
         this.init();
     }
 
-    public member(memberId: any) {
+    public member(memberId: any): any {
         memberId = parseInt(memberId);
         let member = this.membersDB.find({userId: memberId}).value();
         if (typeof member === 'undefined') {
@@ -35,7 +35,7 @@ export default class Database {
         return member;
     }
 
-    public team(teamId: any) {
+    public team(teamId: any): any {
         const team = this.teamsDB.find({teamId}).value();
         const members = this.membersDB.filter({teamId}).value();
 
@@ -47,7 +47,7 @@ export default class Database {
         return team;
     }
 
-    public group(groupId: any) {
+    public group(groupId: any): any {
         const group = this.groupsDB.find({groupId}).value();
 
         const teams = this.teamsDB.filter({groupId}).value();
@@ -64,7 +64,7 @@ export default class Database {
      * 分团列表
      * @returns {Array}
      */
-    public groups() {
+    public groups(): any[] {
         const groups = this.groupsDB.value();
         const result = [];
         for (const group of groups) {
@@ -76,30 +76,54 @@ export default class Database {
     /**
      * 成员筛选
      */
-    public getMemberOptions(): any[] {
-        return this.db.get('memberOptions').value();
-    }
-
-    public refreshMemberOptions() {
-        const options: any[] = this.groups().map((group: any) => {
-            return {
-                value: group.groupId + '',
+    public refreshOptions(): void {
+        const memberOptions: any[] = [];
+        const teamOptions: any[] = [];
+        const groupOptions: any[] = [];
+        this.groups().forEach((group: any) => {
+            //成员
+            memberOptions.push({
+                value: String(group.groupId),
                 label: group.groupName,
                 children: group.teams.map((team: any) => {
                     return {
-                        value: team.teamId + '',
+                        value: String(team.teamId),
                         label: team.teamName,
                         children: team.members.map((member: any) => {
                             return {
-                                value: member.userId + '',
+                                value: String(member.userId),
                                 label: `${member.realName}(${member.abbr})`,
                             };
                         }),
                     };
                 }),
-            };
+            });
+            //队伍
+            teamOptions.push({
+                value: String(group.groupId),
+                label: group.groupName,
+                children: group.teams.map((team: any) => {
+                    return {
+                        value: String(team.teamId),
+                        label: team.teamName,
+                    };
+                }),
+            });
+            //分团
+            groupOptions.push({
+                value: String(group.groupId),
+                label: group.groupName
+            });
         });
-        this.db.set('memberOptions', options).write();
+
+        this.db.set('memberOptions', memberOptions).write();
+        this.db.set('teamOptions', teamOptions).write();
+        this.db.set('groupOptions', groupOptions).write();
+    }
+
+
+    public getMemberOptions(): any[] {
+        return this.db.get('memberOptions').value();
     }
 
     /**
@@ -109,37 +133,11 @@ export default class Database {
         return this.db.get('teamOptions').value();
     }
 
-    public refreshTeamOptions() {
-        const options: any[] = this.groups().map((group: any) => {
-            return {
-                value: group.groupId + '',
-                label: group.groupName,
-                children: group.teams.map((team: any) => {
-                    return {
-                        value: team.teamId + '',
-                        label: team.teamName,
-                    };
-                }),
-            };
-        });
-        this.db.set('teamOptions', options).write();
-    }
-
     /**
      * 分团筛选
      */
     public getGroupOptions(): any[] {
         return this.db.get('groupOptions').value();
-    }
-
-    public refreshGroupOptions() {
-        const options: any[] = this.groups().map((group: any) => {
-            return {
-                value: group.groupId + '',
-                label: group.groupName,
-            };
-        });
-        this.db.set('groupOptions', options).write();
     }
 
     /**
@@ -230,14 +228,10 @@ export default class Database {
         this.groupsDB = this.db.get('groups').cloneDeep();
 
         //回放筛选
-        if (!this.db.has('memberOptions').value()) {
-            this.refreshMemberOptions();
-        }
-        if (!this.db.has('teamOptions').value()) {
-            this.refreshMemberOptions();
-        }
-        if (!this.db.has('groupOptions').value()) {
-            this.refreshMemberOptions();
+        if (!this.db.has('memberOptions').value()
+            || !this.db.has('teamOptions').value()
+            || !this.db.has('groupOptions').value()) {
+            this.refreshOptions();
         }
 
         if (!this.db.has('config')) {

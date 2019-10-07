@@ -18,7 +18,7 @@
                         v-for="(item, i) in liveList"
                         v-if="i <  index * Constants.LIST_COL && i >= (index - 1) * Constants.LIST_COL"
                         :key="item.liveId">
-                    <div @click="onItemClick(item)">
+                    <div style="padding: 6px 0;">
                         <el-popover placement="top" trigger="hover" :ref="`popover-${item.liveId}`">
                             <p>{{item.title}}</p>
                             <div>
@@ -134,10 +134,11 @@
         private play(item: any) {
             const ChildProcess = require('child_process');
             Apis.instance().live(item.liveId).then(content => {
-                const command = `"${Tools.ffplayPath()}" ${content.playStreamPath}`;
+                const command = `"${Tools.ffplayPath()}" -window_title "${item.userInfo.nickname} ${item.title}" ${content.playStreamPath}`;
                 Debug.log(command);
                 ChildProcess.exec(command);
-            }).catch(error => {
+            }).catch((error: any) => {
+                this.$message.error(error);
                 Debug.error(error);
             });
         }
