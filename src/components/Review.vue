@@ -306,7 +306,10 @@
             const random: number = parseInt((parseFloat(Math.random().toFixed(5)) * 100000).toString());
             const filename = `${this.member.realName} ${date}.mp4`;
             const downloadTask: DownloadTask = new DownloadTask(this.playStreamPath, filename, this.liveId);
-            EventBus.post<DownloadTask>(Constants.Event.DOWNLOAD_TASK, downloadTask);
+            this.$router.push('/downloads');
+            this.$nextTick(() => {
+                EventBus.post<DownloadTask>(Constants.Event.DOWNLOAD_TASK, downloadTask);
+            });
         }
     }
 </script>
