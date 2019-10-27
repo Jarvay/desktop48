@@ -122,7 +122,11 @@
                 const randomNumber = parseInt((Math.random() * 100000000).toFixed());
                 const filename = `${member.realName} ${date}-${randomNumber}.flv`;
                 const recordTask: RecordTask = new RecordTask(content.playStreamPath, filename, content.liveId);
-                EventBus.post<RecordTask>(Constants.Event.RECORD_TASK, recordTask);
+                EventBus.post<string>(Constants.Event.CHANGE_SELECTED_MENU, Constants.Menu.DOWNLOADS);
+                this.$router.push('/downloads');
+                this.$nextTick(() => {
+                    EventBus.post<RecordTask>(Constants.Event.RECORD_TASK, recordTask);
+                });
             }).catch(error => {
                 Debug.error(error);
             });

@@ -54,6 +54,7 @@ export default class Constants {
     public static readonly Event = {
         'DOWNLOAD_TASK': 'DOWNLOAD_TASK',
         'RECORD_TASK': 'RECORD_TASK',
+        'CHANGE_SELECTED_MENU': 'CHANGE_SELECTED_MENU'
     };
 
     /**

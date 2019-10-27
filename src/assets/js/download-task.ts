@@ -83,7 +83,9 @@ export default class DownloadTask {
             })
             .on('progress', (progress: any) => {
                 let percent: number = parseFloat(progress.percent.toFixed(2));
-                if (percent > 100) percent = 100;
+                if (percent > 100) {
+                    percent = 100;
+                }
                 this._onProgress(percent);
                 Debug.info('ffmpeg progress event', progress);
             })
@@ -103,10 +105,15 @@ export default class DownloadTask {
     }
 
     public stop() {
-        if (this._ffmpegCommand === null || this._status !== Constants.DownloadStatus.Downloading) return;
-        this._ffmpegCommand.ffmpegProc.stdin.write('q');
-        this._status = Constants.DownloadStatus.Finish;
-        Debug.info('download task stop');
+        if (this._ffmpegCommand === null || this._status !== Constants.DownloadStatus.Downloading) {
+            return;
+        }
+        try {
+            this._ffmpegCommand.ffmpegProc.stdin.write('q');
+        } finally {
+            this._status = Constants.DownloadStatus.Finish;
+            Debug.info('download task stop');
+        }
     }
 
     public openSaveDirectory() {
