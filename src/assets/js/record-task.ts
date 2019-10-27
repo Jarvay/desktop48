@@ -81,16 +81,7 @@ export default class RecordTask {
                 this.setDuration(progress.timemark);
             })
             .on('end', () => {
-                ffmpeg(this.getFilePath())
-                    .audioCodec('aac')
-                    .videoCodec('libx264')
-                    .duration(this._duration)
-                    .on('end', () => {
-                        Debug.info('end');
-                        this._status = Constants.RecordStatus.Finish;
-                        this._onEnd();
-                    })
-                    .save(this.getFilePath().replace('.flv', '.mp4'));
+                this._onEnd();
             })
             .audioCodec('copy')
             .videoCodec('copy')
@@ -107,9 +98,12 @@ export default class RecordTask {
 
     public stop() {
         if (this._ffmpegCommand === null || this._status !== Constants.RecordStatus.Recording) return;
-        this._ffmpegCommand.ffmpegProc.stdin.write('q');
-        this._status = Constants.RecordStatus.Finish;
-        Debug.info('record task stop');
+        try {
+            this._ffmpegCommand.ffmpegProc.stdin.write('q');
+        } finally {
+            this._status = Constants.RecordStatus.Finish;
+            Debug.info('record task stop');
+        }
     }
 
     public openSaveDirectory() {
