@@ -28,7 +28,7 @@
         @Prop({type: Number, required: true}) private number!: number;
         @Prop({type: Number, required: true}) private startTime!: any;
         @Prop({type: Boolean, required: true}) private barrageLoaded!: boolean;
-        private startDate: string = Tools.dateFormat(parseInt(this.startTime), 'yyyy-MM-dd hh:mm');
+        protected startDate: string = Tools.dateFormat(parseInt(this.startTime), 'yyyy-MM-dd hh:mm');
         public $refs!: {
             barrage: HTMLFormElement
         };

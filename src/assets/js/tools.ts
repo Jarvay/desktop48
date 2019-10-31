@@ -2,12 +2,12 @@ import Debug from './debug';
 import path from 'path';
 import {remote} from 'electron';
 import fs from 'fs';
+import https from 'https';
 
 const YI_ZHI_BO_HOST = 'alcdn.hls.xiaoka.tv';
 
 class Tools {
     public static readonly APP_DATA_PATH: string = remote.app.getPath('userData');
-    // public static readonly APP_DATA_PATH: string = remote.app.getAppPath();
 
     /**
      *
@@ -77,12 +77,10 @@ class Tools {
         });
     }
 
-    public static download(options: any) {
-        const https = require('https');
-
+    public static download({url = '', filePath = '', onProgress = (progress: string) => {}, onFinish = () => {}, onError = (error: any) => {}}) {
         let totalBytes = 0;
         let currentBytes = 0;
-        https.get(options.url, (res: any) => {
+        https.get(url, (res: any) => {
             res.setEncoding('binary');
             let fileData = '';
             totalBytes = parseInt(res.headers['content-length'], 10);
@@ -90,15 +88,15 @@ class Tools {
                 fileData += chunk;
                 currentBytes += chunk.length;
 
-                options.onProgress((currentBytes / totalBytes * 100).toFixed(2));
+                onProgress((currentBytes / totalBytes * 100).toFixed(2));
             });
             res.on('end', () => {
-                fs.writeFile(options.filePath, fileData, 'binary', (error: any) => {
+                fs.writeFile(filePath, fileData, 'binary', (error: any) => {
                     if (error) {
                         Debug.log(error, '');
-                        options.onError(error);
+                        onError(error);
                     } else {
-                        options.onFinish();
+                        onFinish();
                     }
                 });
             });

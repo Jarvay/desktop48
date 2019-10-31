@@ -6,7 +6,9 @@
 
                 <div>
                     <el-tag v-if="item.liveType === 1 && item.liveMode === 0">直播</el-tag>
-                    <el-tag v-else-if="item.liveType === 1 && item.liveMode === 1" type="success">录屏</el-tag>
+                    <el-tag v-else-if="item.liveType === 1 && item.liveMode === 1" type="success">
+                        录屏
+                    </el-tag>
                     <el-tag v-else type="warning">电台</el-tag>
                 </div>
             </div>
@@ -31,7 +33,20 @@
 
     @Component
     export default class LiveItem extends Vue {
-        @Prop({type: Object, required: true}) private item!: object;
+        @Prop({
+            type: Object,
+            required: true
+        }) protected item!: {
+            title: string,
+            liveMode: number,
+            liveType: number,
+            cover: string,
+            date: string,
+            userInfo: { nickname: string },
+            member: {
+                team: { teamColor: string, teamName: string }
+            }
+        };
     }
 </script>
 

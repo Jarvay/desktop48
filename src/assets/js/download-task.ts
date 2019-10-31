@@ -3,6 +3,8 @@ import Tools from '@/assets/js/tools';
 import path from 'path';
 import Constants from '@/assets/js/constants';
 import Database from '@/assets/js/database';
+import ffmpeg from 'fluent-ffmpeg';
+import {remote} from 'electron';
 
 /**
  * 回放下载任务
@@ -66,7 +68,6 @@ export default class DownloadTask {
     }
 
     public start(startListener: () => void) {
-        const ffmpeg = require('fluent-ffmpeg');
         ffmpeg.setFfmpegPath(Tools.ffmpegPath());
         this._ffmpegCommand = ffmpeg(this._url)
             .inputOptions([
@@ -117,6 +118,6 @@ export default class DownloadTask {
     }
 
     public openSaveDirectory() {
-        require('electron').remote.shell.showItemInFolder(this.getFilePath());
+        remote.shell.showItemInFolder(this.getFilePath());
     }
 }
