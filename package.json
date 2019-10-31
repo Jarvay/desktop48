@@ -14,6 +14,7 @@
   },
   "main": "background.js",
   "dependencies": {
+    "@types/lowdb": "^1.0.9",
     "adm-zip": "^0.4.13",
     "core-js": "^2.6.5",
     "element-ui": "^2.12.0",
@@ -35,6 +36,7 @@
     "sass-loader": "^7.1.0",
     "typescript": "^3.6.3",
     "vue-cli-plugin-electron-builder": "^1.4.0",
+    "vue-cli-plugin-element": "^1.0.1",
     "vue-template-compiler": "^2.6.10"
   },
   "postcss": {

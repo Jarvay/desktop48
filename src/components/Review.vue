@@ -75,50 +75,50 @@
         components: {BarrageBox, PlayerControls}
     })
     export default class Review extends Vue {
-        @Prop({type: String, required: true}) private liveTitle: any;
-        @Prop({type: String, required: true}) private liveId: any;
-        @Prop({type: Number, required: true}) private startTime: any;
+        @Prop({type: String, required: true}) protected liveTitle: any;
+        @Prop({type: String, required: true}) protected liveId: any;
+        @Prop({type: Number, required: true}) protected startTime: any;
         //回放相关信息
-        private playStreamPath: string = '';
-        private isReview: boolean = false;
-        private isRadio: boolean = false;
-        private number: number = 0;
-        private member: any = {};
-        private player!: IPlayer;
-        private currentTime: number = 0;
-        private status: any = Constants.STATUS_PREPARED;
-        private duration: number = 0;
-        private isMuted: boolean = false;
-        private volume: number = 80;
+        protected playStreamPath: string = '';
+        protected isReview: boolean = false;
+        protected isRadio: boolean = false;
+        protected number: number = 0;
+        protected member: any = {};
+        protected player!: IPlayer;
+        protected currentTime: number = 0;
+        protected status: any = Constants.STATUS_PREPARED;
+        protected duration: number = 0;
+        protected isMuted: boolean = false;
+        protected volume: number = 80;
         //跑马灯
-        private carousels: any[] = [];
-        private carouselTime: number = 0;
+        protected carousels: any[] = [];
+        protected carouselTime: number = 0;
         //弹幕
-        private barrageUrl: string = '';
-        private barrageLoaded: boolean = false;
-        private finalBarrageList: any[] = [];
-        private barrageList: any[] = [];
-        private currentBarrage: any = {};
-        private videoJsShow: boolean = true;
-        private flvJsShow: boolean = false;
+        protected barrageUrl: string = '';
+        protected barrageLoaded: boolean = false;
+        protected finalBarrageList: any[] = [];
+        protected barrageList: any[] = [];
+        protected currentBarrage: any = {};
+        protected videoJsShow: boolean = true;
+        protected flvJsShow: boolean = false;
         public $refs!: any;
 
         get barrageBox(): any {
             return this.$refs['barrage-box-' + this.liveId];
         }
 
-        private created() {
+        protected created() {
             this.getOne();
         }
 
-        private destroyed() {
+        protected destroyed() {
             if (this.player != null) {
                 this.player.destroy();
                 Debug.info('player destroyed');
             }
         }
 
-        private getOne() {
+        protected getOne() {
             Apis.instance().live(this.liveId).then(data => {
                 this.playStreamPath = Tools.streamPathHandle(data.playStreamPath, this.startTime);
                 this.isReview = data.review;
@@ -139,7 +139,7 @@
             });
         }
 
-        private initPlayer() {
+        protected initPlayer() {
             if (this.player != null) {
                 this.player.destroy();
             }
@@ -172,7 +172,7 @@
         /**
          * 初始化FlvJs
          */
-        private initFlvJs() {
+        protected initFlvJs() {
             if (FlvJs.isSupported()) {
                 const videoElement: any = document.getElementById('flv-js-' + this.liveId);
                 const flvPlayer = FlvJs.createPlayer({
@@ -196,7 +196,7 @@
         /**
          * 初始化VideoJS
          */
-        private initVideoJs() {
+        protected initVideoJs() {
             const videoJsPlayer = VideoJs('video-js-' + this.liveId, {
                 autoplay: false, // 自动播放
                 controls: false, // 是否显示控制栏
@@ -213,31 +213,31 @@
             this.videoJsShow = true;
         }
 
-        private play() {
+        protected play() {
             this.player.play();
             this.status = Constants.STATUS_PLAYING;
             Debug.log('play');
         }
 
-        private pause() {
+        protected pause() {
             this.player.pause();
             this.status = Constants.STATUS_PREPARED;
             Debug.log('pause');
         }
 
-        private mute() {
+        protected mute() {
             this.player.mute();
             this.isMuted = true;
             Debug.log('mute');
         }
 
-        private unmute() {
+        protected unmute() {
             this.player.volume(this.volume);
             this.isMuted = false;
             Debug.log('unmute');
         }
 
-        private progressChange(newTime: number) {
+        protected progressChange(newTime: number) {
             this.currentTime = newTime;
             this.player.currentTime(newTime);
 
@@ -253,18 +253,18 @@
             Debug.log('progressChange');
         }
 
-        private volumeChange(volume: number) {
+        protected volumeChange(volume: number) {
             this.volume = volume;
             Debug.log('volumeChange');
             Database.instance().setConfig('volume', volume);
         }
 
-        private fullScreen() {
+        protected fullScreen() {
             this.player.fullScreen();
             Debug.log('fullScreen');
         }
 
-        private getBarrages() {
+        protected getBarrages() {
             if (this.barrageUrl.length == 0) {
                 return;
             }
@@ -286,7 +286,7 @@
             });
         }
 
-        private loadBarrages() {
+        protected loadBarrages() {
             if (this.barrageList.length == 0) {
                 return;
             }
@@ -301,9 +301,8 @@
             }
         }
 
-        private download() {
+        protected download() {
             const date = Tools.dateFormat(parseInt(this.startTime), 'yyyyMMddhhmm');
-            const random: number = parseInt((parseFloat(Math.random().toFixed(5)) * 100000).toString());
             const filename = `${this.member.realName} ${date}.mp4`;
             const downloadTask: DownloadTask = new DownloadTask(this.playStreamPath, filename, this.liveId);
             EventBus.post<string>(Constants.Event.CHANGE_SELECTED_MENU, Constants.Menu.DOWNLOADS);

@@ -15,8 +15,7 @@
             <el-row v-for="index in Math.ceil(liveList.length / Constants.LIST_COL)"
                     :key="index" :gutter="10">
                 <el-col :span="Constants.LIST_SPAN_TOTAL / Constants.LIST_COL"
-                        v-for="(item, i) in liveList"
-                        v-if="i <  index * Constants.LIST_COL && i >= (index - 1) * Constants.LIST_COL"
+                        v-for="item in listAfterHanlder(index)"
                         :key="item.liveId">
                     <div style="padding: 6px 0;">
                         <el-popover placement="top" trigger="hover" :ref="`popover-${item.liveId}`">
@@ -49,22 +48,29 @@
     import RecordTask from '@/assets/js/record-task';
     import EventBus from '@/assets/js/event-bus';
     import Constants from '@/assets/js/constants';
+    import ChildProcess from 'child_process';
 
     @Component({
         components: {LiveItem}
     })
     export default class Lives extends Vue implements IList {
-        private liveList: any[] = [];
-        private liveNext: string = '0';
-        private loading: boolean = false;
-        private noMore: boolean = false;
+        protected liveList: any[] = [];
+        protected liveNext: string = '0';
+        protected loading: boolean = false;
+        protected noMore: boolean = false;
 
         get disabled() {
             return this.loading || this.noMore;
         }
 
-        public getLiveList() {
-            Apis.instance().lives(0, this.liveNext).then((content: any) => {
+        protected listAfterHanlder(index: number) {
+            return this.liveList.filter((item: any,i: number) => {
+                return i <  index * Constants.LIST_COL && i >= (index - 1) * Constants.LIST_COL;
+            });
+        }
+
+        protected getLiveList() {
+            Apis.instance().lives(this.liveNext).then((content: any) => {
                 if (this.noMore) {
                     this.$message({
                         message: '加载完毕',
@@ -98,24 +104,24 @@
             });
         }
 
-        private created() {
+        protected created() {
             this.getLiveList();
         }
 
-        private refresh() {
+        protected refresh() {
             this.liveList = [];
             this.liveNext = '0';
             this.noMore = false;
             this.getLiveList();
         }
 
-        onItemClick(item: any): void | any {
+        public onItemClick(item: any): void | any {
         }
 
         /**
          * 直播录制
          */
-        private record(item: any) {
+        protected record(item: any) {
             Apis.instance().live(item.liveId).then(content => {
                 const member = Database.instance().member(content.user.userId);
                 const date = Tools.dateFormat(parseInt(item.ctime), 'yyyyMMddhhmm');
@@ -135,10 +141,9 @@
         /**
          * 打开直播
          */
-        private play(item: any) {
-            const ChildProcess = require('child_process');
+        protected play(item: any) {
             Apis.instance().live(item.liveId).then(content => {
-                const command = `"${Tools.ffplayPath()}" -window_title "${item.userInfo.nickname} ${item.title}" ${content.playStreamPath}`;
+                const command = `"${Tools.ffplayPath()}" -window_title "${item.userInfo.nickname} ${item.title}" "${content.playStreamPath}"`;
                 Debug.log(command);
                 ChildProcess.exec(command);
             }).catch((error: any) => {

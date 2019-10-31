@@ -1,10 +1,9 @@
 import Constants from './constants';
 import Database from './database';
 import Debug from '@/assets/js/debug';
+import {remote} from 'electron';
 
 export default class Request {
-    public static readonly net = require('electron').remote.net;
-
     /**
      * 发送post请求
      * @param url
@@ -15,7 +14,7 @@ export default class Request {
         headers['User-Agent'] = Database.instance().getConfig('userAgent', Constants.DEFAULT_USER_AGENT);
         headers['Content-Type'] = 'application/json';
         return new Promise((resolve, reject) => {
-            const request = Request.net.request({
+            const request = remote.net.request({
                 url,
                 method: 'POST',
                 headers,
@@ -53,7 +52,7 @@ export default class Request {
     public static get(url: string): Promise<any> {
         Debug.log('get url', url);
         return new Promise((resolve, reject) => {
-            const request = Request.net.request(url);
+            const request = remote.net.request(url);
 
             let data = '';
             request.on('response', (response: any) => {

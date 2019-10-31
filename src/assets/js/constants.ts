@@ -1,3 +1,5 @@
+import {remote} from 'electron';
+
 export default class Constants {
     /**
      * 初始化状态
@@ -78,7 +80,7 @@ export default class Constants {
     /**
      * 默认下载目录
      */
-    public static readonly DEFAULT_DOWNLOAD_DIR = require('electron').remote.app.getPath('desktop');
+    public static readonly DEFAULT_DOWNLOAD_DIR = remote.app.getPath('desktop');
 
     /**
      * 最大下载任务数

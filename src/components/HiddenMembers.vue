@@ -13,7 +13,8 @@
             <el-tag :style="{color: 'white',borderColor:member.team.teamColor, marginRight: '8px'}" :name="member.userId" closable
                     @close="removeHiddenMember(member.userId)"
                     :color="member.team.teamColor"
-                    v-for="member in hiddenMembers">
+                    v-for="member in hiddenMembers"
+                    :key="member.userId">
                 {{member.realName}}
             </el-tag>
         </div>
@@ -28,13 +29,13 @@
     @Component
     export default class HiddenMembers extends Vue {
         //屏蔽成员
-        private hiddenMembers: any[] = [];
+        protected hiddenMembers: any[] = [];
         //所有成员
-        private members: any[] = Database.instance().getMemberOptions();
+        protected members: any[] = Database.instance().getMemberOptions();
 
-        private selectedMember: any[] = [];
+        protected selectedMember: any[] = [];
 
-        private created() {
+        protected created() {
             Database.instance().getHiddenMembers().forEach((memberId: number) => {
                 if (memberId !== null) {
                     const member: any = Database.instance().member(memberId);
@@ -44,7 +45,7 @@
             });
         }
 
-        private clear() {
+        protected clear() {
             Database.instance().clearHiddenMembers();
             this.hiddenMembers = [];
         }
@@ -52,7 +53,7 @@
         /**
          * 添加屏蔽成员
          */
-        private addHiddenMember() {
+        protected addHiddenMember() {
             Debug.log('selected memberId', this.selectedMember[2]);
             Debug.log('hidden memberIds', Database.instance().getHiddenMembers());
             if (typeof this.selectedMember[2] === 'undefined') {
@@ -82,7 +83,7 @@
          * 移除屏蔽成员
          * @param memberId
          */
-        private removeHiddenMember(memberId: number) {
+        protected removeHiddenMember(memberId: number) {
             this.hiddenMembers = this.hiddenMembers.filter((member: any) => {
                 return member.userId !== memberId;
             });

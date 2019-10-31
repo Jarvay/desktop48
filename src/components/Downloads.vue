@@ -6,25 +6,32 @@
             <span>未有下载任务</span>
         </el-card>
 
-        <el-card v-else style="margin-bottom: 8px;" shadow="hover" v-for="(downloadTask, index) in downloadTasks">
+        <el-card v-else style="margin-bottom: 8px;" shadow="hover"
+                 v-for="downloadTask in downloadTasks"
+                 :key="downloadTask.getLiveId()">
             <div class="task-info">
                 <div>
-                    <i class="el-icon-loading" v-if="downloadTask.isDownloading()" style="color: #409EFF;"></i>
-                    <i class="el-icon-check" v-if="downloadTask.isFinish()" style="color: #67C23A;"></i>
+                    <i class="el-icon-loading" v-if="downloadTask.isDownloading()"
+                       style="color: #409EFF;"></i>
+                    <i class="el-icon-check" v-if="downloadTask.isFinish()"
+                       style="color: #67C23A;"></i>
                     <span style="margin-left: 8px;">{{downloadTask.getFilePath()}}</span>
                 </div>
                 <div>
-                    <el-button v-if="downloadTask.isDownloading()" type="danger" @click="downloadTask.stop()"
+                    <el-button v-if="downloadTask.isDownloading()" type="danger"
+                               @click="downloadTask.stop()"
                                size="small">结束
                     </el-button>
-                    <el-button v-if="downloadTask.isFinish()" type="success" @click="downloadTask.openSaveDirectory()"
+                    <el-button v-if="downloadTask.isFinish()" type="success"
+                               @click="downloadTask.openSaveDirectory()"
                                size="small">打开文件夹
                     </el-button>
                 </div>
             </div>
 
             <div class="task-progress">
-                <el-progress text-inside :stroke-width="18" :percentage="downloadTask.progress"></el-progress>
+                <el-progress text-inside :stroke-width="18"
+                             :percentage="downloadTask.progress"></el-progress>
             </div>
         </el-card>
 
@@ -34,18 +41,24 @@
             <span>未有录制任务</span>
         </el-card>
 
-        <el-card v-else style="margin-bottom: 8px;" shadow="hover" v-for="(recordTask, index) in recordTasks">
+        <el-card v-else style="margin-bottom: 8px;" shadow="hover"
+                 v-for="recordTask in recordTasks"
+                 :key="recordTask.getLiveId()">
             <div class="task-info">
                 <div>
-                    <i class="el-icon-loading" v-if="recordTask.isRecording()" style="color: #409EFF;"></i>
-                    <i class="el-icon-check" v-if="recordTask.isFinish()" style="color: #67C23A;"></i>
+                    <i class="el-icon-loading" v-if="recordTask.isRecording()"
+                       style="color: #409EFF;"></i>
+                    <i class="el-icon-check" v-if="recordTask.isFinish()"
+                       style="color: #67C23A;"></i>
                     <span style="margin-left: 8px;">{{recordTask.getFilePath()}}</span>
                 </div>
                 <div>
-                    <el-button v-if="recordTask.isRecording()" type="danger" @click="recordTask.stop()"
+                    <el-button v-if="recordTask.isRecording()" type="danger"
+                               @click="recordTask.stop()"
                                size="small">结束
                     </el-button>
-                    <el-button v-if="recordTask.isFinish()" type="success" @click="recordTask.openSaveDirectory()"
+                    <el-button v-if="recordTask.isFinish()" type="success"
+                               @click="recordTask.openSaveDirectory()"
                                size="small">打开文件夹
                     </el-button>
                 </div>
@@ -64,10 +77,10 @@
 
     @Component
     export default class Downloads extends Vue {
-        private downloadTasks: DownloadTask[] = [];
-        private recordTasks: RecordTask[] = [];
+        protected downloadTasks: DownloadTask[] = [];
+        protected recordTasks: RecordTask[] = [];
 
-        private created() {
+        protected created() {
             /**
              * 绑定下载事件
              */
@@ -98,6 +111,9 @@
                 });
             });
 
+            /**
+             * 绑定录制事件
+             */
             EventBus.bind<RecordTask>(Constants.Event.RECORD_TASK, (recordTask: RecordTask) => {
                 Debug.log(recordTask);
                 const exists = this.recordTasks.some((item: RecordTask) => {

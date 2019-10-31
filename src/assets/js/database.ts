@@ -1,6 +1,8 @@
 import Constants from './constants';
 import data from './data';
 import Debug from '@/assets/js/debug';
+import low from 'lowdb';
+import LocalStorage from 'lowdb/adapters/LocalStorage';
 
 export default class Database {
     /**
@@ -207,9 +209,7 @@ export default class Database {
     }
 
     public init() {
-        const low = require('lowdb');
-        const LocalStorage = require('lowdb/adapters/LocalStorage');
-        const adapter = new LocalStorage();
+        const adapter = new LocalStorage('database');
 
         this.db = low(adapter);
 

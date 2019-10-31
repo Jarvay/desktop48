@@ -7,11 +7,13 @@
                         <el-select style="width: 100px;" v-model="reviewScreen">
                             <el-option :value="Constants.REVIEW_SCREEN.USER" label="成员"></el-option>
                             <el-option :value="Constants.REVIEW_SCREEN.TEAM" label="队伍"></el-option>
-                            <el-option :value="Constants.REVIEW_SCREEN.GROUP" label="分团"></el-option>
+                            <el-option :value="Constants.REVIEW_SCREEN.GROUP"
+                                       label="分团"></el-option>
                         </el-select>
 
                         <div style="margin-left: 8px;">
-                            <el-cascader transfer v-if="reviewScreen === Constants.REVIEW_SCREEN.USER"
+                            <el-cascader transfer
+                                         v-if="reviewScreen === Constants.REVIEW_SCREEN.USER"
                                          style="width: 320px;"
                                          clearable
                                          placeholder="请选择成员"
@@ -19,21 +21,24 @@
                                          :options="members"
                                          v-model="selectedUser"></el-cascader>
 
-                            <el-cascader transfer v-if="reviewScreen === Constants.REVIEW_SCREEN.TEAM"
+                            <el-cascader transfer
+                                         v-if="reviewScreen === Constants.REVIEW_SCREEN.TEAM"
                                          placeholder="请选择队伍"
                                          clearable
                                          filterable
                                          :options="teams"
                                          v-model="selectedTeam"></el-cascader>
 
-                            <el-cascader transfer v-if="reviewScreen === Constants.REVIEW_SCREEN.GROUP"
+                            <el-cascader transfer
+                                         v-if="reviewScreen === Constants.REVIEW_SCREEN.GROUP"
                                          placeholder="请选择分团"
                                          clearable
                                          filterable
                                          :options="groups"
                                          v-model="selectedGroup"></el-cascader>
                         </div>
-                        <el-button style="margin-left: 8px;" type="primary" @click="refresh">刷新</el-button>
+                        <el-button style="margin-left: 8px;" type="primary" @click="refresh">刷新
+                        </el-button>
                     </el-header>
 
                     <el-main style="overflow: auto;height: 780px;" v-infinite-scroll="getReviewList"
@@ -41,8 +46,7 @@
                         <el-row v-for="index in Math.ceil(reviewList.length / Constants.LIST_COL)"
                                 :key="index" :gutter="10">
                             <el-col :span="Constants.LIST_SPAN_TOTAL / Constants.LIST_COL"
-                                    v-for="(item, i) in reviewList"
-                                    v-if="i <  index * Constants.LIST_COL && i >= (index - 1) * Constants.LIST_COL"
+                                    v-for="item in listAfterHanlder(index)"
                                     :key="item.liveId">
                                 <div @click="onReviewClick(item)">
                                     <live-item :item="item" slot="reference"></live-item>
@@ -53,7 +57,9 @@
                 </el-container>
             </el-tab-pane>
 
-            <el-tab-pane v-for="(liveTab, index) in liveTabs" :label="liveTab.label" :name="liveTab.name">
+            <el-tab-pane v-for="(liveTab, index) in liveTabs" :label="liveTab.label"
+                        :key="index"
+                         :name="liveTab.name">
                 <review :index="index" :live-id="liveTab.liveId" :start-time="liveTab.startTime"
                         :live-title="liveTab.title"></review>
             </el-tab-pane>
@@ -81,23 +87,23 @@
         }
 
         //顶部tabs
-        private activeName: string = 'Home';
-        private liveTabs: any[] = [];
+        protected activeName: string = 'Home';
+        protected liveTabs: any[] = [];
 
-        private reviewList: any[] = [];
-        private reviewNext: string = '0';
-        private loading: boolean = false;
-        private noMore: boolean = false;
-        private reviewScreen: string = Constants.REVIEW_SCREEN.USER;
-        private members: any = Database.instance().getMemberOptions();
-        private teams: any = Database.instance().getTeamOptions();
-        private groups: any = Database.instance().getGroupOptions();
-        private selectedUser: any[] = [];
-        private selectedTeam: any[] = [];
-        private selectedGroup: any[] = [];
+        protected reviewList: any[] = [];
+        protected reviewNext: string = '0';
+        protected loading: boolean = false;
+        protected noMore: boolean = false;
+        protected reviewScreen: string = Constants.REVIEW_SCREEN.USER;
+        protected members: any = Database.instance().getMemberOptions();
+        protected teams: any = Database.instance().getTeamOptions();
+        protected groups: any = Database.instance().getGroupOptions();
+        protected selectedUser: any[] = [];
+        protected selectedTeam: any[] = [];
+        protected selectedGroup: any[] = [];
 
         @Watch('reviewList')
-        private onReviewListChange(newValue: any[]) {
+        protected onReviewListChange(newValue: any[]) {
             if (newValue.length < Constants.MIN_SHOWN_LIVE_COUNT && newValue.length !== 0) {
                 this.getReviewList();
             }
@@ -107,36 +113,30 @@
             return this.loading || this.noMore;
         }
 
+        protected listAfterHanlder(index: number) {
+            return this.reviewList.filter((item: any,i: number) => {
+                return i <  index * Constants.LIST_COL && i >= (index - 1) * Constants.LIST_COL;
+            });
+        }
+
         public getReviewList() {
-            let params: any;
+            let params: any = {
+                userId: '0',
+                teamId: '0',
+                groupId: '0',
+                next: this.reviewNext
+            };
             switch (this.reviewScreen) {
                 case Constants.REVIEW_SCREEN.USER:
-                    params = {
-                        userId: this.selectedUser[2],
-                        teamId: '0',
-                        groupId: '0'
-                    };
+                    params.userId = this.selectedUser[2];
                     break;
                 case Constants.REVIEW_SCREEN.TEAM:
-                    params = {
-                        userId: '0',
-                        teamId: this.selectedTeam[1],
-                        groupId: '0'
-                    };
+                    params.eamId = this.selectedTeam[1];
                     break;
                 case Constants.REVIEW_SCREEN.GROUP:
-                    params = {
-                        userId: '0',
-                        teamId: '0',
-                        groupId: this.selectedGroup[0]
-                    };
+                    params.groupId = this.selectedGroup[0];
                     break;
                 default:
-                    params = {
-                        userId: '0',
-                        teamId: '0',
-                        groupId: '0'
-                    };
                     break;
             }
             params.next = this.reviewNext;
@@ -175,7 +175,7 @@
             });
         }
 
-        private refresh() {
+        protected refresh() {
             this.reviewList = [];
             this.reviewNext = '0';
             this.noMore = false;
@@ -186,7 +186,7 @@
          * 打开回放
          * @param item
          */
-        private onReviewClick(item: any) {
+        protected onReviewClick(item: any) {
             const exists = this.liveTabs.some((tab: any) => {
                 return tab.liveId === item.liveId;
             });
@@ -209,7 +209,7 @@
          * 移除tab
          * @param targetName
          */
-        private onTabRemove(targetName: string) {
+        protected onTabRemove(targetName: string) {
             this.activeName = 'Home';
             this.liveTabs = this.liveTabs.filter((tab: any) => {
                 return tab.name != targetName;

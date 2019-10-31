@@ -51,11 +51,11 @@
         components: {HiddenMembers}
     })
     export default class Setting extends Vue {
-        private userAgent: string = Database.instance().getConfig('userAgent', Constants.DEFAULT_USER_AGENT);
-        private isUpdating: boolean = false;
-        private downloadDirectory: string = Database.instance().getDownloadDir();
+        protected userAgent: string = Database.instance().getConfig('userAgent', Constants.DEFAULT_USER_AGENT);
+        protected isUpdating: boolean = false;
+        protected downloadDirectory: string = Database.instance().getDownloadDir();
 
-        private updateInfo() {
+        protected updateInfo() {
             this.isUpdating = true;
             Apis.instance().syncInfo().then(() => {
                 this.$message({
@@ -69,7 +69,7 @@
             });
         }
 
-        private setUserAgent() {
+        protected setUserAgent() {
             Database.instance().setConfig('userAgent', this.userAgent);
             this.$message({
                 message: '设置成功',
@@ -77,7 +77,7 @@
             });
         }
 
-        private setDownloadDirectory() {
+        protected setDownloadDirectory() {
             const dir = remote.dialog.showOpenDialogSync({
                 properties: ['openDirectory']
             });
@@ -87,7 +87,7 @@
             }
         }
 
-        private openDownloadDirectory() {
+        protected openDownloadDirectory() {
             remote.shell.showItemInFolder(path.join(Database.instance().getDownloadDir(), '48'));
         }
     }

@@ -9,16 +9,6 @@
     import {Component, Vue} from 'vue-property-decorator';
     import Index from './components/Index.vue';
     import Initialize from '@/components/Initialize.vue';
-    import Constants from '@/assets/js/constants';
-
-    import * as ElementUI from 'element-ui';
-    import 'element-ui/lib/theme-chalk/index.css';
-
-    import './assets/css/app.scss';
-    import './assets/css/fonts/iconfont.css';
-
-    Vue.use(ElementUI);
-    Vue.prototype.Constants = Constants;
 
     @Component({
         components: {
@@ -27,9 +17,9 @@
         },
     })
     export default class App extends Vue {
-        private isInitialized: boolean = false;
+        protected isInitialized: boolean = false;
 
-        private onInitialized() {
+        protected onInitialized() {
             this.isInitialized = true;
         }
     }

@@ -3,6 +3,8 @@ import Constants from '@/assets/js/constants';
 import path from 'path';
 import Tools from '@/assets/js/tools';
 import Debug from '@/assets/js/debug';
+import ffmpeg from 'fluent-ffmpeg';
+import {remote} from 'electron';
 
 /**
  * 直播录制任务
@@ -67,7 +69,6 @@ export default class RecordTask {
     }
 
     public start(startListener: () => void) {
-        const ffmpeg = require('fluent-ffmpeg');
         ffmpeg.setFfmpegPath(Tools.ffmpegPath());
         this._ffmpegCommand = ffmpeg(this._url)
             .on('start', () => {
@@ -107,7 +108,7 @@ export default class RecordTask {
     }
 
     public openSaveDirectory() {
-        require('electron').remote.shell.showItemInFolder(this.getFilePath());
+        remote.shell.showItemInFolder(this.getFilePath());
     }
 
     private setDuration(timeMark: string) {

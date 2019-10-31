@@ -21,19 +21,19 @@
     @Component
     export default class Initialize extends Vue {
         //初始化
-        private initText: string = '正在初始化';
-        private isIniting: boolean = false;
-        private percent: number = 0;
-        private downloading = false;
+        protected initText: string = '正在初始化';
+        protected isIniting: boolean = false;
+        protected percent: number = 0;
+        protected downloading = false;
 
-        private created() {
+        protected created() {
             this.init();
         }
 
         /**
          * 初始化
          */
-        private init() {
+        protected init() {
             let url: string;
             switch (process.platform) {
                 default:
@@ -45,10 +45,10 @@
                     break;
             }
 
-            fs.stat(Tools.ffplayPath(), (error: any, stat: any) => {
+            fs.stat(Tools.ffplayPath(), (error: any) => {
                 if (error) {
                     this.isIniting = true;
-                    fs.stat(path.join(Tools.APP_DATA_PATH, "ffmpeg.zip"), (error, stat) => {
+                    fs.stat(path.join(Tools.APP_DATA_PATH, "ffmpeg.zip"), (error) => {
                         if (error) {
                             this.initText = "正在下载所需文件";
                             this.downloading = true;
@@ -79,7 +79,7 @@
         /**
          * 解压
          */
-        private unzip() {
+        protected unzip() {
             Debug.info('正在解压');
             this.initText = "正在解压";
             const AdmZip = require("adm-zip");
@@ -90,13 +90,13 @@
             this.onInitialized();
         }
 
-        private ffmpegInit() {
+        protected ffmpegInit() {
             fs.chmodSync(Tools.ffmpegPath(), '777');
             fs.chmodSync(Tools.ffplayPath(), '777');
         }
 
         @Emit()
-        private onInitialized() {
+        protected onInitialized() {
             this.ffmpegInit();
         }
     };

@@ -38,56 +38,56 @@
 
     @Component
     export default class PlayerControls extends Vue {
-        private dragging: boolean = false;
-        private progress: number = 0;
-        private volume: number = Database.instance().getConfig('volume', 80);
+        protected dragging: boolean = false;
+        protected progress: number = 0;
+        protected volume: number = Database.instance().getConfig('volume', 80);
 
-        @Prop({type: Boolean, required: true}) private isPlaying!: boolean;
-        @Prop({type: Boolean, required: true}) private isMuted!: boolean;
-        @Prop({type: Boolean, required: true}) private volumeDisabled!: boolean;
-        @Prop({type: Number, required: true}) private duration!: number;
-        @Prop({type: Number, required: true}) private currentTime!: number;
+        @Prop({type: Boolean, required: true}) protected isPlaying!: boolean;
+        @Prop({type: Boolean, required: true}) protected isMuted!: boolean;
+        @Prop({type: Boolean, required: true}) protected volumeDisabled!: boolean;
+        @Prop({type: Number, required: true}) protected duration!: number;
+        @Prop({type: Number, required: true}) protected currentTime!: number;
 
         @Watch('currentTime')
-        private currentTimeChange(newVal: number, oldVal: number) {
+        protected currentTimeChange(newVal: number) {
             if (!this.dragging) {
                 this.progress = newVal;
             }
         }
 
         @Emit()
-        private play(): void {
+        protected play(): void {
         }
 
         @Emit()
-        private pause(): void {
+        protected pause(): void {
         }
 
         @Emit()
-        private mute(): void {
+        protected mute(): void {
         }
 
         @Emit()
-        private unmute(): void {
+        protected unmute(): void {
         }
 
         @Emit()
-        private fullScreen(): void {
+        protected fullScreen(): void {
         }
 
         @Emit()
-        private volumeChange(volume: number): number {
+        protected volumeChange(volume: number): number {
             Database.instance().setConfig('volume', volume);
             return volume;
         }
 
         @Emit()
-        private progressChange(newTime: number): number {
+        protected progressChange(newTime: number): number {
             Debug.info('progress change');
             return newTime;
         }
 
-        private timeFormat(seconds: any): string {
+        protected timeFormat(seconds: any): string {
             seconds = Math.round(seconds);
             let minutes: any = Math.floor(seconds / 60);
             let hours: any = Math.floor(minutes / 60);

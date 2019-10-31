@@ -1,6 +1,6 @@
 <template>
     <ul id="barrage-ul" style="overflow-y: auto;height: 600px;">
-        <li v-for="(barrage, index) in barrageList" class="barrage-item">
+        <li v-for="(barrage, index) in barrageList" class="barrage-item" :key="index">
             <span class="barrage-username">{{barrage.username}}：</span>
             <span>{{barrage.content}}</span>
         </li>
@@ -12,9 +12,9 @@
 
     @Component
     export default class Barrage extends Vue {
-        private barrageList: any[] = [];
+        protected barrageList: any[] = [];
 
-        private updated() {
+        protected updated() {
             this.$nextTick(() => {
                 const barrageUl: any = document.getElementById('barrage-ul');
                 barrageUl.scrollTop = barrageUl.scrollHeight;
