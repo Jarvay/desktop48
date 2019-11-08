@@ -46,7 +46,7 @@
                         <el-row v-for="index in Math.ceil(reviewList.length / Constants.LIST_COL)"
                                 :key="index" :gutter="10">
                             <el-col :span="Constants.LIST_SPAN_TOTAL / Constants.LIST_COL"
-                                    v-for="item in listAfterHanlder(index)"
+                                    v-for="item in listAfterHandler(index)"
                                     :key="item.liveId">
                                 <div @click="onReviewClick(item)">
                                     <live-item :item="item" slot="reference"></live-item>
@@ -58,7 +58,7 @@
             </el-tab-pane>
 
             <el-tab-pane v-for="(liveTab, index) in liveTabs" :label="liveTab.label"
-                        :key="index"
+                         :key="index"
                          :name="liveTab.name">
                 <review :index="index" :live-id="liveTab.liveId" :start-time="liveTab.startTime"
                         :live-title="liveTab.title"></review>
@@ -72,25 +72,19 @@
     import Apis from '@/assets/js/apis';
     import Tools from '@/assets/js/tools';
     import Database from '@/assets/js/database';
-    import Debug from '@/assets/js/debug';
     import Constants from '@/assets/js/constants';
-    import IList from '@/assets/js/i-list';
     import LiveItem from '@/components/LiveItem.vue';
     import Review from '@/components/Review.vue';
 
     @Component({
         components: {Review, LiveItem}
     })
-    export default class Reviews extends Vue implements IList {
-        public onItemClick(item: any) {
-            this.onReviewClick(item);
-        }
-
+    export default class Reviews extends Vue {
         //顶部tabs
         protected activeName: string = 'Home';
         protected liveTabs: any[] = [];
 
-        protected reviewList: any[] = [];
+        protected reviewList: any[][] = [];
         protected reviewNext: string = '0';
         protected loading: boolean = false;
         protected noMore: boolean = false;
@@ -113,14 +107,19 @@
             return this.loading || this.noMore;
         }
 
-        protected listAfterHanlder(index: number) {
-            return this.reviewList.filter((item: any,i: number) => {
-                return i <  index * Constants.LIST_COL && i >= (index - 1) * Constants.LIST_COL;
+        protected listAfterHandler(index: number) {
+            return this.reviewList.filter((item: any, i: number) => {
+                return i < index * Constants.LIST_COL && i >= (index - 1) * Constants.LIST_COL;
             });
         }
 
         public getReviewList() {
-            let params: any = {
+            let params: {
+                userId: string,
+                teamId: string,
+                groupId: string,
+                next: string
+            } = {
                 userId: '0',
                 teamId: '0',
                 groupId: '0',
@@ -131,7 +130,7 @@
                     params.userId = this.selectedUser[2];
                     break;
                 case Constants.REVIEW_SCREEN.TEAM:
-                    params.eamId = this.selectedTeam[1];
+                    params.teamId = this.selectedTeam[1];
                     break;
                 case Constants.REVIEW_SCREEN.GROUP:
                     params.groupId = this.selectedGroup[0];
@@ -154,7 +153,7 @@
                     this.noMore = true;
                 }
                 this.reviewNext = content.next;
-                content.liveList.forEach((item: any) => {
+                content.liveList.forEach((item: any, index: number) => {
                     item.cover = Tools.pictureUrls(item.coverPath);
                     item.userInfo.teamLogo = Tools.pictureUrls(item.userInfo.teamLogo);
                     item.isReview = true;
@@ -167,10 +166,10 @@
                         this.reviewList.push(item);
                     }
                 });
-                Debug.log('reviewList', this.reviewList);
+                console.log('reviewList', this.reviewList);
                 this.loading = false;
             }).catch((error: any) => {
-                Debug.info(error);
+                console.info(error);
                 this.loading = false;
             });
         }
@@ -200,7 +199,7 @@
                 name: item.liveId + '_' + Math.random().toString(36).substr(2),
                 startTime: parseInt(item.ctime)
             };
-            Debug.log(liveTab);
+            console.log(liveTab);
             this.liveTabs.push(liveTab);
             this.activeName = liveTab.name;
         }

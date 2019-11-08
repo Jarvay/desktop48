@@ -24,38 +24,40 @@
 <script lang="ts">
     import {Component, Vue} from 'vue-property-decorator';
     import Database from '@/assets/js/database';
-    import Debug from '@/assets/js/debug';
 
     @Component
     export default class HiddenMembers extends Vue {
-        //屏蔽成员
-        protected hiddenMembers: any[] = [];
         //所有成员
         protected members: any[] = Database.instance().getMemberOptions();
 
         protected selectedMember: any[] = [];
 
-        protected created() {
-            Database.instance().getHiddenMembers().forEach((memberId: number) => {
+        get hiddenMembers() {
+            const members: any[] = [];
+            this.$store.hiddenMemberIds.forEach((memberId: number) => {
                 if (memberId !== null) {
                     const member: any = Database.instance().member(memberId);
                     member.team.teamColor = member.team.teamColor === '' ? '#409eff' : `#${member.team.teamColor}`;
                     this.hiddenMembers.push(member);
                 }
             });
+            return members;
+        }
+
+        protected created() {
+
         }
 
         protected clear() {
-            Database.instance().clearHiddenMembers();
-            this.hiddenMembers = [];
+            this.$mutations.setHiddenMemberIds([]);
         }
 
         /**
          * 添加屏蔽成员
          */
         protected addHiddenMember() {
-            Debug.log('selected memberId', this.selectedMember[2]);
-            Debug.log('hidden memberIds', Database.instance().getHiddenMembers());
+            console.log('selected memberId', this.selectedMember[2]);
+            console.log('hidden memberIds', Database.instance().getHiddenMembers());
             if (typeof this.selectedMember[2] === 'undefined') {
                 this.$message({
                     message: '请选中需要屏蔽的成员',
@@ -63,9 +65,7 @@
                 });
                 return;
             }
-            const exists = Database.instance().getHiddenMembers().some((memberId: number) => {
-                return memberId === this.selectedMember[2];
-            });
+            const exists = this.hiddenMembers.some((memberId: number) => memberId === this.selectedMember[2]);
             if (exists) {
                 this.$message({
                     message: '请勿重复添加',
@@ -75,8 +75,9 @@
             }
             const member: any = Database.instance().member(this.selectedMember[2]);
             member.team.teamColor = member.team.teamColor === '' ? '#409eff' : `#${member.team.teamColor}`;
-            this.hiddenMembers.push(member);
-            Database.instance().addHiddenMember(this.selectedMember[2]);
+            const tempIds = Array.from(this.$store.hiddenMemberIds);
+            tempIds.push(member.userId);
+            this.$mutations.setHiddenMemberIds(tempIds);
         }
 
         /**
@@ -84,12 +85,9 @@
          * @param memberId
          */
         protected removeHiddenMember(memberId: number) {
-            this.hiddenMembers = this.hiddenMembers.filter((member: any) => {
-                return member.userId !== memberId;
-            });
-            Database.instance().removeHiddenMember(memberId.toString());
-            Debug.log('remove memberId', memberId);
-            Debug.log('hidden memberIds', Database.instance().getHiddenMembers());
+            this.$mutations.setHiddenMemberIds(this.hiddenMembers.filter((member: any) => member.userId !== memberId));
+            console.log('remove memberId', memberId);
+            console.log('hidden memberIds', Database.instance().getHiddenMembers());
         }
     }
 </script>

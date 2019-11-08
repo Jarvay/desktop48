@@ -1,7 +1,6 @@
 import Request from "./request";
 import Database from "./database";
 import ApiUrls from "./api-urls";
-import Debug from "./debug";
 
 export default class Apis {
 	public static instance() {
@@ -107,14 +106,14 @@ export default class Apis {
 		return Request.get(barrageUrl);
 	}
 
-	public request(url: string, data: any, headers: any) {
+	private request(url: string, data: any, headers: any) {
 		return new Promise((resolve, reject) => {
 			Request.post(url, data, headers)
 				.then(responseBody => {
-					Debug.log("url", url);
-					Debug.log("request headers", headers);
-					Debug.log("request body", data);
-					Debug.log("responseBody", responseBody);
+					console.log("url", url);
+					console.log("request headers", headers);
+					console.log("request body", data);
+					console.log("responseBody", responseBody);
 					if (responseBody.success) {
 						resolve(responseBody.content);
 					} else {
@@ -122,7 +121,7 @@ export default class Apis {
 					}
 				})
 				.catch(error => {
-					Debug.error(error);
+					console.error(error);
 					throw new Error(`request error ${error}`);
 				});
 		});

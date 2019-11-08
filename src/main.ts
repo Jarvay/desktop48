@@ -17,14 +17,41 @@ Vue.config.productionTip = false;
 
 const originalPush = VueRouter.prototype.push;
 VueRouter.prototype.push = function push(location: any) {
-    // @ts-ignore
-    return originalPush.call(this, location).catch((err: any) => err);
+    return originalPush.call<any, any, any>(this, location).catch((err: any) => err);
 };
 
 Vue.use(VueRouter);
-const router = new VueRouter({routes});
+const router: VueRouter = new VueRouter({routes});
+
+if (process.env.NODE_ENV === 'production') {
+    (<any>window).console = <Console>({
+        debug: (message ?: string, ...optionalParams: any[]) => {
+        },
+        error: (message?: any, ...optionalParams: any[]) => {
+        },
+        info: (message ?: any, ...optionalParams: any[]) => {
+        },
+        log: (message?: any, ...optionalParams: any[]) => {
+        },
+        warn: (message?: any, ...optionalParams: any[]) => {
+        }
+    });
+}
+
+import {store, mutations} from "@/assets/js/store";
+
+Vue.prototype.$store = store;
+Vue.prototype.$mutations = mutations;
+
+declare module 'vue/types/vue' {
+    interface Vue {
+        $store: any,
+        $mutations: any,
+        Constants: any
+    }
+}
 
 new Vue({
     render: (h) => h(App),
-    router
+    router,
 }).$mount('#app');

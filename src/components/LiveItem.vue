@@ -40,7 +40,7 @@
             title: string,
             liveMode: number,
             liveType: number,
-            cover: string,
+            cover: string[],
             date: string,
             userInfo: { nickname: string },
             member: {

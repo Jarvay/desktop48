@@ -12,11 +12,11 @@
 
 <script lang="ts">
     import {Component, Emit, Vue} from 'vue-property-decorator';
-    import Debug from '@/assets/js/debug';
     import Constants from '@/assets/js/constants';
     import Tools from '@/assets/js/tools';
     import fs from 'fs';
     import path from 'path';
+    import AdmZip from 'adm-zip';
 
     @Component
     export default class Initialize extends Vue {
@@ -37,10 +37,10 @@
             let url: string;
             switch (process.platform) {
                 default:
-                case "win32":
+                case 'win32':
                     url = Constants.FFMPEG_URL_WIN32;
                     break;
-                case "darwin":
+                case 'darwin':
                     url = Constants.FFMPEG_URL_MAC;
                     break;
             }
@@ -48,13 +48,13 @@
             fs.stat(Tools.ffplayPath(), (error: any) => {
                 if (error) {
                     this.isIniting = true;
-                    fs.stat(path.join(Tools.APP_DATA_PATH, "ffmpeg.zip"), (error) => {
+                    fs.stat(path.join(Tools.APP_DATA_PATH, 'ffmpeg.zip'), (error) => {
                         if (error) {
-                            this.initText = "正在下载所需文件";
+                            this.initText = '正在下载所需文件';
                             this.downloading = true;
                             Tools.download({
                                 url: url,
-                                filePath: path.join(Tools.APP_DATA_PATH, "ffmpeg.zip"),
+                                filePath: path.join(Tools.APP_DATA_PATH, 'ffmpeg.zip'),
                                 onError: () => {
                                     this.downloading = false;
                                 },
@@ -80,13 +80,12 @@
          * 解压
          */
         protected unzip() {
-            Debug.info('正在解压');
-            this.initText = "正在解压";
-            const AdmZip = require("adm-zip");
-            const zip = new AdmZip(path.join(Tools.APP_DATA_PATH, "ffmpeg.zip"));
-            const dir = zip.getEntries()[0].entryName;
+            console.info('正在解压');
+            this.initText = '正在解压';
+            const zip = new AdmZip(path.join(Tools.APP_DATA_PATH, 'ffmpeg.zip'));
+            const [parentEntry] = zip.getEntries();
             zip.extractAllTo(Tools.APP_DATA_PATH, true);
-            fs.renameSync(path.join(Tools.APP_DATA_PATH, dir), path.join(Tools.APP_DATA_PATH, "ffmpeg"));
+            fs.renameSync(path.join(Tools.APP_DATA_PATH, parentEntry.entryName), path.join(Tools.APP_DATA_PATH, 'ffmpeg'));
             this.onInitialized();
         }
 
