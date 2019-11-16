@@ -1,5 +1,5 @@
 <template>
-    <el-container v-loading="loading">
+    <el-container>
         <el-header class="header-box">
             <el-button type="primary" @click="refresh">刷新</el-button>
         </el-header>
@@ -10,14 +10,15 @@
             </el-card>
         </div>
 
-        <el-main style="overflow: auto;height: 800px;" v-infinite-scroll="getLiveList"
+        <el-main v-loading="loading" style="overflow: auto;height: 800px;"
+                 v-infinite-scroll="getLiveList"
                  :infinite-scroll-disabled="disabled" v-else>
-            <el-row v-for="index in Math.ceil(liveList.length / Constants.LIST_COL)"
+            <el-row v-for="(items, index) in listAfterHandle"
                     :key="index" :gutter="10">
                 <el-col :span="Constants.LIST_SPAN_TOTAL / Constants.LIST_COL"
-                        v-for="item in listAfterHanlder(index)"
+                        v-for="item in items"
                         :key="item.liveId">
-                    <div style="padding: 6px 0;">
+                    <div style="padding-top: 16px;">
                         <el-popover placement="top" trigger="hover" :ref="`popover-${item.liveId}`">
                             <p>{{item.title}}</p>
                             <div>
@@ -42,18 +43,17 @@
     import Apis from '@/assets/js/apis';
     import Database from '@/assets/js/database';
     import Tools from '@/assets/js/tools';
-    import Debug from '@/assets/js/debug';
-    import IList from '@/assets/js/i-list';
     import LiveItem from '@/components/LiveItem.vue';
     import RecordTask from '@/assets/js/record-task';
     import EventBus from '@/assets/js/event-bus';
     import Constants from '@/assets/js/constants';
     import ChildProcess from 'child_process';
+    import {store} from "@/assets/js/store";
 
     @Component({
         components: {LiveItem}
     })
-    export default class Lives extends Vue implements IList {
+    export default class Lives extends Vue {
         protected liveList: any[] = [];
         protected liveNext: string = '0';
         protected loading: boolean = false;
@@ -63,10 +63,17 @@
             return this.loading || this.noMore;
         }
 
-        protected listAfterHanlder(index: number) {
-            return this.liveList.filter((item: any,i: number) => {
-                return i <  index * Constants.LIST_COL && i >= (index - 1) * Constants.LIST_COL;
+        get listAfterHandle() {
+            const list = this.liveList.filter((item: any) => {
+                return !store.hiddenMemberIds.some((memberId: number) => item.userInfo.userId == memberId);
             });
+
+            const rowCount = Math.ceil(list.length / Constants.LIST_COL);
+            const data: any[] = [];
+            for (let i = 0; i < rowCount; i++) {
+                data[i] = list.slice(i * Constants.LIST_COL, (i + 1) * Constants.LIST_COL);
+            }
+            return data;
         }
 
         protected getLiveList() {
@@ -89,17 +96,12 @@
                     item.isReview = true;
                     item.member = Database.instance().member(item.userInfo.userId);
                     item.date = Tools.dateFormat(parseInt(item.ctime), 'yyyy-MM-dd hh:mm:ss');
-                    const hidden = Database.instance().getHiddenMembers().some((memberId: number) => {
-                        return memberId === item.userInfo.userId;
-                    });
-                    if (!hidden) {
-                        this.liveList.push(item);
-                    }
+                    this.liveList.push(item);
                 });
-                Debug.log('liveList', this.liveList);
+                console.log('liveList', this.liveList);
                 this.loading = false;
             }).catch((error: any) => {
-                Debug.info(error);
+                console.info(error);
                 this.loading = false;
             });
         }
@@ -113,9 +115,6 @@
             this.liveNext = '0';
             this.noMore = false;
             this.getLiveList();
-        }
-
-        public onItemClick(item: any): void | any {
         }
 
         /**
@@ -134,7 +133,7 @@
                     EventBus.post<RecordTask>(Constants.Event.RECORD_TASK, recordTask);
                 });
             }).catch(error => {
-                Debug.error(error);
+                console.error(error);
             });
         }
 
@@ -144,11 +143,11 @@
         protected play(item: any) {
             Apis.instance().live(item.liveId).then(content => {
                 const command = `"${Tools.ffplayPath()}" -window_title "${item.userInfo.nickname} ${item.title}" "${content.playStreamPath}"`;
-                Debug.log(command);
+                console.log(command);
                 ChildProcess.exec(command);
             }).catch((error: any) => {
                 this.$message.error(error);
-                Debug.error(error);
+                console.error(error);
             });
         }
     }

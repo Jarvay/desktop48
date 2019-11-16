@@ -2,7 +2,6 @@ import Database from '@/assets/js/database';
 import Constants from '@/assets/js/constants';
 import path from 'path';
 import Tools from '@/assets/js/tools';
-import Debug from '@/assets/js/debug';
 import ffmpeg from 'fluent-ffmpeg';
 import {remote} from 'electron';
 
@@ -74,11 +73,11 @@ export default class RecordTask {
             .on('start', () => {
                 this._status = Constants.RecordStatus.Recording;
                 startListener();
-                Debug.info('record task start');
+                console.info('record task start');
             })
             .on('progress', (progress: any) => {
-                Debug.info('ffmpeg progress event');
-                Debug.log(progress);
+                console.info('ffmpeg progress event');
+                console.log(progress);
                 this.setDuration(progress.timemark);
             })
             .on('end', () => {
@@ -103,7 +102,7 @@ export default class RecordTask {
             this._ffmpegCommand.ffmpegProc.stdin.write('q');
         } finally {
             this._status = Constants.RecordStatus.Finish;
-            Debug.info('record task stop');
+            console.info('record task stop');
         }
     }
 
@@ -118,6 +117,6 @@ export default class RecordTask {
         const minutes: number = parseFloat(timeArray[1]);
         const seconds: number = parseFloat(timeArray[2]);
         this._duration = hours * 60 * 60 + minutes * 60 + seconds;
-        Debug.log('duration', this._duration);
+        console.log('duration', this._duration);
     }
 }

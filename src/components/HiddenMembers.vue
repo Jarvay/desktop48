@@ -10,7 +10,8 @@
         <el-button style="margin-left: 8px;" type="danger" @click="clear">清空</el-button>
 
         <div style="margin-top: 8px;">
-            <el-tag :style="{color: 'white',borderColor:member.team.teamColor, marginRight: '8px'}" :name="member.userId" closable
+            <el-tag :style="{color: 'white',borderColor:member.team.teamColor, marginRight: '8px'}"
+                    :name="member.userId" closable
                     @close="removeHiddenMember(member.userId)"
                     :color="member.team.teamColor"
                     v-for="member in hiddenMembers"
@@ -24,38 +25,41 @@
 <script lang="ts">
     import {Component, Vue} from 'vue-property-decorator';
     import Database from '@/assets/js/database';
-    import Debug from '@/assets/js/debug';
+    import {mutations, store} from "@/assets/js/store";
 
     @Component
     export default class HiddenMembers extends Vue {
-        //屏蔽成员
-        protected hiddenMembers: any[] = [];
         //所有成员
         protected members: any[] = Database.instance().getMemberOptions();
 
         protected selectedMember: any[] = [];
 
-        protected created() {
-            Database.instance().getHiddenMembers().forEach((memberId: number) => {
-                if (memberId !== null) {
-                    const member: any = Database.instance().member(memberId);
-                    member.team.teamColor = member.team.teamColor === '' ? '#409eff' : `#${member.team.teamColor}`;
-                    this.hiddenMembers.push(member);
-                }
+        get hiddenMembers() {
+            let members: any[] = Database.instance().membersDB.filter((member: any) => {
+                return store.hiddenMemberIds.some((memberId: number) => memberId == member.userId);
+            }).sortBy((member: any) => store.hiddenMemberIds.findIndex((memberId: number) => memberId == member.userId)).value() || [];
+
+            members.forEach((member: any) => {
+                member.team = Database.instance().team(member.teamId);
+                member.team.teamColor = member.team.teamColor == '' ? '#409eff' : `#${member.team.teamColor}`;
             });
+            return members;
+        }
+
+        protected created() {
+
         }
 
         protected clear() {
-            Database.instance().clearHiddenMembers();
-            this.hiddenMembers = [];
+            mutations.setHiddenMemberIds([]);
         }
 
         /**
          * 添加屏蔽成员
          */
         protected addHiddenMember() {
-            Debug.log('selected memberId', this.selectedMember[2]);
-            Debug.log('hidden memberIds', Database.instance().getHiddenMembers());
+            console.log('selected memberId', this.selectedMember[2]);
+            console.log('hidden memberIds', Database.instance().getHiddenMembers());
             if (typeof this.selectedMember[2] === 'undefined') {
                 this.$message({
                     message: '请选中需要屏蔽的成员',
@@ -63,9 +67,8 @@
                 });
                 return;
             }
-            const exists = Database.instance().getHiddenMembers().some((memberId: number) => {
-                return memberId === this.selectedMember[2];
-            });
+            const exists = store.hiddenMemberIds.some((memberId: number) => memberId == this.selectedMember[2]);
+            console.log(exists);
             if (exists) {
                 this.$message({
                     message: '请勿重复添加',
@@ -74,9 +77,11 @@
                 return;
             }
             const member: any = Database.instance().member(this.selectedMember[2]);
-            member.team.teamColor = member.team.teamColor === '' ? '#409eff' : `#${member.team.teamColor}`;
-            this.hiddenMembers.push(member);
-            Database.instance().addHiddenMember(this.selectedMember[2]);
+            member.team.teamColor = member.team.teamColor == '' ? '#409eff' : `#${member.team.teamColor}`;
+            const tempIds = Array.from(store.hiddenMemberIds);
+            tempIds.push(member.userId);
+            mutations.setHiddenMemberIds(tempIds);
+            this.selectedMember = [];
         }
 
         /**
@@ -84,16 +89,21 @@
          * @param memberId
          */
         protected removeHiddenMember(memberId: number) {
-            this.hiddenMembers = this.hiddenMembers.filter((member: any) => {
-                return member.userId !== memberId;
-            });
-            Database.instance().removeHiddenMember(memberId.toString());
-            Debug.log('remove memberId', memberId);
-            Debug.log('hidden memberIds', Database.instance().getHiddenMembers());
+            mutations.setHiddenMemberIds(store.hiddenMemberIds.filter((item: number) => item != memberId));
+            console.log('remove memberId', memberId);
+            console.log('hidden memberIds', Database.instance().getHiddenMembers());
         }
     }
 </script>
 
-<style scoped lang="scss">
+<style lang="scss">
+    .el-icon-close:before {
+        color: #fff !important;
+    }
 
+    .el-tag {
+        .el-tag__close {
+            color: #fff !important;
+        }
+    }
 </style>

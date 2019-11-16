@@ -1,4 +1,3 @@
-import Debug from './debug';
 import path from 'path';
 import {remote} from 'electron';
 import fs from 'fs';
@@ -45,7 +44,7 @@ class Tools {
 
     public static lyricsParse(lyrics: string) {
         if (typeof lyrics === 'undefined'){
-            Debug.error('lyrics undefined');
+            console.error('lyrics undefined');
         }
         const barrages: any[] = [];
         const lines = lyrics.split('\n');
@@ -93,7 +92,7 @@ class Tools {
             res.on('end', () => {
                 fs.writeFile(filePath, fileData, 'binary', (error: any) => {
                     if (error) {
-                        Debug.log(error, '');
+                        console.log(error, '');
                         onError(error);
                     } else {
                         onFinish();
@@ -130,38 +129,34 @@ class Tools {
      * ffplay路径
      */
     public static ffplayPath(): string {
-        const ffmpegDir = path.join(this.APP_DATA_PATH, 'ffmpeg', 'bin');
-        let ffplayPath;
-
-        switch (process.platform) {
-            default:
-            case 'win32':
-                ffplayPath = path.join(ffmpegDir, 'ffplay.exe');
-                break;
-            case 'darwin':
-                ffplayPath = path.join(ffmpegDir, 'ffplay');
-                break;
-        }
-        return ffplayPath;
+        return this.ffmpegToolsPath('ffplay');
     }
 
     /**
      * ffmpeg路径
      */
     public static ffmpegPath(): string {
+        return this.ffmpegToolsPath('ffmpeg');
+    }
+
+    /**
+     * ffmpeg|ffplay路径
+     * @param executeFilename
+     */
+    private static ffmpegToolsPath(executeFilename: string): string {
         const ffmpegDir = path.join(this.APP_DATA_PATH, 'ffmpeg', 'bin');
-        let ffmpegPath;
+        let executeFilePath;
 
         switch (process.platform) {
             default:
             case 'win32':
-                ffmpegPath = path.join(ffmpegDir, 'ffmpeg.exe');
+                executeFilePath = path.join(ffmpegDir, `${executeFilename}.exe`);
                 break;
             case 'darwin':
-                ffmpegPath = path.join(ffmpegDir, 'ffmpeg');
+                executeFilePath = path.join(ffmpegDir, `${executeFilename}`);
                 break;
         }
-        return ffmpegPath;
+        return executeFilePath;
     }
 }
 

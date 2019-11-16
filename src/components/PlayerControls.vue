@@ -34,7 +34,6 @@
 <script lang="ts">
     import {Component, Emit, Prop, Vue, Watch} from 'vue-property-decorator';
     import Database from '@/assets/js/database';
-    import Debug from '@/assets/js/debug';
 
     @Component
     export default class PlayerControls extends Vue {
@@ -83,7 +82,7 @@
 
         @Emit()
         protected progressChange(newTime: number): number {
-            Debug.info('progress change');
+            console.info('progress change');
             return newTime;
         }
 

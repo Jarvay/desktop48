@@ -72,7 +72,6 @@
     import DownloadTask from '@/assets/js/download-task';
     import EventBus from '@/assets/js/event-bus';
     import Constants from '@/assets/js/constants';
-    import Debug from '@/assets/js/debug';
     import RecordTask from '@/assets/js/record-task';
 
     @Component
@@ -85,7 +84,7 @@
              * 绑定下载事件
              */
             EventBus.bind<DownloadTask>(Constants.Event.DOWNLOAD_TASK, (downloadTask: DownloadTask) => {
-                Debug.log(downloadTask);
+                console.log(downloadTask);
                 const exists = this.downloadTasks.some((item: DownloadTask) => {
                     return item.getLiveId() === downloadTask.getLiveId();
                 });
@@ -115,7 +114,7 @@
              * 绑定录制事件
              */
             EventBus.bind<RecordTask>(Constants.Event.RECORD_TASK, (recordTask: RecordTask) => {
-                Debug.log(recordTask);
+                console.log(recordTask);
                 const exists = this.recordTasks.some((item: RecordTask) => {
                     return item.getLiveId() === recordTask.getLiveId() && item.isRecording();
                 });
