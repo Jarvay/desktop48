@@ -42,7 +42,6 @@
     import Database from '@/assets/js/database';
     import Constants from '@/assets/js/constants';
     import Apis from '@/assets/js/apis';
-    import Debug from '@/assets/js/debug';
     import HiddenMembers from '@/components/HiddenMembers.vue';
     import {remote} from 'electron';
     import path from 'path';
@@ -64,7 +63,7 @@
                 });
                 this.isUpdating = false;
             }).catch((error: any) => {
-                Debug.error(error);
+                console.error(error);
                 this.isUpdating = false;
             });
         }

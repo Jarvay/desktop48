@@ -1,8 +1,8 @@
 import Constants from './constants';
 import data from './data';
-import Debug from '@/assets/js/debug';
 import low from 'lowdb';
 import LocalStorage from 'lowdb/adapters/LocalStorage';
+import {mutations, store} from "@/assets/js/store";
 
 export default class Database {
     /**
@@ -14,7 +14,7 @@ export default class Database {
 
     private static database: Database = new Database();
     public db: any;
-    public membersDB: any;
+    public  membersDB: any;
     public teamsDB: any;
     public groupsDB: any;
 
@@ -75,9 +75,6 @@ export default class Database {
         return result;
     }
 
-    /**
-     * 成员筛选
-     */
     public refreshOptions(): void {
         const memberOptions: any[] = [];
         const teamOptions: any[] = [];
@@ -123,7 +120,9 @@ export default class Database {
         this.db.set('groupOptions', groupOptions).write();
     }
 
-
+    /**
+     * 成员筛选
+     */
     public getMemberOptions(): any[] {
         return this.db.get('memberOptions').value();
     }
@@ -143,23 +142,6 @@ export default class Database {
     }
 
     /**
-     * 添加屏蔽成员
-     * @param memberId
-     */
-    public addHiddenMember(memberId: any) {
-        this.removeHiddenMember(memberId);
-        this.db.get('hiddenMembers').push(memberId).write();
-    }
-
-    /**
-     * 取消屏蔽成员
-     * @param memberId
-     */
-    public removeHiddenMember(memberId: any) {
-        this.db.get('hiddenMembers').pull(memberId).write();
-    }
-
-    /**
      * 获取屏蔽成员
      */
     public getHiddenMembers(): any[] {
@@ -167,10 +149,10 @@ export default class Database {
     }
 
     /**
-     * 清空屏蔽成员
+     * 设置屏蔽成员
      */
-    public clearHiddenMembers() {
-        this.db.get('hiddenMembers').remove().write();
+    public setHiddenMembers(members: number[] = []) {
+        this.db.set('hiddenMembers', members).write();
     }
 
     /**

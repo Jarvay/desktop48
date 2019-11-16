@@ -1,6 +1,5 @@
 import Constants from './constants';
 import Database from './database';
-import Debug from '@/assets/js/debug';
 import {remote} from 'electron';
 
 export default class Request {
@@ -10,10 +9,10 @@ export default class Request {
      * @param body
      * @param headers
      */
-    public static post(url: string, body: object, headers: any): Promise<any> {
+    public static post(url: string, body: object, headers: any = {}): Promise<any> {
         headers['User-Agent'] = Database.instance().getConfig('userAgent', Constants.DEFAULT_USER_AGENT);
         headers['Content-Type'] = 'application/json';
-        return new Promise((resolve, reject) => {
+        return new Promise<any>((resolve, reject) => {
             const request = remote.net.request({
                 url,
                 method: 'POST',
@@ -50,7 +49,7 @@ export default class Request {
      * @param url
      */
     public static get(url: string): Promise<any> {
-        Debug.log('get url', url);
+        console.log('get url', url);
         return new Promise((resolve, reject) => {
             const request = remote.net.request(url);
 

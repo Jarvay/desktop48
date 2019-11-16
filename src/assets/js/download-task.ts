@@ -1,4 +1,3 @@
-import Debug from '@/assets/js/debug';
 import Tools from '@/assets/js/tools';
 import path from 'path';
 import Constants from '@/assets/js/constants';
@@ -80,7 +79,7 @@ export default class DownloadTask {
             .on('start', () => {
                 this._status = Constants.DownloadStatus.Downloading;
                 startListener();
-                Debug.info('download task start');
+                console.info('download task start');
             })
             .on('progress', (progress: any) => {
                 let percent: number = parseFloat(progress.percent.toFixed(2));
@@ -88,7 +87,7 @@ export default class DownloadTask {
                     percent = 100;
                 }
                 this._onProgress(percent);
-                Debug.info('ffmpeg progress event', progress);
+                console.info('ffmpeg progress event', progress);
             })
             .on('end', () => {
                 this._status = Constants.DownloadStatus.Finish;
@@ -113,7 +112,7 @@ export default class DownloadTask {
             this._ffmpegCommand.ffmpegProc.stdin.write('q');
         } finally {
             this._status = Constants.DownloadStatus.Finish;
-            Debug.info('download task stop');
+            console.info('download task stop');
         }
     }
 

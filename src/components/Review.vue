@@ -57,7 +57,6 @@
     import {Component, Prop, Vue} from 'vue-property-decorator';
     import Apis from '@/assets/js/apis';
     import Tools from '@/assets/js/tools';
-    import Debug from '@/assets/js/debug';
     import VideoJsPlayer from '@/assets/js/video-js-player';
     import Constants from '@/assets/js/constants';
     import Database from '@/assets/js/database';
@@ -114,7 +113,7 @@
         protected destroyed() {
             if (this.player != null) {
                 this.player.destroy();
-                Debug.info('player destroyed');
+                console.info('player destroyed');
             }
         }
 
@@ -135,7 +134,7 @@
 
                 this.initPlayer();
             }).catch((error: any) => {
-                Debug.error(error);
+                console.error(error);
             });
         }
 
@@ -216,25 +215,25 @@
         protected play() {
             this.player.play();
             this.status = Constants.STATUS_PLAYING;
-            Debug.log('play');
+            console.log('play');
         }
 
         protected pause() {
             this.player.pause();
             this.status = Constants.STATUS_PREPARED;
-            Debug.log('pause');
+            console.log('pause');
         }
 
         protected mute() {
             this.player.mute();
             this.isMuted = true;
-            Debug.log('mute');
+            console.log('mute');
         }
 
         protected unmute() {
             this.player.volume(this.volume);
             this.isMuted = false;
-            Debug.log('unmute');
+            console.log('unmute');
         }
 
         protected progressChange(newTime: number) {
@@ -250,18 +249,18 @@
                 }
             });
             this.currentBarrage = this.barrageList.shift();
-            Debug.log('progressChange');
+            console.log('progressChange');
         }
 
         protected volumeChange(volume: number) {
             this.volume = volume;
-            Debug.log('volumeChange');
+            console.log('volumeChange');
             Database.instance().setConfig('volume', volume);
         }
 
         protected fullScreen() {
             this.player.fullScreen();
-            Debug.log('fullScreen');
+            console.log('fullScreen');
         }
 
         protected getBarrages() {
@@ -278,7 +277,7 @@
                     type: 'success'
                 });
             }).catch((error: any) => {
-                Debug.error(error);
+                console.error(error);
                 this.$message({
                     message: '弹幕加载失败',
                     type: 'error'
