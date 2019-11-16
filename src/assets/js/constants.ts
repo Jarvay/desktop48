@@ -87,7 +87,7 @@ export default class Constants {
      */
     public static readonly MAX_DOWNLOAD_TASK = 3;
 
-    public static readonly MIN_SHOWN_LIVE_COUNT = 20;
+    public static readonly MIN_SHOWN_LINE_COUNT = 3;
 
     /**
      * 未知成员

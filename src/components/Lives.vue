@@ -18,7 +18,7 @@
                 <el-col :span="Constants.LIST_SPAN_TOTAL / Constants.LIST_COL"
                         v-for="item in items"
                         :key="item.liveId">
-                    <div style="padding: 6px 0;">
+                    <div style="padding-top: 16px;">
                         <el-popover placement="top" trigger="hover" :ref="`popover-${item.liveId}`">
                             <p>{{item.title}}</p>
                             <div>
@@ -71,7 +71,7 @@
             const rowCount = Math.ceil(list.length / Constants.LIST_COL);
             const data: any[] = [];
             for (let i = 0; i < rowCount; i++) {
-                data[i] = list.slice(i * Constants.LIST_COL, (i + 1) * Constants.LIST_COL - 1);
+                data[i] = list.slice(i * Constants.LIST_COL, (i + 1) * Constants.LIST_COL);
             }
             return data;
         }

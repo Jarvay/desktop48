@@ -100,7 +100,7 @@
 
         @Watch('listAfterHandle')
         protected onListAfterHandleChange(newValue: any[]) {
-            if (newValue.length < Constants.MIN_SHOWN_LIVE_COUNT && newValue.length !== 0) {
+            if (newValue.length < Constants.MIN_SHOWN_LINE_COUNT && newValue.length !== 0) {
                 this.getReviewList();
             }
         }
@@ -117,7 +117,7 @@
             const rowCount = Math.ceil(list.length / Constants.LIST_COL);
             const data: any[] = [];
             for (let i = 0; i < rowCount; i++) {
-                data[i] = list.slice(i * Constants.LIST_COL, (i + 1) * Constants.LIST_COL - 1);
+                data[i] = list.slice(i * Constants.LIST_COL, (i + 1) * Constants.LIST_COL);
             }
             return data;
         }
