@@ -1,5 +1,5 @@
 <template>
-    <el-container v-loading="loading">
+    <el-container>
         <el-header class="header-box">
             <el-button type="primary" @click="refresh">刷新</el-button>
         </el-header>
@@ -10,12 +10,13 @@
             </el-card>
         </div>
 
-        <el-main style="overflow: auto;height: 800px;" v-infinite-scroll="getLiveList"
+        <el-main v-loading="loading" style="overflow: auto;height: 800px;"
+                 v-infinite-scroll="getLiveList"
                  :infinite-scroll-disabled="disabled" v-else>
-            <el-row v-for="index in Math.ceil(liveList.length / Constants.LIST_COL)"
+            <el-row v-for="(items, index) in listAfterHandle"
                     :key="index" :gutter="10">
                 <el-col :span="Constants.LIST_SPAN_TOTAL / Constants.LIST_COL"
-                        v-for="item in listAfterHandler(index)"
+                        v-for="item in items"
                         :key="item.liveId">
                     <div style="padding: 6px 0;">
                         <el-popover placement="top" trigger="hover" :ref="`popover-${item.liveId}`">
@@ -47,6 +48,7 @@
     import EventBus from '@/assets/js/event-bus';
     import Constants from '@/assets/js/constants';
     import ChildProcess from 'child_process';
+    import {store} from "@/assets/js/store";
 
     @Component({
         components: {LiveItem}
@@ -61,10 +63,17 @@
             return this.loading || this.noMore;
         }
 
-        protected listAfterHandler(index: number) {
-            return this.liveList.filter((item: any, i: number) => {
-                return i < index * Constants.LIST_COL && i >= (index - 1) * Constants.LIST_COL;
+        get listAfterHandle() {
+            const list = this.liveList.filter((item: any) => {
+                return !store.hiddenMemberIds.some((memberId: number) => item.userInfo.userId == memberId);
             });
+
+            const rowCount = Math.ceil(list.length / Constants.LIST_COL);
+            const data: any[] = [];
+            for (let i = 0; i < rowCount; i++) {
+                data[i] = list.slice(i * Constants.LIST_COL, (i + 1) * Constants.LIST_COL - 1);
+            }
+            return data;
         }
 
         protected getLiveList() {
@@ -87,12 +96,7 @@
                     item.isReview = true;
                     item.member = Database.instance().member(item.userInfo.userId);
                     item.date = Tools.dateFormat(parseInt(item.ctime), 'yyyy-MM-dd hh:mm:ss');
-                    const hidden = Database.instance().getHiddenMembers().some((memberId: number) => {
-                        return memberId === item.userInfo.userId;
-                    });
-                    if (!hidden) {
-                        this.liveList.push(item);
-                    }
+                    this.liveList.push(item);
                 });
                 console.log('liveList', this.liveList);
                 this.loading = false;

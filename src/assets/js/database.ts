@@ -14,7 +14,7 @@ export default class Database {
 
     private static database: Database = new Database();
     public db: any;
-    public membersDB: any;
+    public  membersDB: any;
     public teamsDB: any;
     public groupsDB: any;
 
@@ -116,11 +116,8 @@ export default class Database {
         });
 
         this.db.set('memberOptions', memberOptions).write();
-        mutations.setMemberOptions(memberOptions);
         this.db.set('teamOptions', teamOptions).write();
-        mutations.setTeamOptions(teamOptions);
         this.db.set('groupOptions', groupOptions).write();
-        mutations.setGroupOptions(groupOptions);
     }
 
     /**

@@ -38,19 +38,6 @@ if (process.env.NODE_ENV === 'production') {
     });
 }
 
-import {store, mutations} from "@/assets/js/store";
-
-Vue.prototype.$store = store;
-Vue.prototype.$mutations = mutations;
-
-declare module 'vue/types/vue' {
-    interface Vue {
-        $store: any,
-        $mutations: any,
-        Constants: any
-    }
-}
-
 new Vue({
     render: (h) => h(App),
     router,

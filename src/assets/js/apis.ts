@@ -1,6 +1,7 @@
 import Request from "./request";
 import Database from "./database";
 import ApiUrls from "./api-urls";
+import {mutations} from "@/assets/js/store";
 
 export default class Apis {
 	public static instance() {
@@ -27,6 +28,9 @@ export default class Apis {
 						.write();
 
 					Database.instance().refreshOptions();
+					mutations.setMemberOptions(Database.instance().getMemberOptions());
+					mutations.setTeamOptions(Database.instance().getTeamOptions());
+					mutations.setGroupOptions(Database.instance().getGroupOptions());
 					resolve(content);
 				})
 				.catch(error => {

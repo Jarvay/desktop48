@@ -10,7 +10,8 @@
         <el-button style="margin-left: 8px;" type="danger" @click="clear">清空</el-button>
 
         <div style="margin-top: 8px;">
-            <el-tag :style="{color: 'white',borderColor:member.team.teamColor, marginRight: '8px'}" :name="member.userId" closable
+            <el-tag :style="{color: 'white',borderColor:member.team.teamColor, marginRight: '8px'}"
+                    :name="member.userId" closable
                     @close="removeHiddenMember(member.userId)"
                     :color="member.team.teamColor"
                     v-for="member in hiddenMembers"
@@ -24,6 +25,7 @@
 <script lang="ts">
     import {Component, Vue} from 'vue-property-decorator';
     import Database from '@/assets/js/database';
+    import {mutations, store} from "@/assets/js/store";
 
     @Component
     export default class HiddenMembers extends Vue {
@@ -33,13 +35,13 @@
         protected selectedMember: any[] = [];
 
         get hiddenMembers() {
-            const members: any[] = [];
-            this.$store.hiddenMemberIds.forEach((memberId: number) => {
-                if (memberId !== null) {
-                    const member: any = Database.instance().member(memberId);
-                    member.team.teamColor = member.team.teamColor === '' ? '#409eff' : `#${member.team.teamColor}`;
-                    this.hiddenMembers.push(member);
-                }
+            let members: any[] = Database.instance().membersDB.filter((member: any) => {
+                return store.hiddenMemberIds.some((memberId: number) => memberId == member.userId);
+            }).sortBy((member: any) => store.hiddenMemberIds.findIndex((memberId: number) => memberId == member.userId)).value() || [];
+
+            members.forEach((member: any) => {
+                member.team = Database.instance().team(member.teamId);
+                member.team.teamColor = member.team.teamColor == '' ? '#409eff' : `#${member.team.teamColor}`;
             });
             return members;
         }
@@ -49,7 +51,7 @@
         }
 
         protected clear() {
-            this.$mutations.setHiddenMemberIds([]);
+            mutations.setHiddenMemberIds([]);
         }
 
         /**
@@ -65,7 +67,8 @@
                 });
                 return;
             }
-            const exists = this.hiddenMembers.some((memberId: number) => memberId === this.selectedMember[2]);
+            const exists = store.hiddenMemberIds.some((memberId: number) => memberId == this.selectedMember[2]);
+            console.log(exists);
             if (exists) {
                 this.$message({
                     message: '请勿重复添加',
@@ -74,10 +77,11 @@
                 return;
             }
             const member: any = Database.instance().member(this.selectedMember[2]);
-            member.team.teamColor = member.team.teamColor === '' ? '#409eff' : `#${member.team.teamColor}`;
-            const tempIds = Array.from(this.$store.hiddenMemberIds);
+            member.team.teamColor = member.team.teamColor == '' ? '#409eff' : `#${member.team.teamColor}`;
+            const tempIds = Array.from(store.hiddenMemberIds);
             tempIds.push(member.userId);
-            this.$mutations.setHiddenMemberIds(tempIds);
+            mutations.setHiddenMemberIds(tempIds);
+            this.selectedMember = [];
         }
 
         /**
@@ -85,13 +89,21 @@
          * @param memberId
          */
         protected removeHiddenMember(memberId: number) {
-            this.$mutations.setHiddenMemberIds(this.hiddenMembers.filter((member: any) => member.userId !== memberId));
+            mutations.setHiddenMemberIds(store.hiddenMemberIds.filter((item: number) => item != memberId));
             console.log('remove memberId', memberId);
             console.log('hidden memberIds', Database.instance().getHiddenMembers());
         }
     }
 </script>
 
-<style scoped lang="scss">
+<style lang="scss">
+    .el-icon-close:before {
+        color: #fff !important;
+    }
 
+    .el-tag {
+        .el-tag__close {
+            color: #fff !important;
+        }
+    }
 </style>
