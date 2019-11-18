@@ -1,6 +1,6 @@
 {
   "name": "desktop48",
-  "version": "2.1.4-beta",
+  "version": "2.1.5-beta",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
