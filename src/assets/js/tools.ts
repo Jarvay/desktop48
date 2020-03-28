@@ -2,6 +2,7 @@ import path from 'path';
 import {remote} from 'electron';
 import fs from 'fs';
 import https from 'https';
+import Database from '@/assets/js/database';
 
 const YI_ZHI_BO_HOST = 'alcdn.hls.xiaoka.tv';
 
@@ -140,23 +141,34 @@ class Tools {
     }
 
     /**
+     * 获取执行文件全称
+     * @param filename
+     */
+    public static ffmpegFullFilename(filename:string): string {
+        switch (process.platform) {
+            default:
+            case 'win32':
+                return `${filename}.exe`;
+            case 'darwin':
+                return filename;
+        }
+    }
+
+    public static setFfmpegExecutable() {
+        try {
+            fs.chmodSync(Tools.ffmpegPath(), '777');
+            fs.chmodSync(Tools.ffplayPath(), '777');
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    /**
      * ffmpeg|ffplay路径
      * @param executeFilename
      */
     private static ffmpegToolsPath(executeFilename: string): string {
-        const ffmpegDir = path.join(this.APP_DATA_PATH, 'ffmpeg', 'bin');
-        let executeFilePath;
-
-        switch (process.platform) {
-            default:
-            case 'win32':
-                executeFilePath = path.join(ffmpegDir, `${executeFilename}.exe`);
-                break;
-            case 'darwin':
-                executeFilePath = path.join(ffmpegDir, `${executeFilename}`);
-                break;
-        }
-        return executeFilePath;
+        return  path.join(Database.instance().getFfmpegDir(), this.ffmpegFullFilename(executeFilename));
     }
 }
 

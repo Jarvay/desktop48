@@ -1,3 +1,4 @@
+import fs from "fs";
 <template>
     <div>
         <el-divider content-position="left">更新成员信息</el-divider>
@@ -29,6 +30,19 @@
             </div>
         </el-card>
 
+        <el-divider content-position="left">ffmpeg目录</el-divider>
+
+        <el-card style="margin-top: 16px;" shadow="hover">
+            <div style="display: flex;flex-direction: row; width: 640px;">
+                <el-input type="text" v-model="ffmpegDirectory" placeholder="ffmpeg目录"
+                          @click="setFfmpegDirectory" readonly></el-input>
+
+                <el-button style="margin-left: 8px;" type="primary" @click="setFfmpegDirectory">选择</el-button>
+
+                <el-button style="margin-left: 8px;" type="success" @click="openFfmpegDirectory">打开目录</el-button>
+            </div>
+        </el-card>
+
         <el-divider content-position="left">屏蔽成员直播|回放</el-divider>
 
         <el-card style="margin-top: 16px;" shadow="hover">
@@ -45,6 +59,8 @@
     import HiddenMembers from '@/components/HiddenMembers.vue';
     import {remote} from 'electron';
     import path from 'path';
+    import Tools from '@/assets/js/tools';
+    import * as fs from 'fs';
 
     @Component({
         components: {HiddenMembers}
@@ -53,6 +69,7 @@
         protected userAgent: string = Database.instance().getConfig('userAgent', Constants.DEFAULT_USER_AGENT);
         protected isUpdating: boolean = false;
         protected downloadDirectory: string = Database.instance().getDownloadDir();
+        protected ffmpegDirectory: string = Database.instance().getFfmpegDir();
 
         protected updateInfo() {
             this.isUpdating = true;
@@ -88,6 +105,38 @@
 
         protected openDownloadDirectory() {
             remote.shell.showItemInFolder(path.join(Database.instance().getDownloadDir(), '48'));
+        }
+
+        protected setFfmpegDirectory() {
+            const dir = remote.dialog.showOpenDialogSync({
+                properties: ['openDirectory']
+            });
+            if (typeof dir !== 'undefined') {
+                const [ffmpegDir] = dir;
+                try {
+                    fs.statSync(path.join(ffmpegDir, Tools.ffmpegFullFilename('ffmpeg')));
+                    fs.statSync(path.join(ffmpegDir, Tools.ffmpegFullFilename('ffplay')));
+                    this.ffmpegDirectory = ffmpegDir;
+                    Database.instance().setFfmpegDir(ffmpegDir);
+                } catch (e) {
+                    this.confirmFfmpegDir();
+                }
+            }
+        }
+
+        protected confirmFfmpegDir() {
+            this.$confirm('选择的目录下没有ffmpeg或ffplay', {
+                confirmButtonText: '重新选择',
+                cancelButtonText: '就这样吧'
+            }).then(() => {
+                this.setFfmpegDirectory();
+            }).catch(() => {
+
+            });
+        }
+
+        protected openFfmpegDirectory() {
+            remote.shell.showItemInFolder(path.join(Database.instance().getFfmpegDir(), '48'));
         }
     }
 </script>

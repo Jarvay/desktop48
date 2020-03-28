@@ -1,13 +1,19 @@
+import {remote} from "electron";
 <template>
-    <el-container>
-        <el-main style="display: flex;flex-direction: column;align-items:center;justify-content:center;height: 600px;">
-            <div>
-                <i class="el-icon-loading"></i>
-                <span style="margin-left: 8px;">{{initText}}</span>
-            </div>
-            <el-progress v-if="downloading" style="margin-top: 16px;" type="circle" :percentage="percent"></el-progress>
-        </el-main>
-    </el-container>
+  <el-container>
+    <el-main
+            style="display: flex;flex-direction: column;align-items:center;justify-content:center;height: 600px;">
+      <div>
+        <i class="el-icon-loading"></i>
+        <span style="margin-left: 8px;">{{initText}}</span>
+      </div>
+      <el-progress v-if="downloading" style="margin-top: 16px;" type="circle"
+                   :percentage="percent"></el-progress>
+
+      <el-button style="margin-top: 32px;" @click="selectFfmpegDir" type="primary">跳过，手动选择ffmpeg目录
+      </el-button>
+    </el-main>
+  </el-container>
 </template>
 
 <script lang="ts">
@@ -17,6 +23,8 @@
     import fs from 'fs';
     import path from 'path';
     import AdmZip from 'adm-zip';
+    import Database from '@/assets/js/database';
+    import {remote} from 'electron';
 
     @Component
     export default class Initialize extends Vue {
@@ -80,23 +88,64 @@
          * 解压
          */
         protected unzip() {
-            console.info('正在解压');
             this.initText = '正在解压';
             const zip = new AdmZip(path.join(Tools.APP_DATA_PATH, 'ffmpeg.zip'));
             const [parentEntry] = zip.getEntries();
+            const originPath = path.join(Tools.APP_DATA_PATH, parentEntry.entryName);
+            fs.stat(originPath, err => {
+                if (!err) {
+                    fs.unlink(originPath, () => {
+                    });
+                }
+            });
             zip.extractAllTo(Tools.APP_DATA_PATH, true);
-            fs.renameSync(path.join(Tools.APP_DATA_PATH, parentEntry.entryName), path.join(Tools.APP_DATA_PATH, 'ffmpeg'));
+
+            const filePath = path.join(Tools.APP_DATA_PATH, 'ffmpeg');
+            fs.stat(filePath, err => {
+                if (!err) {
+                    fs.unlink(filePath, () => {
+                    });
+                }
+            });
+            fs.renameSync(originPath, filePath);
+            Database.instance().setFfmpegDir(path.join(filePath, 'bin'));
             this.onInitialized();
         }
 
-        protected ffmpegInit() {
-            fs.chmodSync(Tools.ffmpegPath(), '777');
-            fs.chmodSync(Tools.ffplayPath(), '777');
+        /**
+         * 选择ffmpeg目录
+         */
+        protected selectFfmpegDir() {
+            const dir = remote.dialog.showOpenDialogSync({
+                properties: ['openDirectory']
+            });
+            if (typeof dir !== 'undefined' && dir.length !== 0) {
+                const [ffmpegDir] = dir;
+                try {
+                    fs.statSync(path.join(ffmpegDir, Tools.ffmpegFullFilename('ffmpeg')));
+                    fs.statSync(path.join(ffmpegDir, Tools.ffmpegFullFilename('ffplay')));
+                    Database.instance().setFfmpegDir(ffmpegDir);
+                    this.onInitialized();
+                } catch (e) {
+                    this.confirmFfmpegDir();
+                }
+            }
+        }
+
+        protected confirmFfmpegDir() {
+            this.$confirm('选择的目录下没有ffmpeg或ffplay', {
+                confirmButtonText: '重新选择',
+                cancelButtonText: '就这样吧'
+            }).then(() => {
+               this.selectFfmpegDir();
+            }).catch(() => {
+                this.onInitialized();
+            });
         }
 
         @Emit()
         protected onInitialized() {
-            this.ffmpegInit();
+            Tools.setFfmpegExecutable();
         }
     };
 </script>

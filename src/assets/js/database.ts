@@ -182,6 +182,21 @@ export default class Database {
         this.setConfig('downloadDir', downloadDir);
     }
 
+    /**
+     * 设置ffmpeg目录
+     * @param ffmpegDir
+     */
+    public setFfmpegDir(ffmpegDir: string) {
+        this.setConfig('ffmpegDir', ffmpegDir);
+    }
+
+    /**
+     * 获取ffmpeg目录
+     */
+    public getFfmpegDir() {
+        return this.getConfig('ffmpegDir', '');
+    }
+
     public setConfig(key: string, value: any) {
         this.db.set(`config.${key}`, value).write();
     }
