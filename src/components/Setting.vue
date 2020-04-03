@@ -1,4 +1,3 @@
-import fs from "fs";
 <template>
     <div>
         <el-divider content-position="left">更新成员信息</el-divider>
@@ -60,7 +59,7 @@ import fs from "fs";
     import {remote} from 'electron';
     import path from 'path';
     import Tools from '@/assets/js/tools';
-    import * as fs from 'fs';
+    import fs from 'fs';
 
     @Component({
         components: {HiddenMembers}
