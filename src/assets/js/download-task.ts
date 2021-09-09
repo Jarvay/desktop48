@@ -72,6 +72,8 @@ export default class DownloadTask {
             .inputOptions([
                 '-protocol_whitelist',
                 'file,http,https,tcp,tls',
+                `-user_agent`,
+                ` ${Database.instance().get('userAgent', Constants.DEFAULT_USER_AGENT)}`
             ])
             .audioCodec('copy')
             .videoCodec('copy')
