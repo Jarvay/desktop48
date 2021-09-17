@@ -35,7 +35,7 @@ export default class Constants {
     /**
      * ffmpeg下载地址
      */
-    public static readonly FFMPEG_URL_WIN32 = 'https://ffmpeg.zeranoe.com/builds/win64/static/ffmpeg-latest-win64-static.zip';
+    public static readonly FFMPEG_URL_WIN32 = 'https://www.gyan.dev/ffmpeg/builds/packages/ffmpeg-4.4-essentials_build.zip';
     public static readonly FFMPEG_URL_MAC = 'https://ffmpeg.zeranoe.com/builds/macos64/static/ffmpeg-latest-macos64-static.zip';
 
     /**

@@ -16,8 +16,11 @@ export default class Request {
             const request = remote.net.request({
                 url,
                 method: 'POST',
-                headers,
             });
+
+            for (let key in headers) {
+                request.setHeader(key, headers[key]);
+            }
 
             let data = '';
             request.on('response', (response: any) => {

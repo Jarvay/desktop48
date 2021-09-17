@@ -33,15 +33,6 @@
 
                         <video class="video" :id="'flv-js-' + liveId" ref="video" v-show="flvJsShow"></video>
                     </div>
-
-                    <player-controls ref="controls" :is-muted="isMuted"
-                                     :is-playing="status === Constants.STATUS_PLAYING" :volume-disabled="isMuted"
-                                     @play="play" @pause="pause" @mute="mute" @unmute="unmute"
-                                     @progress-change="progressChange"
-                                     @volume-change="volumeChange"
-                                     @full-screen="fullScreen"
-                                     :current-time="currentTime"
-                                     :duration="duration"></player-controls>
                 </el-card>
 
                 <barrage-box :ref="'barrage-box-' + liveId" :number="number"
@@ -69,6 +60,7 @@
     import IPlayer from '@/assets/js/i-player';
     import FlvJs from 'flv.js';
     import FlvJsPlayer from '@/assets/js/flv-js-player';
+    import {ipcRenderer} from "electron";
 
     @Component({
         components: {BarrageBox, PlayerControls}
@@ -183,7 +175,6 @@
                     hasAudio: true,
                 });
                 flvPlayer.attachMediaElement(videoElement);
-                flvPlayer.volume = this.$refs.controls.volume * 0.01;
                 flvPlayer.load();
                 this.player = new FlvJsPlayer(flvPlayer);
 
@@ -198,14 +189,14 @@
         protected initVideoJs() {
             const videoJsPlayer = VideoJs('video-js-' + this.liveId, {
                 autoplay: false, // 自动播放
-                controls: false, // 是否显示控制栏
+                controls: true, // 是否显示控制栏
                 techOrder: ['html5'], // 兼容顺序
                 sourceOrder: true, //
                 sources: [{
                     src: this.playStreamPath
-                }]
+                }],
+              playbackRates: [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2.0, 2.5, 3.0, 3.5, 4, 4.5, 5]
             });
-            videoJsPlayer.volume(this.$refs.controls.volume * 0.01);
             this.player = new VideoJsPlayer(videoJsPlayer);
 
             this.flvJsShow = false;

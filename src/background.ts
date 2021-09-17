@@ -1,6 +1,6 @@
 'use strict';
 
-import {app, protocol, BrowserWindow, shell, Menu} from 'electron';
+import {app, protocol, BrowserWindow, shell, Menu, ipcMain} from 'electron';
 import {
     createProtocol,
     installVueDevtools,
@@ -40,7 +40,9 @@ function createWindow() {
         show: false,
         width: 1280, height: 720, webPreferences: {
             nodeIntegration: true,
+            enableRemoteModule: true,
         },
+        autoHideMenuBar: true,
     });
 
     if (process.env.WEBPACK_DEV_SERVER_URL) {

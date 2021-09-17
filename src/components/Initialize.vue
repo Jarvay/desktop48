@@ -63,8 +63,9 @@ import {remote} from "electron";
                             Tools.download({
                                 url: url,
                                 filePath: path.join(Tools.APP_DATA_PATH, 'ffmpeg.zip'),
-                                onError: () => {
+                                onError: (error) => {
                                     this.downloading = false;
+                                    console.error('error', error);
                                 },
                                 onFinish: () => {
                                     this.downloading = false;
