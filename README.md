@@ -1,5 +1,5 @@
 - Windows: [https://wwa.lanzoui.com/b00n47cgd](https://wwa.lanzoui.com/b00n47cgd)
-- Mac: [https://wwa.lanzoui.com/b00n47cgd](https://wwa.lanzoui.com/b00n47cgd)
+- Mac: [https://wwa.lanzoui.com/b00n47che](https://wwa.lanzoui.com/b00n47che)
 
 #### 手动配置ffmpeg:
 
