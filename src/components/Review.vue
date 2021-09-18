@@ -70,6 +70,7 @@
     import FlvJs from 'flv.js';
     import FlvJsPlayer from '@/assets/js/flv-js-player';
     import {ipcRenderer} from "electron";
+    import {cloneDeep} from "lodash";
 
     @Component({
         components: {BarrageBox, PlayerControls}
@@ -98,7 +99,6 @@
         protected barrageLoaded: boolean = false;
         protected finalBarrageList: any[] = [];
         protected barrageList: any[] = [];
-        protected currentBarrage: any = {};
         protected videoJsShow: boolean = true;
         protected flvJsShow: boolean = false;
         public $refs!: any;
@@ -163,9 +163,8 @@
             });
             //当前进度
             this.player.onTimeUpdate((currentTime: number) => {
-                this.currentTime = currentTime;
-
-                this.loadBarrages();
+                if (this.currentTime === currentTime) return;
+                this.onTimeUpdate(currentTime);
             });
         }
 
@@ -237,19 +236,31 @@
         }
 
         protected progressChange(newTime: number) {
-            this.currentTime = newTime;
             this.player.currentTime(newTime);
-
-            //重新加载弹幕
-            this.barrageBox.clear();
-            this.barrageList = [];
-            this.finalBarrageList.forEach(item => {
-                if (Tools.timeToSecond(item.time) - 2 > newTime) {
-                    this.barrageList.push(item);
-                }
-            });
-            this.currentBarrage = this.barrageList.shift();
+            this.onTimeUpdate(newTime);
             console.log('progressChange');
+        }
+
+        protected onTimeUpdate(newTime: number) {
+          if (newTime < this.currentTime) {
+            this.barrageList = cloneDeep(this.finalBarrageList);
+          }
+
+          this.currentTime = newTime;
+
+          //重新加载弹幕
+          for (let item of this.barrageList) {
+            if (Tools.timeToSecond(item.time) <= newTime - 1) {
+              this.barrageBox.shoot({
+                content: item.content,
+                username: item.username,
+                time: item.time,
+              });
+              this.barrageList.shift();
+            } else {
+              break;
+            }
+          }
         }
 
         protected volumeChange(volume: number) {
@@ -269,13 +280,8 @@
             }
             Apis.instance().barrage(this.barrageUrl).then((response: any) => {
                 this.barrageLoaded = true;
-                this.finalBarrageList = this.barrageList = Tools.lyricsParse(response);
-                this.currentBarrage = this.barrageList.shift();
-
-                this.$message({
-                    message: '弹幕已加载',
-                    type: 'success'
-                });
+                this.finalBarrageList = Tools.lyricsParse(response);
+                this.barrageList = cloneDeep(this.finalBarrageList);
             }).catch((error: any) => {
                 console.error(error);
                 this.$message({
@@ -283,21 +289,6 @@
                     type: 'error'
                 });
             });
-        }
-
-        protected loadBarrages() {
-            if (this.barrageList.length == 0) {
-                return;
-            }
-            const barrageTime: number = Tools.timeToSecond(this.currentBarrage.time);
-            if (barrageTime > this.currentTime - 1 && barrageTime < this.currentTime + 1) { //弹幕可误差1秒
-                this.barrageBox.shoot({
-                    content: this.currentBarrage.content,
-                    username: this.currentBarrage.username
-                });
-                this.currentBarrage = this.barrageList.shift();
-                this.loadBarrages();
-            }
         }
 
         protected download() {

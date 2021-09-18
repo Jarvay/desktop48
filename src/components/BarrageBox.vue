@@ -1,9 +1,9 @@
 <template>
     <el-card style="flex: 1 0 auto;margin-left: 16px;">
         <div slot="header">
-            <span>弹幕</span>
-            <span style="color: #ccc;" v-if="!barrageLoaded">未加载</span>
-            <span style="color: #19be6b;" v-else>已加载</span>
+            <el-tag :type="statusType">
+              {{statusText}}
+            </el-tag>
         </div>
         <div slot="extra">
             <span>观看人数：{{number}} </span>
@@ -32,6 +32,14 @@
         public $refs!: {
             barrage: HTMLFormElement
         };
+
+        get statusType() {
+          return this.barrageLoaded ? 'success' : 'info';
+        }
+
+        get statusText() {
+          return this.barrageLoaded ? '弹幕已加载' : '弹幕未加载';
+        }
 
         public clear() {
             this.$refs.barrage.clear();

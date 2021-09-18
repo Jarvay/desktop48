@@ -1,6 +1,8 @@
 import {remote} from 'electron';
 
 export default class Constants {
+    public static readonly MAX_BARRAGE_LENGTH = 50;
+
     /**
      * 初始化状态
      */

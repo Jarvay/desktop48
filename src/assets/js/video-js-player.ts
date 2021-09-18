@@ -42,7 +42,9 @@ export default class VideoJsPlayer implements IPlayer {
 
     public onTimeUpdate(callback: (currentTime: number) => void): void {
         this.player.on('timeupdate', (event: any) => {
-            callback(event.target.player.currentTime());
+            try {
+                callback(event.target.player.currentTime());
+            } catch (e) {}
         });
     }
 

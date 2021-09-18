@@ -1,6 +1,7 @@
 <template>
     <ul id="barrage-ul" style="overflow-y: auto;height: 600px;">
         <li v-for="(barrage, index) in barrageList" class="barrage-item" :key="index">
+            <span class="barrage-time">{{barrage.time}}</span>
             <span class="barrage-username">{{barrage.username}}：</span>
             <span>{{barrage.content}}</span>
         </li>
@@ -9,6 +10,7 @@
 
 <script lang="ts">
     import {Component, Vue} from 'vue-property-decorator';
+    import Constants from "@/assets/js/constants";
 
     @Component
     export default class Barrage extends Vue {
@@ -22,13 +24,14 @@
         }
 
         public shoot(barrage: any) {
-            if (this.barrageList.length >= 30) {
+            if (this.barrageList.length >= Constants.MAX_BARRAGE_LENGTH) {
                 this.barrageList.shift();
             }
             this.barrageList.push({
                 content: barrage.content,
                 username: barrage.username,
                 level: barrage.level,
+                time: barrage.time.replace(/\.[0-9]*/, ''),
             });
         }
 
@@ -48,6 +51,11 @@
 
         .barrage-username {
             color: #18c8cc;
+            margin-left: 16px;
         }
+
+      .barrage-time {
+        color: #bfbfbf;
+      }
     }
 </style>

@@ -21,6 +21,7 @@
     "element-ui": "^2.12.0",
     "fluent-ffmpeg": "^2.1.2",
     "flv.js": "^1.5.0",
+    "lodash": "^4.17.21",
     "lowdb": "^1.0.0",
     "video.js": "^7.15.4",
     "vue": "^2.6.10",

@@ -36,6 +36,7 @@
     import Downloads from '@/components/Downloads.vue';
     import Constants from '@/assets/js/constants';
     import EventBus from '@/assets/js/event-bus';
+    import Apis from "@/assets/js/apis";
 
     @Component({
         components: {
@@ -55,6 +56,8 @@
             EventBus.bind<string>(Constants.Event.CHANGE_SELECTED_MENU, (menu: string) => {
                 this.$refs.navMenu.activeIndex = menu;
             });
+
+            Apis.instance().syncInfo();
         }
     }
 </script>
