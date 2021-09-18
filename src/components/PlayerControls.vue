@@ -26,7 +26,7 @@
                            @change="volumeChange"></el-slider>
             </div>
 
-            <i style="margin-left: 8px;" class="button icon-fullscreen iconfont" @click="fullScreen"></i>
+            <i v-if="showFullScreen" style="margin-left: 8px;" class="button icon-fullscreen iconfont" @click="fullScreen"></i>
         </div>
     </div>
 </template>
@@ -46,6 +46,7 @@
         @Prop({type: Boolean, required: true}) protected volumeDisabled!: boolean;
         @Prop({type: Number, required: true}) protected duration!: number;
         @Prop({type: Number, required: true}) protected currentTime!: number;
+        @Prop({type: Boolean, required: false, default: false}) protected showFullScreen!: number;
 
         @Watch('currentTime')
         protected currentTimeChange(newVal: number) {

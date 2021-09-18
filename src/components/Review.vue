@@ -19,7 +19,7 @@
                     </p>
 
                     <div class="carousel-box" v-if="isRadio">
-                        <el-carousel style="top: 25%;" autoplay loop :interval="carouselTime">
+                        <el-carousel style="height: 100%;" autoplay loop :interval="carouselTime">
                             <el-carousel-item v-for="carousel in carousels" :key="carousel">
                                 <el-image class="picture" :src="carousel"/>
                             </el-carousel-item>
@@ -33,6 +33,15 @@
 
                         <video class="video" :id="'flv-js-' + liveId" ref="video" v-show="flvJsShow"></video>
                     </div>
+
+                    <player-controls v-if="isRadio" ref="controls" :is-muted="isMuted"
+                                     :is-playing="status === Constants.STATUS_PLAYING" :volume-disabled="isMuted"
+                                     @play="play" @pause="pause" @mute="mute" @unmute="unmute"
+                                     @progress-change="progressChange"
+                                     @volume-change="volumeChange"
+                                     @full-screen="fullScreen"
+                                     :current-time="currentTime"
+                                     :duration="duration"></player-controls>
                 </el-card>
 
                 <barrage-box :ref="'barrage-box-' + liveId" :number="number"
@@ -305,5 +314,14 @@
 </script>
 
 <style scoped lang="scss">
+/deep/.el-carousel__container {
+  height: 100%;
+}
 
+/deep/.el-carousel__item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
 </style>

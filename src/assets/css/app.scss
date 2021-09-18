@@ -94,7 +94,7 @@ $width: 400px;
 .carousel-box {
   position: relative;
   width: $width;
-  height: $height;
+  height: 550px;
 }
 
 .barrage-container {
@@ -108,6 +108,5 @@ $width: 400px;
 }
 
 .picture {
-  max-width: 400px;
-  max-height: $height;
+
 }
