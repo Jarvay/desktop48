@@ -1,5 +1,7 @@
 'use strict';
 
+require('update-electron-app')();
+
 import {app, protocol, BrowserWindow, shell, Menu, ipcMain} from 'electron';
 import {
     createProtocol,

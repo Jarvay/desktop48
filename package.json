@@ -1,7 +1,8 @@
 {
   "name": "desktop48",
-  "version": "2.2.1",
+  "version": "2.2.2",
   "private": true,
+  "repository": "https://github.com/Jarvay/desktop48",
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
@@ -23,6 +24,7 @@
     "flv.js": "^1.5.0",
     "lodash": "^4.17.21",
     "lowdb": "^1.0.0",
+    "update-electron-app": "^2.0.1",
     "video.js": "^7.15.4",
     "vue": "^2.6.10",
     "vue-class-component": "^7.0.2",
