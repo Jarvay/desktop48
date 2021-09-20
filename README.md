@@ -1,29 +1,10 @@
-# desktop48-element-ui
+- Windows: [https://wwa.lanzoui.com/b00n47cgd](https://wwa.lanzoui.com/b00n47cgd)
+- Mac: [https://wwa.lanzoui.com/b00n47che](https://wwa.lanzoui.com/b00n47che)
 
-## Project setup
-```
-npm install
-```
+#### 手动配置ffmpeg:
 
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
+1.下载ffmpeg压缩包
 
-### Compiles and minifies for production
-```
-npm run build
-```
+2.解压到你喜欢的位置
 
-### Run your tests
-```
-npm run test
-```
-
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+3.手动配置ffmpeg文件夹选择"解压后的文件夹/bin"
