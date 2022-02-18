@@ -8,3 +8,5 @@
 2.解压到你喜欢的位置
 
 3.手动配置ffmpeg文件夹选择"解压后的文件夹/bin"
+
+## [批量下载器](https://github.com/Jarvay/Pocket48-Review-Downloader)
