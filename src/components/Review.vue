@@ -69,8 +69,20 @@
     import IPlayer from '@/assets/js/i-player';
     import FlvJs from 'flv.js';
     import FlvJsPlayer from '@/assets/js/flv-js-player';
-    import {ipcRenderer} from "electron";
     import {cloneDeep} from "lodash";
+
+    VideoJs.Vhs.xhr.beforeRequest = function (options: any) {
+      let headers = options.headers || {};
+      headers["headers1"] = "headers1";
+      headers["headers2"] = "headers2";
+      headers["token"] = "J2LqH1mnoXE0ZL5typ3VT3n4fe7RFYAO";
+
+      options.headers = headers;
+
+      console.log("options", options);
+
+      return options;
+    };
 
     @Component({
         components: {BarrageBox, PlayerControls}
@@ -305,11 +317,11 @@
 </script>
 
 <style scoped lang="scss">
-/deep/.el-carousel__container {
+::v-deep.el-carousel__container {
   height: 100%;
 }
 
-/deep/.el-carousel__item {
+::v-deep.el-carousel__item {
   display: flex;
   flex-direction: column;
   align-items: center;

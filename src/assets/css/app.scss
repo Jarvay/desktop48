@@ -1,4 +1,4 @@
-html,body,#app,.el-container{
+html, body, #app, .el-container {
   padding: 0;
   margin: 0;
   height: 100%;
@@ -81,13 +81,12 @@ html,body,#app,.el-container{
   display: flex;
 }
 
-$height: 640px;
+$height: calc(100vh - 310px);
 $width: 400px;
 
 .video {
   display: flex;
   justify-content: center;
-  width: $width;
   height: $height;
 }
 
@@ -105,9 +104,12 @@ $width: 400px;
   .barrage-box {
     flex: 1 0 auto;
     padding-left: 0;
+    margin: 0;
+    height: $height;
   }
 }
 
-.picture {
-
+.reviews-main {
+  height: calc(100vh - 170px);
+  overflow-y: auto;
 }

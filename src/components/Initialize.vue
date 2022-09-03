@@ -10,7 +10,7 @@ import {remote} from "electron";
       <el-progress v-if="downloading" style="margin-top: 16px;" type="circle"
                    :percentage="percent"></el-progress>
 
-      <el-button style="margin-top: 32px;" @click="selectFfmpegDir" type="primary">跳过，手动选择ffmpeg目录
+      <el-button v-if="!ffmpegConfigured" style="margin-top: 32px;" @click="selectFfmpegDir" type="primary">跳过，手动选择ffmpeg目录
       </el-button>
     </el-main>
   </el-container>
@@ -25,6 +25,7 @@ import {remote} from "electron";
     import AdmZip from 'adm-zip';
     import Database from '@/assets/js/database';
     import {remote} from 'electron';
+    import Apis from '@/assets/js/apis';
 
     @Component
     export default class Initialize extends Vue {
@@ -33,6 +34,7 @@ import {remote} from "electron";
         protected isIniting: boolean = false;
         protected percent: number = 0;
         protected downloading = false;
+        protected ffmpegConfigured = false;
 
         protected created() {
             this.init();
@@ -80,7 +82,7 @@ import {remote} from "electron";
                         }
                     });
                 } else {
-                    this.onInitialized();
+                    this.syncInfo();
                 }
             });
         }
@@ -110,7 +112,7 @@ import {remote} from "electron";
             });
             fs.renameSync(originPath, filePath);
             Database.instance().setFfmpegDir(path.join(filePath, 'bin'));
-            this.onInitialized();
+            this.syncInfo();
         }
 
         /**
@@ -126,7 +128,7 @@ import {remote} from "electron";
                     fs.statSync(path.join(ffmpegDir, Tools.ffmpegFullFilename('ffmpeg')));
                     fs.statSync(path.join(ffmpegDir, Tools.ffmpegFullFilename('ffplay')));
                     Database.instance().setFfmpegDir(ffmpegDir);
-                    this.onInitialized();
+                    this.syncInfo();
                 } catch (e) {
                     this.confirmFfmpegDir();
                 }
@@ -140,8 +142,15 @@ import {remote} from "electron";
             }).then(() => {
                this.selectFfmpegDir();
             }).catch(() => {
-                this.onInitialized();
+                this.syncInfo();
             });
+        }
+
+        protected async syncInfo() {
+          this.ffmpegConfigured = true;
+          this.initText = '正在更新成员信息';
+          await Apis.instance().syncInfo();
+          this.onInitialized();
         }
 
         @Emit()

@@ -41,7 +41,7 @@
                         </el-button>
                     </el-header>
 
-                    <el-main v-loading="loading" style="overflow: auto;height: 780px;"
+                    <el-main class="reviews-main" v-loading="loading"
                              v-infinite-scroll="getReviewList"
                              :infinite-scroll-disabled="disabled">
                         <el-row v-for="(items, index) in listAfterHandle"

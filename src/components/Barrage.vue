@@ -1,5 +1,5 @@
 <template>
-    <ul id="barrage-ul" style="overflow-y: auto;height: 600px;">
+    <ul id="barrage-ul" style="overflow-y: auto;">
         <li v-for="(barrage, index) in barrageList" class="barrage-item" :key="index">
             <span class="barrage-time">{{barrage.time}}</span>
             <span class="barrage-username">{{barrage.username}}：</span>

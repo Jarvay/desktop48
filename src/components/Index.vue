@@ -56,8 +56,6 @@
             EventBus.bind<string>(Constants.Event.CHANGE_SELECTED_MENU, (menu: string) => {
                 this.$refs.navMenu.activeIndex = menu;
             });
-
-            Apis.instance().syncInfo();
         }
     }
 </script>

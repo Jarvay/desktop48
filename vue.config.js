@@ -1,12 +1,9 @@
+const webpack = require('webpack');
+
 module.exports = {
     pluginOptions: {
         electronBuilder: {
-            chainWebpackRendererProcess: config => {
-                config.plugin('define').tap(args => {
-                    args[0]['process.env.FLUENTFFMPEG_COV'] = false;
-                    return args;
-                });
-            },
+            nodeIntegration: true,
             builderOptions: {
                 'productName': 'Desktop48',
                 'appId': 'cn.jarvay.desktop48',
@@ -43,5 +40,12 @@ module.exports = {
                 }
             },
         }
+    },
+    configureWebpack: {
+        plugins: [
+            new webpack.DefinePlugin({
+                'process.env.FLUENTFFMPEG_COV': false
+            })
+        ]
     }
 };
